@@ -1,0 +1,95 @@
+@import '../../../../styles/index.scss';
+
+.title
+{
+    @extend %font;
+    margin: 0;
+    font-size: 1.75em;
+
+}
+
+.table
+{
+    border-color: $primary_color;
+
+    td
+    {
+        position: relative;
+
+        &[type="simple"]
+        {
+            &:hover
+            {
+                cursor: pointer;
+            }
+        }
+
+        button
+        {
+            @extend %button;
+            @extend %border;
+        }
+    }
+}
+
+.modal
+{   
+    display: grid;
+    column-gap: 10px;
+    row-gap: 15px;
+
+    .variable
+    {   
+        margin: 0;
+        width: fit-content;
+
+        &:hover
+        {
+            cursor: pointer;
+        }
+    }
+
+    .object
+    {
+        display: grid;
+        grid-template-columns: fit-content(0) auto;
+        column-gap: 5px;
+        row-gap: 2.5px;
+    }
+
+    .massive
+    {
+        display: grid;
+        // grid-template-columns: repeat(2, 1fr);
+        // grid-auto-columns: auto;
+        row-gap: 3px;
+        overflow: auto;
+
+        .separator
+        {
+            @extend %border;
+            background-color: $primary_color;
+            border-width: 1px;
+            border-radius: 25px;
+        }
+
+        button
+        {
+            @extend %border;
+            @extend %button;
+            @extend %font;
+            font-size: .8em;
+        }
+    }
+    
+    .text
+    {
+        grid-column: 1;
+        font-weight: bold;
+    }
+
+    .content
+    {
+        grid-column: 2;
+    }
+}

@@ -1,0 +1,101 @@
+@import '../../../styles/index.scss';
+
+
+.modal_overlay
+{
+    z-index: 1001;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba($color: #000000, $alpha: 0.9);
+    //
+    opacity: 0;
+    animation: show 1s 1;
+    animation-fill-mode: forwards;
+    animation-delay: .15s;
+
+    .modal
+    {
+        @extend %border;
+        //
+        display: grid;
+        row-gap: 10px;
+        //
+        position: absolute;
+        left: 50%;
+        right: 50%;
+        padding: 10px;
+        width: 600px;
+        max-width: 100%;
+        transform: translate(-50%, -50%);
+        border-radius: 10px;
+        background-color: $sub_color;
+        //
+        top: 25%;
+        animation: show_modal 1s 1;
+        animation-fill-mode: forwards;
+        animation-delay: .25s;
+
+        .title
+        {
+            margin: 0;
+        }
+
+        .content
+        {
+            overflow: auto;
+            max-height: 550px;
+
+            .input
+            {
+                width: 100%;
+            }
+        }
+
+        .separator
+        {
+            @extend %border;
+            border-width: 2px;
+        }
+
+        .buttons
+        {
+            display: grid;
+            grid-template-rows: auto;
+            grid-template-columns: fit-content(0);
+            column-gap: 10px;
+
+            button
+            {
+                @extend %button;
+                @extend %font;
+                grid-row: 1;
+                font-size: 1em;
+                width: fit-content;
+            }
+        }
+    }
+}
+//
+@keyframes show {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes show_modal {
+
+    0% {
+        top: 25%;
+    }
+
+    100% {
+        top: 50%;
+    }
+}

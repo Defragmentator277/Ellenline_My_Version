@@ -1,0 +1,17 @@
+@import '../../../styles/index.scss';
+
+.input{
+    @extend %border;
+    @extend %font;
+    background-color: $primary_color;
+    border-radius: 10px;
+    font-size: 1.25em;
+    color: $sub_color;
+    text-align: center;
+} 
+
+.input::placeholder{
+
+    color: #FFDD00;
+    text-align: center;
+}

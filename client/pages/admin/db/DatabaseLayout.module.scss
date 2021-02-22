@@ -1,0 +1,24 @@
+@import '../../../styles/index.scss';
+
+.main
+{
+    display: grid;
+    height: 100%;
+    grid-template-columns: fit-content(0px) auto;
+    grid-template-rows: 1fr;
+    column-gap: 5px;
+
+    .aside
+    {
+        grid-column: 1;
+        width: fit-content;
+    }
+
+    .article
+    {
+        @extend %border;
+        grid-column: 2;
+        padding: 5px;
+        overflow-x: auto;
+    }
+}

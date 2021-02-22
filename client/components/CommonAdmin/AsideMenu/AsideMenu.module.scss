@@ -1,0 +1,61 @@
+@import '../../../styles/index.scss';
+
+
+.menu
+{
+    @extend %border;
+    @extend %font;
+    // position: absolute;
+    // top: 5px;   
+    // bottom: 5px;
+    padding: 5px 10px;
+
+    p
+    {
+        margin: 0;
+    }
+
+    .item
+    {
+        position: relative;
+
+        &:hover
+        {
+            cursor: pointer;
+
+            .submenu
+            {
+                display: block;
+            }
+        }
+
+        .submenu
+        {
+            @extend %border;
+            z-index: 10;
+            display: none;
+            position: absolute;
+            left: 100%;
+            top: -100%;
+            margin-left: 10.5px;  
+            padding: 5px;
+            border-width: 2px;
+            background-color: $sub_color;
+
+            a
+            {
+                display: block;
+            }
+        }
+
+        .submenu::before
+        {
+            @include triangle(right, 15px);
+            content: ' ';
+            position: absolute;
+            left: -30px;
+            top: 50%;
+            transform: translateY(-50%);   
+        }
+    }
+}

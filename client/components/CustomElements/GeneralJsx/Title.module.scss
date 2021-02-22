@@ -1,0 +1,8 @@
+@import '../../../styles/index.scss';
+
+.title
+{
+    @extend %font;
+    font-size: 1.5em;
+    margin: 0;
+}

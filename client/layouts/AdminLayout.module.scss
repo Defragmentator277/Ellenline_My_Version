@@ -1,0 +1,11 @@
+@import '../styles/index.scss';
+
+.main
+{
+    @extend %border;
+    position: relative;
+    margin: 5px;
+    margin-top: -5px;
+    padding: 5px;
+    height: 90vh;
+}

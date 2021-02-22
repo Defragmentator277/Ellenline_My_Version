@@ -1,0 +1,30 @@
+@import '../../../styles/index.scss';
+
+.overlay
+{
+    z-index: 1049;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+.menu
+{
+    z-index: 1050;
+    display: grid;
+    grid-auto-rows: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: $sub_color;
+
+    .button
+    {
+        @extend %button;
+        padding: 2.5px 5px;
+        border-bottom-left-radius: 0;
+        border-bottom-right-radius: 0;
+        text-align: left;
+    }
+}

@@ -1,0 +1,21 @@
+@import '../../../styles/index.scss';
+
+.header
+{
+    @extend %font;
+    display: flex;
+    font-size: 1.25em;
+
+    .item
+    {
+        @extend %border;
+        @extend %button;
+        border-top-left-radius: 10px;
+        border-top-right-radius: 10px;
+        display: block;
+        font-size: 1.5em;
+        border-width: 3px;
+        margin: 0 10px;
+        padding: 5px 10px;
+    }
+}
