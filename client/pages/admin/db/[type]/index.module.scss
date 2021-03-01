@@ -16,12 +16,13 @@
     {
         position: relative;
 
-        &[type="simple"]
+        & > p:not([path="_id"])
         {
             &:hover
             {
                 cursor: pointer;
             }
+
         }
 
         button
@@ -41,6 +42,7 @@
     .variable
     {   
         margin: 0;
+        word-break: break-all;
         width: fit-content;
 
         &:hover
@@ -62,8 +64,31 @@
         display: grid;
         // grid-template-columns: repeat(2, 1fr);
         // grid-auto-columns: auto;
-        row-gap: 3px;
+        row-gap: 10px;
         overflow: auto;
+
+        .item
+        {
+            @extend %border;
+            display: grid;
+            grid-auto-rows: auto;
+            row-gap: 2.5px;
+            //
+            border-left: none;
+            border-right: none;
+            padding: 5px 5px;
+
+            &:hover
+            {
+                cursor: pointer;
+            }
+
+            button
+            {
+                width: fit-content;
+                padding: 2.5px 5px;
+            }
+        }
 
         .separator
         {

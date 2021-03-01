@@ -8,6 +8,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "mongodb": "^3.6.4",
     "next": "^10.0.5",
     "next-connect": "^0.10.0",

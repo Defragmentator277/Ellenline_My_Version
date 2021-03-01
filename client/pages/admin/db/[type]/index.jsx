@@ -11,6 +11,9 @@ import classes from './index.module.scss';
 const Type = (props) => {
     const type = props.type;
     const collection = props.collection;
+    const keys = Local.GetFields(type);
+    const isDifficult = keys.some((element) => { return element.type == 'object' });
+    //
     //
     const [contentModal, setContentModal] = useState();
     const [contentContext, setContentContext] = useState();
@@ -21,271 +24,350 @@ const Type = (props) => {
     }
 
     function GenerateTable() {
+        const elements = [];
+        //Из ключей создается массив колоннок
+        const columns = keys.map((element) => {
+            if(element.title && (element.type == 'object' || element.type == 'massive'))
+                return element.title;
+            else
+                return element.prop;
+        });
+        //По клику на клетку запоминает последний айди
+        let last_id;
 
-        function Convertation(type_convert) {
-            const elements = [];
-            const columns = Local.GetColumns(type);
-
-            //В этой функции происходит основное взаимодествие с БД
-            function OnClickCell(e) {
-                e.preventDefault();
-                const cell = e.currentTarget;
-                const row = cell.parentNode;
-                if(cell.getAttribute('type') != 'simple')
-                    return;
-                const column = columns[[...row.childNodes].indexOf(cell)];
-                if(column == '_id' || column == 'id')
-                    return;
-                //header тоже считается поэтому на одни элемент меньше
-                const row_index = [...row.parentNode.childNodes].indexOf(row) - 1;
-                const object = collection[row_index];
-                const id = object._id;
-                //Buttons
-                //Кнопка изменить
-                const ChangeButton =
+        //В этой функции происходит основное взаимодествие с БД
+        function OnClickCell(e) {
+            e.preventDefault();
+            const cell = e.currentTarget;
+            //header тоже считается поэтому на одни элемент меньше
+            const column = cell.getAttribute('column');
+            //В случаи если колонна id
+            if(column == '_id' || column == 'id')
+                return;
+            const id = cell.parentNode.getAttribute('_id');
+            const object = collection.find((element) => element._id == id);
+            const type_of = typeof object[column];
+            //В случаи если объект являеться сложным запоминает айди, но не открывает контекстное меню
+            if(type_of == 'object')
+            {
+                last_id = id;
+                return;
+            }
+            //Buttons
+            //Кнопка изменить
+            const ChangeButton =
+            {
+                title: 'Изменить',
+                OnClick: (event) => 
                 {
-                    title: 'Изменить',
-                    OnClick: (event) => 
-                    {
-                        //Открытие модульного окна для изменения параметра
-                        setContentModal(
-                        { 
-                            title: 'Изменить ' + column, 
-                            fields: [ { type: (typeof object[column]) } ],
-                            //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
-                            onChainge: (e, value) => 
-                            {
-                                cell.innerHTML = value;
-                                fetch(`${Global.url}/api/db/${type}/update?id=${id}&prop=${JSON.stringify({[column]: value})}`);   
-                            }
-                        });
-                    }
-                }
-                //Кнопка Добавить
-                const AddButton =
-                {
-                    title: 'Добавить',
-                    OnClick: (event) => 
-                    {
-                        const fields = [];
-                        Object.keys(object).forEach((element) => 
-                        { 
-                            // console.log(element);
-                            if(element != '_id' && element != 'id')
-                            {
-                                const prop = object[element];
-                                fields.push(
-                                { 
-                                    type: typeof prop, 
-                                    prop: element
-                                });
-                            }
-                        });
-                        //
-                        setContentModal(
+                    //Открытие модульного окна для изменения параметра
+                    setContentModal(
+                    { 
+                        title: 'Изменить', 
+                        fields: [ { type: type_of, prop: column } ],
+                        //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
+                        onChainge: (e, value) =>
                         {
-                            title: 'Добавить',
-                            fields: fields,
-                            onChainge: (e, value) => 
-                            {
-                                console.log("ON CHAINGE");
-                                if(Object.keys(object).every((element) => {
-                                    return !(element != '_id' && element != 'id' 
-                                    && !value[element]);
-                                }))
-                                {
-                                    //All properties
-                                    fetch(`${Global.url}/api/db/${type}/insert?object=${JSON.stringify(value)}`);
-                                    location.reload();
-                                }
-                                else
-                                {
-                                    //Not all properties!
-                                    alert('Не все нужные поля были заполнены!');
-                                }
-                            }
-                        });
-                    }
-                } 
-                //Кнопка удалить
-                const DeleteButton = 
-                {
-                    title: 'Удалить',
-                    OnClick: (event) => 
-                    {
-                        fetch(`${Global.url}/api/db/${type}/delete?id=${id}`);
-                        location.reload();
-                    }
-                }
-                //Создание content для контекстного меню
-                //
-                setContentContext(
-                { 
-                    content: [ ChangeButton, AddButton, DeleteButton ],
-                    points: 
-                    {
-                        left: e.clientX,
-                        top: e.clientY
-                    }
-                });
-            }
-            //Создание столбцов заголовков
-            function CreateHeader() {
-                const header = [];
-                columns.forEach((element) => {
-                    header.push(<th>{Global.FirstLetter(element)}</th>);
-                });
-                elements.push(<tr>{header}</tr>);
-            }
-
-            function Iterate(WhatPush) {
-                for(let i = 0; i < collection.length; i++)
-                {
-                    const row = [];
-                    const object = collection[i];
-                    columns.forEach((element) => {
-                        row.push(<td 
-                            type={(typeof object[element]) == 'object' ? 'difficult' : 'simple'} 
-                            onClick={(e) => OnClickCell(e)} align='center'>
-                            {WhatPush(object, element)}
-                        </td>);
+                            fetch(`${Global.url}/api/db/${type}/update?id=${id}&prop=${JSON.stringify({ key:column, new_value:value[column] })}`);   
+                            cell.innerHTML = value[column];
+                        }
                     });
-                    elements.push(<tr>{row}</tr>)
                 }
-                
-                return elements;
             }
-            //Простая конвертация
-            function Simple() {
-                //Найти максимальные значения ключей
-                return Iterate((object, element) => { return object[element] });
-            }
-            //Сложная конвертация
-            function Difficult() {
-                function OnClick(e) {
-                    const field = e.currentTarget;
-                    if(field.getAttribute('path') == 'id')
-                        return;
-
-                    setContentContext(
+            //Кнопка Добавить
+            const AddButton =
+            {
+                title: 'Добавить',
+                OnClick: (event) => 
+                {
+                    const fields = [];
+                    //
+                    function ConvertToFields(element) {
+                        switch(element.type)
+                        {
+                            case 'massive':
+                                //В случаи если это массив значит нужно добавить кнопку
+                                //element.prop = [ ... ]
+                                return {
+                                    type: 'button',
+                                    prop: 
+                                    {
+                                        title: 'Добавить',
+                                        fields: element.prop
+                                    },
+                                    title: element.title
+                                };
+                            //В случаи массива или объекта
+                            case 'object':
+                                let prop = element.prop;
+                                if(Array.isArray(prop))
+                                    return {
+                                        type: 'object',
+                                        prop: prop.map((element) => ConvertToFields(element)),
+                                        title: element.title
+                                    };
+                                else
+                                    //В случаи если это объект рекурсивно добираемся до свойств
+                                    return ConvertToFields(prop);
+                            default:
+                                return element;
+                        }
+                    }
+                    //
+                    keys.forEach((element) => {
+                        //Пропускаем поля c id, т.к. они по дефолту добавлються потом в бд
+                        if(element.prop !== '_id' 
+                        && element.prop !== 'id')
+                        {
+                            fields.push(ConvertToFields(element));
+                        }
+                    });
+                    //
+                    setContentModal(
                     {
-                        content: 
-                        [
+                        title: 'Добавить',
+                        fields: fields,
+                        onChainge: (e, value) => 
+                        {
+                            //All properties
+                            fetch(`${Global.url}/api/db/${type}/insert?object=${JSON.stringify(value)}`);
+                            location.reload();
+                        }
+                    });
+                }
+            } 
+            //Кнопка удалить
+            const DeleteButton = 
+            {
+                title: 'Удалить',
+                OnClick: (event) => 
+                {
+                    fetch(`${Global.url}/api/db/${type}/delete?id=${id}`);
+                    location.reload();
+                }
+            }
+            //Создание content для контекстного меню
+            //
+            setContentContext(
+            { 
+                content: [ ChangeButton, AddButton, DeleteButton ],
+                points: 
+                {
+                    left: e.clientX,
+                    top: e.clientY
+                }
+            });
+        }
+        //Функция итерации 
+        function Iterate(WhatPush) {
+            for(let i = 0; i < collection.length; i++)
+            {
+                const row = [];
+                const object = collection[i];
+                columns.forEach((element) => {
+                    row.push(<td 
+                        align='center'
+                        column={element}
+                        onClick={(e) => OnClickCell(e)}>
+                        {WhatPush(object, element)}
+                    </td>);
+                });
+                elements.push(<tr _id={object._id}>{row}</tr>)
+            }
+            
+            return elements;
+        }
+        //Простая конвертация
+        function Simple() {
+            //Найти максимальные значения ключей
+            return Iterate((object, element) => { return object[element] });
+        }
+        //Сложная конвертация
+        function Difficult() {
+            //
+            function ConvertVariable(variable, name_prop, title = null) {
+                const type_of = typeof variable;
+                switch(type_of)
+                {
+                    case 'string':
+                    case 'number':
+                    default:
+                        function OnClickVariable(e) {
+                            const field = e.currentTarget;
+                            //Возможно излишне ресурсо затратно
+                            const last_prop = name_prop.split('.').reverse()[0];
+                            if(last_prop == 'id' ||
+                               last_prop == '_id')
+                                return;
+                                
+                            const ChangeButton = 
                             {
                                 title: 'Изменить',
                                 OnClick: 
                                 (e) => 
                                 {
-                                    console.log('click on chainge');
+                                    setContentModal(
+                                    {
+                                        title: 'Изменить',
+                                        fields: [ { type: type_of, prop: last_prop } ],
+                                        //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
+                                        onChainge: (e, value) => 
+                                        {
+                                            const mass = name_prop.split(/.\d+./g);
+                                            let object;
+                                            switch(mass.length)
+                                            {
+                                                //В случаи если нет вложенных массивов
+                                                case 1:
+                                                    object = { key: name_prop, new_value: value[last_prop] };
+                                                    break;
+                                                //В случаи если один вложенный массив
+                                                case 2:
+                                                    object = 
+                                                    { 
+                                                        id: parseInt(name_prop.match(/\d+/g)), 
+                                                        path: mass[0],
+                                                        key: mass[1], 
+                                                        new_value: value[last_prop]
+                                                    };
+                                                    break;
+                                                //В случаи нескольких вложенных массивов
+                                                //Пока не поддерживается
+                                                default:
+                                                    return console.log("ERROR HAS ARRAY IN ARRAY, THIS FEATURE DON`T SUPPORT");
+                                            };
+                                            fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}`);
+                                            field.innerHTML = value;
+                                        }
+                                    });
                                 }
-                            }
-                        ],
-                        points: 
-                        {
-                            left: e.clientX,
-                            top: e.clientY
+                            };
+        
+                            setContentContext(
+                            {
+                                content: [ ChangeButton ],
+                                points: 
+                                {
+                                    left: e.clientX,
+                                    top: e.clientY
+                                }
+                            });
                         }
-                    });
-                }
-                //
-                function ConvertVariable(variable, title, name_prop) {
 
-                    switch(typeof variable)
-                    {
-                        case 'string':
-                        case 'number':
-                        default:
-                            return <p className={classes.variable} path={name_prop} onClick={(e) => OnClick(e)}>
-                                {variable.toString()}
-                            </p>;
-                        // case 'boolean':
-                        //     return variable ? 'Да' : 'Нет';
-                        case 'object':
-                            let content = [];
-                            let className;
-                            if(Array.isArray(variable) && variable.length != 0)
+                        return <p 
+                            className={classes.variable} 
+                            onClick={(e) => OnClickVariable(e)}>
+                            {variable.toString()}
+                        </p>;
+                    // case 'boolean':
+                    //     return variable ? 'Да' : 'Нет';
+                    case 'object':
+                        let content = [];
+                        let className;
+                        if(Array.isArray(variable))
+                        {
+                            className = classes.massive;
+                            //
+                            variable.forEach((element, index) => {
+                                const path = `${name_prop}.${element.id || index}`;
+                                //
+                                function OnClickRemoveButton(e) {
+                                    e.preventDefault();
+                                    const array = path.split(/.\d+/g);
+                                    const object = { key: array[0], new_value: parseInt(path.match(/\d+/g))};
+                                    fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
+                                }
+                                //
+                                content.push(<div className={classes.item}>
+                                    {ConvertVariable(element, path)}
+                                    <button onClick={(e) => OnClickRemoveButton(e)}>
+                                        Удалить
+                                    </button>
+                                </div>);
+                            });
+                            //Add button
+                            //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
+                            //Объекта который также будет находиться в кнопке
+                            function OnClickAddButton(e, value)
                             {
-                                className = classes.massive;
-                                variable.forEach((element, index) => {
-                                    content.push(ConvertVariable(element, null, element.id || index));
-                                    //SEPARATOR
-                                    content.push(<div className={classes.separator}></div>);
-                                });
-                                //Add button
-                                content.push(<button path={name_prop}>
-                                    Добавить
-                                </button>);
+                                e.preventDefault();
+                                const object = { key: name_prop, new_value: value };
+                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
                             }
-                            else
-                            {
-                                className = classes.object;
-                                Object.keys(variable).forEach((element) => {
-                                    content.push(<>
-                                        <div className={classes.text}>
-                                            {Global.FirstLetter(element)}:
-                                        </div>
-                                        <div className={classes.content}>
-                                            {ConvertVariable(variable[element], null, element)}
-                                        </div> 
-                                    </>);    
-                                });
-                            }
+                            //
+                            content.push(<button 
+                                window={
+                                {
+                                    title: 'Добавить',
+                                    fields: Local.GetFields(type, name_prop),
+                                    onChainge: OnClickAddButton
+                                }}>
+                                Добавить
+                            </button>);
+                        }
+                        else
+                        {
+                            className = classes.object;
+                            Object.keys(variable).forEach((element) => {
+                                content.push(<>
+                                    <div className={classes.text}>
+                                        {Global.FirstLetter(element)}:
+                                    </div>
+                                    <div className={classes.content}>
+                                        {ConvertVariable(variable[element], `${name_prop}.${element}`)}
+                                    </div> 
+                                </>);    
+                            });
+                        }
 
-                            if(title)
-                            {
-                                content = <div path={title} className={className}>
-                                    {content}
-                                </div>;
-                                // if(className == classes.massive)
-                                return <button onClick={(e) => OpenModalButton(e, content, title)}>
-                                    Открыть
-                                </button>;
-                            }
-                            
-                            return <div path={name_prop} className={className}>
+                        if(title)
+                        {
+                            content = <div className={className}>
                                 {content}
                             </div>;
-                    }
-                }
-
-                function OpenModalButton(e, content, title) {
-                    setContentModal({ content: content, title: title });
-                }
-
-                return Iterate((object, element) => { return ConvertVariable(object[element], element) });
-            }
-
-            CreateHeader();
-            if(collection && collection.length != 0)
-            {
-                switch(type_convert)
-                {
-                    case 'simple':
-                        return Simple();
-                    case 'difficult':
-                        return Difficult();
-                    default:
-                        console.log('ERROR THIS TYPE OF CONVERTATION DON`T SUPPORT');
-                        return 'ERROR THIS TYPE OF CONVERTATION DON`T SUPPORT';
+                            return <button onClick={(e) => OpenModalButton(e, content, title)}>
+                                Открыть
+                            </button>;
+                        }
+                        
+                        return <div className={className}>
+                            {content}
+                        </div>;
                 }
             }
+
+            function OpenModalButton(e, content, title) {
+                setContentModal(
+                { 
+                    content: content, 
+                    title: title 
+                });
+            }
+
+            return Iterate((object, element) => { return ConvertVariable(object[element], element, element) });
         }
-
+        
+        //Создание таблицы
         let table;
-        switch(type)
+        if(collection && collection.length != 0)
         {
-            case 'cities':
-            case 'countries':
-                table = Convertation('simple');
-                break;
-            case 'resorts':
-                table = Convertation('difficult');
-                break;
-            default:
-                console.log('ERROR THIS TYPE OF DOCUMENT("TABLE" IN SQL) DON`T EXISTS');
-                return;
+            //Создание столбцов заголовков
+            const header = [];
+            columns.forEach((element) => { 
+                header.push(<th>{Global.FirstLetter(element)}</th>);//ТУТ ОШИБКА
+            });
+            elements.push(<tr>{header}</tr>);
+            //end
+            if(isDifficult)
+                table = Difficult();
+            else
+                table = Simple();
         }
-        return <table className={classes.table} cellspacing='0' cellpadding='5' border='1'>
+        return <table 
+            className={classes.table} 
+            cellspacing='0'
+            cellpadding='5' 
+            border='1'>
             {table}
         </table>;
     }
@@ -323,6 +405,9 @@ const Type = (props) => {
 
 export async function getStaticPaths() {
     const paths = Local.items.map((element) => { return { params: { type: element.href } } });
+    // fetch(Global.url + '/api/db');
+    // console.log(Global.url + '/api/db');
+    // const paths = ;
     return {
         paths: paths,
         fallback: true

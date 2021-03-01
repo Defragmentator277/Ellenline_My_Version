@@ -46,11 +46,42 @@
         .content
         {
             overflow: auto;
-            max-height: 550px;
+            max-height: 500px;
+
+            .massive
+            {
+                .title
+                {
+                    @extend %font;
+                    margin: 0;
+                    font-size: 1.75em;
+                    font-weight: bold;
+                }
+
+                .button
+                {
+                    @extend %button;
+                    width: 100%;
+                    font-size: 1.15em;
+                    padding: 5px 10px;
+                }
+            }
 
             .input
             {
                 width: 100%;
+            }
+
+            .object
+            {
+                margin-left: 25px;
+
+                & > .title
+                {
+                    margin-left: -10px;
+                    font-size: 1.75em;
+                    font-weight: bold;
+                }
             }
         }
 

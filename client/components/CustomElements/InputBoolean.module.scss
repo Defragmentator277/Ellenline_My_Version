@@ -1,0 +1,19 @@
+@import '../../styles/index.scss';
+
+.wrapper
+{
+    display: grid;
+    grid-template-columns: repeat(2, fit-content(0));
+    column-gap: 5px;
+
+    .input
+    {
+        @extend %grid_center;
+        transform: scale(1.5);
+    }
+    
+    .title
+    {
+        display: inline-block;
+    }
+}
