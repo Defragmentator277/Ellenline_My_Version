@@ -42,26 +42,32 @@ handler.get(async (req, res) => {
         switch(operator)
         {
             case '$push':
+                console.log(prop);
+                // res.status(200);
                 //Здесь нужно узнать новый айди
                 collection.aggregate(
                 [ 
-                    { $unwind: '$rooms' }, // "развязываем" по массиву
-                    { $sort: { 'rooms.id': -1 } }, //сортируем по полю id
+                    { $match: { '_id': ObjectId(id) } },
+                    { $unwind: '$' + prop.key }, // "развязываем" по массиву
+                    { $sort: { [prop.key + '.id']: -1 } }, //сортируем по полю id
                     { $limit: 1 }
                 ]).toArray((err, result) =>
                 {
                     if(err)
                         return console.log(err);
-                    let new_id;
-                    if(result[0] == undefined)
-                        new_id = 0;
-                    else
-                        new_id = result[0].rooms.id;
+                    const path = prop.key.split('.');
+                    let new_id = -1;
+                    if(result[0])
+                    {
+                        let document = result[0];
+                        for(let i = 0; i < path.length; i++)
+                            document = document[path[i]];
+                        new_id = document.id;
+                    }
                     prop.new_value = Object.assign(prop.new_value, { id: ++new_id });
                     Update(id, prop, '$push');
                     res.json(result);
                 });
-                // Update(id, prop, operator);
                 break;
             case '$set':
                 Update(id, prop, '$set');
