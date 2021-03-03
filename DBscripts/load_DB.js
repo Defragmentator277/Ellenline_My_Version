@@ -8,10 +8,99 @@ db.createCollection('bands');
 db.bands.insertMany(
 [
     {
-        
+        '_id': 0,
+        'name': 'Suffocation',
+        'rating': 4,
+        'albums':
+        {
+            'new': 
+            {
+                'avg_rating': 4,
+                'names':
+                [
+                    {
+                        'id': 0,
+                        'name': 'Of The Dark Light...'
+                    },
+                    {
+                        'id': 1,
+                        'name': 'Suffocation'
+                    }
+                ],
+                'members':
+                [
+                    {
+                        'id': 0,
+                        'name': 'Fluttershy'
+                    },
+                    {
+                        'id': 1,
+                        'name': 'Applejack'
+                    },
+                    {
+                        'id': 2,
+                        'name': 'Rarity'
+                    }
+                ]
+            },
+            'old':
+            {
+                'avg_rating': 4.5,
+                'names':
+                [
+                    {
+                        'id': 0,
+                        'name': 'Effigy Of Forgotten'
+                    },
+                    {
+                        'id': 1,
+                        'name': 'Pierced From Within'
+                    }
+                ]
+            }
+        },
+        'comments':
+        [
+            {
+                'id': 0,
+                'user_name': 'kallisto',
+                'text': 'Love him'
+            }
+        ]
     },
     {
-
+        '_id': 1,
+        'name': 'Cannibal Corpse',
+        'rating': 5,
+        'albums':
+        {
+            'new':
+            {
+                'avg_rating': 5,
+                'names':
+                [
+                    {
+                        'id': 0,
+                        'name': 'Новый участник'
+                    },
+                    {
+                        'id': 1,
+                        'name': 'Старый участник'
+                    }
+                ]
+            },
+            'old':
+            {
+                'avg_rating': 4,
+                'names':
+                [
+                    {
+                        'id': 0,
+                        'name': 'Wretched The Spawn'
+                    }
+                ]
+            }
+        }
     }
 ]);
 //
