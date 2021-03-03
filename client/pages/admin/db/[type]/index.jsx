@@ -177,7 +177,7 @@ const Type = (props) => {
                         align='center'
                         column={title}//old
                         onClick={(e) => OnClickCell(e)}>
-                        {WhatPush(object, title)}
+                        {WhatPush(object, elem_struct)}
                     </td>);
                 });
                 elements.push(<tr _id={object._id}>{row}</tr>)
@@ -188,17 +188,17 @@ const Type = (props) => {
         //Простая конвертация
         function Simple() {
             //Найти максимальные значения ключей
-            //OLD
-            return Iterate((object, element) => { return object[element] });
             //NEW 
-            // return Iterate((object, elem_struct) => { return object[elem_struct.prop] });
+            return Iterate((object, elem_struct) => { return object[elem_struct.prop] });
         }
         //Сложная конвертация
         function Difficult() {
-            //#region  OLD FORM
-            function ConvertVariable(variable, name_prop, title = null) {
-                const type_of = typeof variable;
-                switch(type_of)
+            //#region NEW FORM 
+            function ConvertVariable(object, elem_struct, path = []) {
+                
+                let className;
+                let content = [];
+                switch(elem_struct.type)
                 {
                     case 'string':
                     case 'number':
@@ -268,252 +268,104 @@ const Type = (props) => {
                         return <p 
                             className={classes.variable} 
                             onClick={(e) => OnClickVariable(e)}>
-                            {variable.toString()}
+                            {object[elem_struct.prop].toString()}
                         </p>;
+                        break;
+                    case 'massive':
+                        className = classes.massive;
+                        console.log(object);
+                        //
+                        const array = object[elem_struct.title];
+                        //
+                        array.forEach((element, index) => {
+                            //Изменить index
+
+                            function OnClickRemoveButton(e) {
+                                // e.preventDefault();
+                                // const array = path.split(/.\d+/g);
+                                // const object = { key: array[0], new_value: parseInt(path.match(/\d+/g))};
+                                // fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
+                                return;
+                            }
+                            //
+                            content.push(<div className={classes.item}>
+                                {ConvertVariable(element, { type: 'object', prop: elem_struct.prop, title: elem_struct.title })}
+                                <button onClick={(e) => OnClickRemoveButton(e)}>
+                                    Удалить
+                                </button>
+                            </div>);
+                        });
+                        //Add button
+                        //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
+                        //Объекта который также будет находиться в кнопке
+                        // function OnClickAddButton(e, value)
+                        // {
+                        //     e.preventDefault();
+                        //     const object = { key: name_prop, new_value: value };
+                        //     fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
+                        // }
+                        //
+                        // function GetFields() {
+                        //     const path = name_prop.split('.');
+                        //     let object = struct;
+                        //     for(let i = 0; i < path.length; i++)
+                        //         object = object.find((element) => element.title == path[i]).prop;
+                        //     return object;
+                        // }
+                        //
+                        // content.push(<button 
+                        //     window={
+                        //     {
+                        //         title: 'Добавить',
+                        //         fields: [],
+                        //         onChainge: OnClickAddButton
+                        //     }}>
+                        //     Добавить
+                        // </button>);
+                        break;
                     case 'object':
-                        let content = [];
-                        let className;
-                        if(Array.isArray(variable))
-                        {
-                            className = classes.massive;
-                            //
-                            variable.forEach((element, index) => {
-                                const path = `${name_prop}.${element.id || index}`;
-                                //
-                                function OnClickRemoveButton(e) {
-                                    e.preventDefault();
-                                    const array = path.split(/.\d+/g);
-                                    const object = { key: array[0], new_value: parseInt(path.match(/\d+/g))};
-                                    fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
-                                }
-                                //
-                                content.push(<div className={classes.item}>
-                                    {ConvertVariable(element, path)}
-                                    <button onClick={(e) => OnClickRemoveButton(e)}>
-                                        Удалить
-                                    </button>
-                                </div>);
-                            });
-                            //Add button
-                            //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
-                            //Объекта который также будет находиться в кнопке
-                            function OnClickAddButton(e, value)
-                            {
-                                e.preventDefault();
-                                const object = { key: name_prop, new_value: value };
-                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
-                            }
-                            //
-                            function GetFields() {
-                                const path = name_prop.split('.');
-                                let object = struct;
-                                for(let i = 0; i < path.length; i++)
-                                    object = object.find((element) => element.title == path[i]).prop;
-                                return object;
-                            }
-                            //
-                            content.push(<button 
-                                window={
-                                {
-                                    title: 'Добавить',
-                                    fields: GetFields(),
-                                    onChainge: OnClickAddButton
-                                }}>
-                                Добавить
-                            </button>);
-                        }
-                        else
-                        {
-                            className = classes.object;
-                            Object.keys(variable).forEach((element) => {
-                                content.push(<>
-                                    <div className={classes.text}>
-                                        {Global.FirstLetter(element)}:
-                                    </div>
-                                    <div className={classes.content}>
-                                        {ConvertVariable(variable[element], `${name_prop}.${element}`)}
-                                    </div> 
-                                </>);    
-                            });
-                        }
-
-                        if(title)
-                        {
-                            content = <div className={className}>
-                                {content}
-                            </div>;
-                            return <button onClick={(e) => OpenModalButton(e, content, title)}>
-                                Открыть
-                            </button>;
-                        }
+                        className = classes.object;
+                        const new_object = object[elem_struct.title];
+                        console.log('_________________________________________');
+                        console.log(new_object);
                         
-                        return <div className={className}>
-                            {content}
-                        </div>;
+                        //
+                        elem_struct.prop.forEach((element) => {
+                            let title;
+                            if(element.title)
+                                title = element.title;
+                            else
+                                title = element.prop;
+                            console.log(title)
+                            console.log(new_object);
+                            // console.log(new_object[title]);
+
+                            content.push(<>
+                                <div className={classes.text}>
+                                    {Global.FirstLetter(title)}:
+                                </div>
+                                {/* <div className={classes.content}>
+                                    {ConvertVariable(new_object[title], element)}
+                                </div>  */}
+                            </>);    
+                        });
+
                 }
-            }
-            //#endregion OLD FORM
 
-            //#region NEW FORM 
-            // function ConvertVariable(object, elem_struct) {
-            //     switch(elem_struct.type)
-            //     {
-            //         case 'string':
-            //         case 'number':
-            //         default:
-            //             function OnClickVariable(e) {
-            //                 const field = e.currentTarget;
-            //                 //Возможно излишне ресурсо затратно
-            //                 const last_prop = name_prop.split('.').reverse()[0];
-            //                 if(last_prop == 'id' ||
-            //                    last_prop == '_id')
-            //                     return;
-                                
-            //                 const ChangeButton = 
-            //                 {
-            //                     title: 'Изменить',
-            //                     OnClick: 
-            //                     (e) => 
-            //                     {
-            //                         setContentModal(
-            //                         {
-            //                             title: 'Изменить',
-            //                             fields: [ { type: type_of, prop: last_prop } ],
-            //                             //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
-            //                             onChainge: (e, value) => 
-            //                             {
-            //                                 const mass = name_prop.split(/.\d+./g);
-            //                                 let object;
-            //                                 switch(mass.length)
-            //                                 {
-            //                                     //В случаи если нет вложенных массивов
-            //                                     case 1:
-            //                                         object = { key: name_prop, new_value: value[last_prop] };
-            //                                         break;
-            //                                     //В случаи если один вложенный массив
-            //                                     case 2:
-            //                                         object = 
-            //                                         { 
-            //                                             id: parseInt(name_prop.match(/\d+/g)), 
-            //                                             path: mass[0],
-            //                                             key: mass[1], 
-            //                                             new_value: value[last_prop]
-            //                                         };
-            //                                         break;
-            //                                     //В случаи нескольких вложенных массивов
-            //                                     //Пока не поддерживается
-            //                                     default:
-            //                                         return console.log("ERROR HAS ARRAY IN ARRAY, THIS FEATURE DON`T SUPPORT");
-            //                                 };
-            //                                 fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}`);
-            //                                 field.innerHTML = value;
-            //                             }
-            //                         });
-            //                     }
-            //                 };
-        
-            //                 setContentContext(
-            //                 {
-            //                     content: [ ChangeButton ],
-            //                     points: 
-            //                     {
-            //                         left: e.clientX,
-            //                         top: e.clientY
-            //                     }
-            //                 });
-            //             }
-
-            //             return <p 
-            //                 className={classes.variable} 
-            //                 onClick={(e) => OnClickVariable(e)}>
-            //                 {object[elem_struct.prop].toString()}
-            //             </p>;
-            //         case 'massive':
-            //             className = classes.massive;
-            //             const array = object[elem_struct.title]
-            //             //
-            //             variable.forEach((element, index) => {
-            //                 const path = `${name_prop}.${element.id || index}`;
-            //                 //
-            //                 function OnClickRemoveButton(e) {
-            //                     e.preventDefault();
-            //                     const array = path.split(/.\d+/g);
-            //                     const object = { key: array[0], new_value: parseInt(path.match(/\d+/g))};
-            //                     fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
-            //                 }
-            //                 //
-            //                 content.push(<div className={classes.item}>
-            //                     {ConvertVariable(element, path)}
-            //                     <button onClick={(e) => OnClickRemoveButton(e)}>
-            //                         Удалить
-            //                     </button>
-            //                 </div>);
-            //             });
-            //             //Add button
-            //             //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
-            //             //Объекта который также будет находиться в кнопке
-            //             function OnClickAddButton(e, value)
-            //             {
-            //                 e.preventDefault();
-            //                 const object = { key: name_prop, new_value: value };
-            //                 fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
-            //             }
-            //             //
-            //             function GetFields() {
-            //                 const path = name_prop.split('.');
-            //                 let object = struct;
-            //                 for(let i = 0; i < path.length; i++)
-            //                     object = object.find((element) => element.title == path[i]).prop;
-            //                 return object;
-            //             }
-            //             //
-            //             content.push(<button 
-            //                 window={
-            //                 {
-            //                     title: 'Добавить',
-            //                     fields: GetFields(),
-            //                     onChainge: OnClickAddButton
-            //                 }}>
-            //                 Добавить
-            //             </button>);
-            //             return;
-            //         case 'object':
-            //             let content = [];
-            //             let className;
-            //             if(Array.isArray(variable))
-            //             {
-            //             }
-            //             else
-            //             {
-            //                 className = classes.object;
-            //                 Object.keys(variable).forEach((element) => {
-            //                     content.push(<>
-            //                         <div className={classes.text}>
-            //                             {Global.FirstLetter(element)}:
-            //                         </div>
-            //                         <div className={classes.content}>
-            //                             {ConvertVariable(variable[element], `${name_prop}.${element}`)}
-            //                         </div> 
-            //                     </>);    
-            //                 });
-            //             }
-
-            //     }
-
-            //     if(title)
-            //     {
-            //         content = <div className={className}>
-            //             {content}
-            //         </div>;
-            //         return <button onClick={(e) => OpenModalButton(e, content, title)}>
-            //             Открыть
-            //         </button>;
-            //     }
+                if(path.length == 0)
+                {
+                    content = <div className={className}>
+                        {content}
+                    </div>;
+                    return <button onClick={(e) => OpenModalButton(e, content, elem_struct.title)}>
+                        Открыть
+                    </button>;
+                }
                 
-            //     return <div className={className}>
-            //         {content}
-            //     </div>;
-            // }
+                return <div className={className}>
+                    {content}
+                </div>;
+            }
             //#endregion
 
             function OpenModalButton(e, content, title) {
@@ -524,10 +376,8 @@ const Type = (props) => {
                 });
             }
 
-            // OLD
-            return Iterate((object, elem_struct) => { return ConvertVariable(object[elem_struct], elem_struct, elem_struct) });
             // NEW
-            // return Iterate((object, elem_struct) => { return ConvertVariable(object[elem_struct.prop], elem_struct.title, elem_struct.title) });
+            return Iterate((object, elem_struct) => { return ConvertVariable(object, elem_struct) });
         }
         
         //Создание таблицы
