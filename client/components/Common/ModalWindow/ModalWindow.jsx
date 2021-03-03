@@ -115,26 +115,24 @@ const ModalWindow = (props) => {
                 case 'button':
                     //В случаи типа 'button' field.prop хранит в себе объект для создание ModalWindow
                     function OnChainge(e, this_value) {
-                        path.push(field.title);
+                        let object = value;
+                        let part;
                         //
-                        let part = path[0];
-                        let object = {};
-                        //
-                        if(path.length != 1)
+                        if(path.length > 0)
                         {
+                            part = path[0];
+                            //
                             if(value[part] == undefined)
                                 value[part] = {};
                             object = value[part];
-                        }
-                        else
-                            object = value;
-                        //
-                        for(let i = 1; i < path.length - 1; i++)
-                        {
-                            part = path[i];
-                            if(object[part] == undefined)
-                                object[part] = {};
-                            object = object[part];
+                            //
+                            for(let i = 1; i < path.length; i++)
+                            {
+                                part = path[i];
+                                if(object[part] == undefined)
+                                    object[part] = {};
+                                object = object[part];
+                            }
                         }
                         //
                         part = field.title;
@@ -197,24 +195,31 @@ const ModalWindow = (props) => {
     function GenerateButtons() {
 
         //Проверяет пусты ли поля
-        function CheckEmptyness(properties, object = value) {
+        function CheckEmptyness(properties, object = value, path = []) {
             //true - обязательные поля не заполнены, false - все заполнено
             for(let i = 0; i < properties.length; i++)
             {
                 const element = properties[i];
                 if(element.type == 'number' 
-                && parseInt(object[element.prop]) != NaN)
-                    return;
+                && parseInt(object[element.prop]) == 0)
+                    continue;
+                if(element.type == 'button')
+                {
+                    if(object[element.title] == undefined)
+                    {
+                        alert('Заполните массив ' + element.title + ' хотя бы одним значением!');
+                        return true;
+                    }
+                }   
                 if(element.type == 'object')
                 {
-                    if(CheckEmptyness(element.prop, object[element.title]))
+                    if(CheckEmptyness(element.prop, object[element.title], path.concat(element.title)))
                         return true;
                 }
                 else if((!object[element.prop] 
                 && element.type != 'boolean'
                 && element.type != 'button'))
                 {
-                    console.log(parseInt(object[element.prop]));
                     alert('Поле ' + element.prop + ' не заполнено!');
                     return true;
                 }
