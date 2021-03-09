@@ -33,6 +33,8 @@ handler.get(async (req, res) => {
                 return console.log(err);
             res.status(200);
         });
+        console.log(prop);
+        res.status(200);
     }
     //Update простого свойства
     else
@@ -42,7 +44,7 @@ handler.get(async (req, res) => {
         switch(operator)
         {
             case '$push':
-                //Здесь нужно узнать новый айди
+                //ИЗМЕНИТЬ
                 collection.aggregate(
                 [ 
                     { $unwind: '$rooms' }, // "развязываем" по массиву
@@ -59,7 +61,6 @@ handler.get(async (req, res) => {
                         new_id = result[0].rooms.id;
                     prop.new_value = Object.assign(prop.new_value, { id: ++new_id });
                     Update(id, prop, '$push');
-                    res.json(result);
                 });
                 // Update(id, prop, operator);
                 break;
@@ -67,6 +68,7 @@ handler.get(async (req, res) => {
                 Update(id, prop, '$set');
             case '$pull':
                 prop.new_value = { id: prop.new_value };
+                console.log(prop);
                 Update(id, prop, '$pull');
                 break;
             default:
