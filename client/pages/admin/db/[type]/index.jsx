@@ -175,7 +175,7 @@ const Type = (props) => {
                         align='center'
                         column={title}//old
                         onClick={(e) => OnClickCell(e)}>
-                        {WhatPush(object, title)}
+                        {WhatPush(object, elem_struct)}
                     </td>);
                 });
                 elements.push(<tr _id={object._id}>{row}</tr>)
@@ -186,21 +186,52 @@ const Type = (props) => {
         //Простая конвертация
         function Simple() {
             //Найти максимальные значения ключей
-            return Iterate((object, element) => { return object[element] });
+            //NEW 
+            return Iterate((object, elem_struct) => { return object[elem_struct.prop] });
         }
         //Сложная конвертация
         function Difficult() {
-            function ConvertVariable(variable, name_prop, title = null) {
-                const type_of = typeof variable;
-                switch(type_of)
+            //#region NEW FORM 
+            function ConvertVariable(object, elem_struct, path = []) {
+                
+                let className;
+                let content = [];
+                switch(elem_struct.type)
                 {
+                    default:
+                        console.log('THIS TYPE DON`T SUPPORT');
+                        return <div>DONT SUPPORT</div>;
                     case 'string':
                     case 'number':
-                    default:
+                    case 'boolean':
+                    //MongoDB object represent id of element in documents (TABLE IN SQL NOTATION)
+                    case 'ObjectId':
+                        const this_path = [];
+                        let prop_path, id, last_prop;
+                        // let id;
+                        for(let i = 0; i < path.length; i++)
+                        {
+                            if(typeof path[i] == 'number')
+                            {
+                                this_path.push(path[i + 1]);
+                                //
+                                id = parseInt(path[i++]);
+                                prop_path = this_path.slice(0).join('.');
+                                last_prop = path.slice(i + 1, path.length).concat(elem_struct.prop).join('.');
+                                //
+                                this_path.push(id);
+                            }
+                            else
+                                this_path.push(path[i]);
+                        }
+                        // this_path - all path to propertie, elem_struct.prop - last propertie
+
+                        this_path.push(elem_struct.prop);
+
                         function OnClickVariable(e) {
                             const field = e.currentTarget;
                             //Возможно излишне ресурсо затратно
-                            const last_prop = name_prop.split('.').reverse()[0];
+
                             if(last_prop == 'id' ||
                                last_prop == '_id')
                                 return;
@@ -211,35 +242,35 @@ const Type = (props) => {
                                 OnClick: 
                                 (e) => 
                                 {
-                                    setContentModal(
+                                    setContentModal(    
                                     {
                                         title: 'Изменить',
-                                        fields: [ { type: type_of, prop: last_prop } ],
+                                        fields: [ elem_struct ],
                                         //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
                                         onChainge: (e, value) => 
                                         {
-                                            const mass = name_prop.split(/.\d+./g);
                                             let object;
-                                            switch(mass.length)
+                                            switch(id)
                                             {
                                                 //В случаи если нет вложенных массивов
-                                                case 1:
-                                                    object = { key: name_prop, new_value: value[last_prop] };
+                                                case undefined:
+                                                    object = { key: this_path.join('.'), new_value: value[elem_struct.prop] };
                                                     break;
                                                 //В случаи если один вложенный массив
-                                                case 2:
+                                                default:
                                                     object = 
                                                     { 
-                                                        id: parseInt(name_prop.match(/\d+/g)), 
-                                                        path: mass[0],
-                                                        key: mass[1], 
-                                                        new_value: value[last_prop]
+                                                        id: id, 
+                                                        path: prop_path,
+                                                        key: last_prop, 
+                                                        new_value: value[elem_struct.prop]
                                                     };
                                                     break;
                                                 //В случаи нескольких вложенных массивов
                                                 //Пока не поддерживается
-                                                default:
-                                                    return console.log("ERROR HAS ARRAY IN ARRAY, THIS FEATURE DON`T SUPPORT");
+                                                // default:
+                                                //     console.log("ERROR HAS ARRAY IN ARRAY, THIS FEATURE DON`T SUPPORT");
+                                                //     break;
                                             };
                                             fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}`);
                                             field.innerHTML = value;
@@ -262,90 +293,103 @@ const Type = (props) => {
                         return <p 
                             className={classes.variable} 
                             onClick={(e) => OnClickVariable(e)}>
-                            {variable.toString()}
+                            {object[elem_struct.prop].toString()}
                         </p>;
-                    case 'object':
-                        let content = [];
-                        let className;
-                        if(Array.isArray(variable))
-                        {
-                            className = classes.massive;
-                            //
-                            variable.forEach((element, index) => {
-                                const path = `${name_prop}.${element.id || index}`;
-                                //
-                                function OnClickRemoveButton(e) {
-                                    e.preventDefault();
-                                    const array = path.split(/.\d+/g);
-                                    const object = { key: array[0], new_value: parseInt(path.match(/\d+/g))};
-                                    fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
-                                }
-                                //
-                                content.push(<div className={classes.item}>
-                                    {ConvertVariable(element, path)}
-                                    <button onClick={(e) => OnClickRemoveButton(e)}>
-                                        Удалить
-                                    </button>
-                                </div>);
-                            });
-                            //Add button
-                            //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
-                            //Объекта который также будет находиться в кнопке
-                            function OnClickAddButton(e, value)
-                            {
-                                e.preventDefault();
-                                const object = { key: name_prop, new_value: value };
-                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
-                            }
-                            //
-                            function GetFields() {
-                                const path = name_prop.split('.');
-                                let object = struct;
-                                for(let i = 0; i < path.length; i++)
-                                    object = object.find((element) => element.title == path[i]).prop;
-                                return object;
-                            }
-                            //
-                            content.push(<button 
-                                window={
-                                {
-                                    title: 'Добавить',
-                                    fields: GetFields(),
-                                    onChainge: OnClickAddButton
-                                }}>
-                                Добавить
-                            </button>);
-                        }
-                        else
-                        {
-                            className = classes.object;
-                            Object.keys(variable).forEach((element) => {
-                                content.push(<>
-                                    <div className={classes.text}>
-                                        {Global.FirstLetter(element)}:
-                                    </div>
-                                    <div className={classes.content}>
-                                        {ConvertVariable(variable[element], `${name_prop}.${element}`)}
-                                    </div> 
-                                </>);    
-                            });
-                        }
+                        break;
+                    case 'massive':
+                        className = classes.massive;
+                        //
+                        const array = object[elem_struct.title];
+                        const array_path = path.concat(elem_struct.title).join('.');
+                        //
+                        array.forEach((element, index) => {
 
-                        if(title)
+                            function OnClickRemoveButton(e) {
+                                e.preventDefault();
+                                const object = { key: array_path, new_value: element.id };
+                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
+                                return;
+                            }
+                            //Конвертация элемента массива
+                            function ConvertElementOfArray() {
+                                return ConvertVariable(
+                                    { [elem_struct.title]: element }, 
+                                    { 
+                                        type: 'object', 
+                                        prop: elem_struct.prop, 
+                                        title: elem_struct.title
+                                    }, path.concat(element.id));
+                            }
+                            //
+                            content.push(<div className={classes.item}>
+                                {ConvertElementOfArray()}
+                                <button onClick={(e) => OnClickRemoveButton(e)}>
+                                    Удалить
+                                </button>
+                            </div>);
+                        });
+                        //Add button
+                        //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
+                        //Объекта который также будет находиться в кнопке
+                        function OnClickAddButton(e, value)
                         {
-                            content = <div className={className}>
-                                {content}
-                            </div>;
-                            return <button onClick={(e) => OpenModalButton(e, content, title)}>
-                                Открыть
-                            </button>;
+                            e.preventDefault();
+                            const object = { key: array_path, new_value: value };
+                            console.log(object);
+                            fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
+                            return;
                         }
-                        
-                        return <div className={className}>
-                            {content}
-                        </div>;
+                        //
+                        content.push(<button 
+                            window={
+                            {
+                                title: 'Добавить',
+                                //elem_struct.prop содержит все поля для создания нового элемента
+                                fields: elem_struct.prop, 
+                                onChainge: OnClickAddButton
+                            }}>
+                            Добавить
+                        </button>);
+                        break;
+                    case 'object':
+                        className = classes.object; 
+                        const new_object = object[elem_struct.title];
+                        //
+                        elem_struct.prop.forEach((element) => {
+                            let title;
+                            if(element.title)
+                                title = element.title;
+                            else
+                                title = element.prop;
+                            //
+                            content.push(<>
+                                <div className={classes.text}>
+                                    {Global.FirstLetter(title)}:
+                                </div>
+                                <div className={classes.content}>
+                                    {ConvertVariable(new_object, element, path.concat(elem_struct.title))}
+                                </div> 
+                            </>);    
+                        });
+                        break;
                 }
+
+                if(path.length == 0)
+                {
+                    content = <div className={className}>
+                        {content}
+                    </div>;
+                    //
+                    return <button onClick={(e) => OpenModalButton(e, content, elem_struct.title)}>
+                        Открыть
+                    </button>;
+                }
+                
+                return <div className={className}>
+                    {content}
+                </div>;
             }
+            //#endregion
 
             function OpenModalButton(e, content, title) {
                 setContentModal(
@@ -355,7 +399,8 @@ const Type = (props) => {
                 });
             }
 
-            return Iterate((object, elem_struct) => { return ConvertVariable(object[elem_struct], elem_struct, elem_struct) });
+            // NEW
+            return Iterate((object, elem_struct) => { return ConvertVariable(object, elem_struct) });
         }
         
         //Создание таблицы

@@ -33,6 +33,8 @@ handler.get(async (req, res) => {
                 return console.log(err);
             res.status(200);
         });
+        console.log(prop);
+        res.status(200);
     }
     //Update простого свойства
     else
@@ -42,9 +44,6 @@ handler.get(async (req, res) => {
         switch(operator)
         {
             case '$push':
-                console.log(prop);
-                // res.status(200);
-                //Здесь нужно узнать новый айди
                 collection.aggregate(
                 [ 
                     { $match: { '_id': ObjectId(id) } },
@@ -66,13 +65,13 @@ handler.get(async (req, res) => {
                     }
                     prop.new_value = Object.assign(prop.new_value, { id: ++new_id });
                     Update(id, prop, '$push');
-                    res.json(result);
                 });
                 break;
             case '$set':
                 Update(id, prop, '$set');
             case '$pull':
                 prop.new_value = { id: prop.new_value };
+                console.log(prop);
                 Update(id, prop, '$pull');
                 break;
             default:
