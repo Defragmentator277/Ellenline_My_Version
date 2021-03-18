@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import ListItem from './ListItem.jsx';
 //
 import classes from './List.module.scss';
+import image from 'next/image';
 
 const List = (props) => {
     const resort = props.resort;
@@ -16,14 +17,16 @@ const List = (props) => {
             for(let i = 0; i < items.length; i++)
             {
                 let element = items[i];
+                // element.price = 'от ' + element.price;
                 elements.push(<ListItem category={resort}
                                         path={path}
-                                        id={element.id}
-                                        title={element.title}
-                                        image={typeof element.images === 'object' ? element.images[0]: element.images}
-                                        address={element.address}
-                                        price={element.price}
-                                        services={element.services}/>);
+                                        {...element}/>);
+                                        // id={element._id}
+                                        // title={element.name}
+                                        // image={element.image}
+                                        // adress={element.adress}
+                                        // price={element.price}
+                                        // services={element.services}/>);
             }
         }
         return elements;

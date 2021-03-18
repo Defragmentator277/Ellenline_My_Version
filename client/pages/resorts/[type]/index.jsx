@@ -28,9 +28,7 @@ const Relax = (props) => {
 //Здесь я заранее задам пути т.к. их всего три: (вот они слева направо)
 //cruises, relax, tours
 export async function getStaticPaths() {
-    const res = await fetch(Global.url + '/api/resorts');
-    const resorts = await res.json();
-    const paths = resorts.map((element) => {
+    const paths = Object.keys(Global.resorts).map((element) => {
         return { params: { type: element } };
     });
     return {

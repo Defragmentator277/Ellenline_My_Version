@@ -1,214 +1,276 @@
-import React, { useState } from 'react';
+import React, { cloneElement, useEffect, useState } from 'react';
 //
 import DatabaseLayout from '../DatabaseLayout.jsx';
 import ModalWindow from '../../../../components/Common/ModalWindow/ModalWindow.jsx';
 import ContextMenu from '../../../../components/Common/ContextMenu/ContextMenu.jsx';
+import SelectOption from '../../../../components/CustomElements/SelectOption.jsx';
 //
 import Global from '../../../global.js';
 import Local from '../local.js';
 import classes from './index.module.scss';
+import { DBRef, ObjectID, ObjectId } from 'bson';
 
 const Type = (props) => {
+    const items = props.items ?
+        props.items.map((element) => { return { title: element, href: element } }) 
+        : [];
     const type = props.type;
     const collection = props.collection;
     const struct = props.struct;
-    const isDifficult = struct.some((element) => { return element.type == 'object' });
+    // const isDifficult = struct.some((element) => { return element.type == 'object' || element.type == 'massive' });
+    //
+    // const [isClient, setIsClient] = useState(false);
     //
     const [contentModal, setContentModal] = useState();
     const [contentContext, setContentContext] = useState();
+    //
 
     function GenerateTitle() {
-        const title = Local.items.find((element) => element.href == type).title;
+        const title = Global.FirstLetter(type);//Local.items.find((element) => element.href == type).title;
         return <h1 className={classes.title}>{title}</h1>;
     }
 
     function GenerateTable() {
         const elements = [];
+
+        //Вызывает setValues, функцию заполняющую значения в select
+        function GetIds(setValues, ref) {
+            fetch(`${Global.url}/api/db/${ref}`)
+            .then((res) => 
+            {
+                console.log('Успех');
+                return res.json();
+            })
+            .then((res) => 
+            {
+                setValues(res.map((element) => {
+                    return element._id;
+                }));
+            })
+            .catch((err) => 
+            {
+                console.log('Ошибка');
+                return err.json();
+            })
+            .catch((err) => 
+            {
+                console.log(err);
+            });
+        }
+        //Кнопка Добавить
+        const AddButton =
+        {
+            title: 'Добавить',
+            OnClick: (event) => 
+            {
+                const fields = [];
+                //
+                function ConvertToFields(element) {
+                    switch(element.type)
+                    {
+                        case 'massive':
+                            //В случаи если это массив значит нужно добавить кнопку
+                            //element.prop = [ ... ]
+                            // console.log(element.prop);
+                            return {
+                                type: 'button',
+                                prop: 
+                                {
+                                    title: 'Добавить',
+                                    fields: element.prop.map((element) => ConvertToFields(element))
+                                },
+                                title: element.title
+                            };
+                        //В случаи массива или объекта
+                        case 'object':
+                            let prop = element.prop;
+                            if(Array.isArray(prop))
+                                return {
+                                    type: 'object',
+                                    prop: prop.map((element) => ConvertToFields(element)),
+                                    title: element.title
+                                };
+                            else
+                                //В случаи если это объект рекурсивно добираемся до свойств
+                                return ConvertToFields(prop);
+                        case 'OtherId':
+                            element.getValues = (values) => GetIds(values, element.ref); 
+                            return element;
+                        default:
+                            return element;
+                    }
+                }
+                //
+                struct.forEach((element) => {
+                    //Пропускаем поля c id, т.к. они по дефолту добавлються потом в бд
+                    if(element.prop !== '_id' 
+                    && element.prop !== 'id')
+                    {
+                        fields.push(ConvertToFields(element));
+                    }
+                });
+                //
+                setContentModal(
+                {
+                    title: 'Добавить',
+                    fields: fields,
+                    onChainge: (e, value) => 
+                    {
+                        //All properties
+                        fetch(`${Global.url}/api/db/${type}/insert?object=${JSON.stringify(value)}`)
+                        .then((res) => 
+                        {
+                            console.log('Успех');
+                            return res.json();
+                        })
+                        .then((res) => 
+                        {
+                            //Конвертирование react component`a в dom
+                            // const dom_object = ReactDOMServer.renderToString(GetRow(res.ops[0]));
+                            //А затем добавление его к разметке
+                            // document.getElementById('dataTable').innerHTML += dom_object;
+                            //ПОСЛЕ ВЫПОЛНЕНИЯ НЕ РАБОТАЮТ КНОПКИ ОКРЫТЬ
+                            console.log(res);
+                            location.reload();
+                        })
+                        .catch((err) => 
+                        {
+                            console.log('Ошибка');
+                            return err.json();
+                        })
+                        .catch((err) => 
+                        {
+                            console.log(err);
+                        });
+                        // location.reload();
+                    }
+                });
+            }
+        } 
         //Из ключей создается массив колоннок
         const columns = struct.map((element) => {
-            if(element.title && (element.type == 'object' || element.type == 'massive'))
+            if(element.title)// && (element.type == 'object' || element.type == 'massive'))
                 return element.title;
             else
                 return element.prop;
         });
         //По клику на клетку запоминает последний айди
-        let last_id;
 
-        //В этой функции происходит основное взаимодествие с БД
-        function OnClickCell(e) {
-            e.preventDefault();
-            const cell = e.currentTarget;
-            //header тоже считается поэтому на одни элемент меньше
-            const column = cell.getAttribute('column');
-            //В случаи если колонна id
-            if(column == '_id' || column == 'id')
-                return;
-            const id = cell.parentNode.getAttribute('_id');
-            const object = collection.find((element) => element._id == id);
-            const type_of = typeof object[column];
-            //В случаи если объект являеться сложным запоминает айди, но не открывает контекстное меню
-            if(type_of == 'object')
-            {
-                last_id = id;
-                return;
-            }
-            //Buttons
-            //Кнопка изменить
-            const ChangeButton =
-            {
-                title: 'Изменить',
-                OnClick: (event) => 
-                {
-                    //Открытие модульного окна для изменения параметра
-                    setContentModal(
-                    { 
-                        title: 'Изменить', 
-                        fields: [ { type: type_of, prop: column } ],
-                        //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
-                        onChainge: (e, value) =>
+        //Функция итерации 
+        function GenerateRows() {
+            let last_id;
+            //Получение строки на основе объекта
+            function GetRow(object) {
+                //В этой функции происходит основное взаимодествие с БД
+                function OnClickCell(e) {
+                    e.preventDefault();
+                    const cell = e.currentTarget;
+                    //header тоже считается поэтому на одни элемент меньше
+                    const column = cell.getAttribute('column');
+                    //В случаи если колонна id
+                    if(column == '_id' || column == 'id')
+                        return;
+                    // const id = cell.parentNode.getAttribute('_id');
+                    const id = object._id;
+                    // struct.forEach(element => )
+                    const type_of = struct.find((elem_struct) => elem_struct.prop === column || elem_struct.title === column).type;
+                    // const type_of = typeof object[column];
+                    //В случаи если объект являеться сложным запоминает айди, но не открывает контекстное меню
+                    if(type_of == 'object' ||
+                       type_of == 'massive' ||
+                       type_of == 'combobox' ||
+                       type_of == 'OtherId')
+                    {
+                        last_id = id;
+                        return;
+                    }
+                    //Buttons
+                    //Кнопка изменить
+                    const ChangeButton =
+                    {
+                        title: 'Изменить',
+                        OnClick: (event) => 
                         {
-                            fetch(`${Global.url}/api/db/${type}/update?id=${id}&prop=${JSON.stringify({ key:column, new_value:value[column] })}`);   
-                            cell.innerHTML = value[column];
-                        }
-                    });
-                }
-            }
-            //Кнопка Добавить
-            const AddButton =
-            {
-                title: 'Добавить',
-                OnClick: (event) => 
-                {
-                    const fields = [];
-                    //
-                    function ConvertToFields(element) {
-                        switch(element.type)
-                        {
-                            case 'massive':
-                                //В случаи если это массив значит нужно добавить кнопку
-                                //element.prop = [ ... ]
-                                return {
-                                    type: 'button',
-                                    prop: 
+                            //Открытие модульного окна для изменения параметра
+                            setContentModal(
+                            { 
+                                title: 'Изменить', 
+                                fields: [ { type: type_of, prop: column } ],
+                                //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
+                                onChainge: (e, value) =>
+                                {
+                                    fetch(`${Global.url}/api/db/${type}/update?id=${id}&prop=${JSON.stringify({ key:column, new_value:value[column] })}`)
+                                    .then((res) => 
                                     {
-                                        title: 'Добавить',
-                                        fields: element.prop
-                                    },
-                                    title: element.title
-                                };
-                            //В случаи массива или объекта
-                            case 'object':
-                                let prop = element.prop;
-                                if(Array.isArray(prop))
-                                    return {
-                                        type: 'object',
-                                        prop: prop.map((element) => ConvertToFields(element)),
-                                        title: element.title
-                                    };
-                                else
-                                    //В случаи если это объект рекурсивно добираемся до свойств
-                                    return ConvertToFields(prop);
-                            default:
-                                return element;
+                                        console.log('Успех');
+                                        return res.json();
+                                    })
+                                    .then((res) => 
+                                    {
+                                        console.log(res);
+                                        cell.innerHTML = value[column];
+                                    })
+                                    .catch((err) => 
+                                    {
+                                        console.log('Ошибка');
+                                        return err.json();
+                                    })
+                                    .catch((err) => 
+                                    {
+                                        console.log(err);
+                                    });   
+                                }
+                            });
                         }
                     }
-                    //
-                    struct.forEach((element) => {
-                        //Пропускаем поля c id, т.к. они по дефолту добавлються потом в бд
-                        if(element.prop !== '_id' 
-                        && element.prop !== 'id')
-                        {
-                            fields.push(ConvertToFields(element));
-                        }
-                    });
-                    //
-                    setContentModal(
+                    //Кнопка удалить
+                    const DeleteButton = 
                     {
-                        title: 'Добавить',
-                        fields: fields,
-                        onChainge: (e, value) => 
+                        title: 'Удалить',
+                        OnClick: (event) => 
                         {
-                            //All properties
-                            fetch(`${Global.url}/api/db/${type}/insert?object=${JSON.stringify(value)}`);
-                            location.reload();
+                            fetch(`${Global.url}/api/db/${type}/delete?id=${id}`)
+                            .then((res) => 
+                            {
+                                console.log('Успех');
+                                //Удаление объекта из таблицы
+                                document.getElementById('dataTable').removeChild(cell.parentNode);
+                                return res.json();
+                            })
+                            .then((res) => 
+                            {
+                                console.log(res);
+                            })
+                            //
+                            .catch((err) => 
+                            {
+                                console.log('Ошибка');
+                                return err.json();
+                            })
+                            .catch((err) => 
+                            {
+                                console.log(err);
+                            });                
+                        }
+                    }
+                    //Создание content для контекстного меню
+                    //
+                    setContentContext(
+                    { 
+                        content: [ ChangeButton, AddButton, DeleteButton ],
+                        points: 
+                        {
+                            left: e.clientX,
+                            top: e.clientY
                         }
                     });
                 }
-            } 
-            //Кнопка удалить
-            const DeleteButton = 
-            {
-                title: 'Удалить',
-                OnClick: (event) => 
-                {
-                    fetch(`${Global.url}/api/db/${type}/delete?id=${id}`);
-                    location.reload();
-                }
-            }
-            //Создание content для контекстного меню
-            //
-            setContentContext(
-            { 
-                content: [ ChangeButton, AddButton, DeleteButton ],
-                points: 
-                {
-                    left: e.clientX,
-                    top: e.clientY
-                }
-            });
-        }
-        //Функция итерации 
-        function Iterate(WhatPush) {
-            for(let i = 0; i < collection.length; i++)
-            {
-                const row = [];
-                const object = collection[i];
-                struct.forEach((elem_struct) => {
-                    //new 
-                    let title;
-                    if(elem_struct.title && (elem_struct.type == 'object' || elem_struct.type == 'massive'))
-                        title = elem_struct.title;
-                    else
-                        title = elem_struct.prop;
-                    //end new
-                    row.push(<td 
-                        align='center'
-                        column={title}//old
-                        onClick={(e) => OnClickCell(e)}>
-                        {WhatPush(object, elem_struct)}
-                    </td>);
-                });
-                elements.push(<tr _id={object._id}>{row}</tr>)
-            }
-            
-            return elements;
-        }
-        //Простая конвертация
-        function Simple() {
-            //Найти максимальные значения ключей
-            //NEW 
-            return Iterate((object, elem_struct) => { return object[elem_struct.prop] });
-        }
-        //Сложная конвертация
-        function Difficult() {
-            //#region NEW FORM 
-            function ConvertVariable(object, elem_struct, path = []) {
-                
-                let className;
-                let content = [];
-                switch(elem_struct.type)
-                {
-                    default:
-                        console.log('THIS TYPE DON`T SUPPORT');
-                        return <div>DONT SUPPORT</div>;
-                    case 'string':
-                    case 'number':
-                    case 'boolean':
-                    //MongoDB object represent id of element in documents (TABLE IN SQL NOTATION)
-                    case 'ObjectId':
-                        const this_path = [];
-                        let prop_path, id, last_prop;
-                        // let id;
+                //#region For Difficult generation
+                function ConvertVariable(object, elem_struct, path = []) {
+                    const this_path = [];
+                    let prop_path, id, last_prop;
+                    //
+                    function getPathsIdsProp() {
                         for(let i = 0; i < path.length; i++)
                         {
                             if(typeof path[i] == 'number')
@@ -224,207 +286,332 @@ const Type = (props) => {
                             else
                                 this_path.push(path[i]);
                         }
-                        // this_path - all path to propertie, elem_struct.prop - last propertie
 
                         this_path.push(elem_struct.prop);
-
-                        function OnClickVariable(e) {
-                            const field = e.currentTarget;
-                            //Возможно излишне ресурсо затратно
-
-                            if(last_prop == 'id' ||
-                               last_prop == '_id')
-                                return;
-                                
-                            const ChangeButton = 
-                            {
-                                title: 'Изменить',
-                                OnClick: 
-                                (e) => 
+                    }
+                    //
+                    function convertToUpdateObject(value) {
+                        switch(id)
+                        {
+                            //В случаи если нет вложенных массивов
+                            case undefined:
+                                return { key: this_path.join('.'), new_value: value };
+                            //В случаи если один вложенный массив
+                            default:
+                                return { 
+                                    id: id, 
+                                    path: prop_path,
+                                    key: last_prop, 
+                                    new_value: value
+                                };
+                            //В случаи нескольких вложенных массивов
+                            //Пока не поддерживается
+                            // default:
+                            //     console.log("ERROR HAS ARRAY IN ARRAY, THIS FEATURE DON`T SUPPORT");
+                            //     break;
+                        };
+                    }
+                    //
+                    let className;
+                    let content = [];
+                    switch(elem_struct.type)
+                    {
+                        default:
+                            console.log(elem_struct.type + ' TYPE DON`T SUPPORT');
+                            return <div>DONT SUPPORT</div>;
+                        case 'string':
+                        case 'number':
+                        case 'boolean':
+                        case 'time':
+                        case 'date':
+                        //MongoDB object represent id of element in documents (TABLE IN SQL NOTATION)
+                        case 'ObjectId':
+                            getPathsIdsProp();
+                            // this_path - all path to propertie, elem_struct.prop - last propertie
+    
+                            function OnClickVariable(e) {
+                                e.preventDefault();
+                                const field = e.currentTarget;
+    
+                                if(elem_struct.prop == 'id' ||
+                                   elem_struct.prop == '_id')
+                                    return;
+                                    
+                                const ChangeButton = 
                                 {
-                                    setContentModal(    
+                                    title: 'Изменить',
+                                    OnClick: 
+                                    (e) => 
                                     {
-                                        title: 'Изменить',
-                                        fields: [ elem_struct ],
-                                        //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
-                                        onChainge: (e, value) => 
+                                        setContentModal(    
                                         {
-                                            let object;
-                                            switch(id)
+                                            title: 'Изменить',
+                                            fields: [ elem_struct ],
+                                            //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
+                                            onChainge: (e, value) => 
                                             {
-                                                //В случаи если нет вложенных массивов
-                                                case undefined:
-                                                    object = { key: this_path.join('.'), new_value: value[elem_struct.prop] };
-                                                    break;
-                                                //В случаи если один вложенный массив
-                                                default:
-                                                    object = 
-                                                    { 
-                                                        id: id, 
-                                                        path: prop_path,
-                                                        key: last_prop, 
-                                                        new_value: value[elem_struct.prop]
-                                                    };
-                                                    break;
-                                                //В случаи нескольких вложенных массивов
-                                                //Пока не поддерживается
-                                                // default:
-                                                //     console.log("ERROR HAS ARRAY IN ARRAY, THIS FEATURE DON`T SUPPORT");
-                                                //     break;
-                                            };
-                                            fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}`);
-                                            field.innerHTML = value;
-                                        }
-                                    });
-                                }
-                            };
-        
-                            setContentContext(
-                            {
-                                content: [ ChangeButton ],
-                                points: 
+                                                let new_object = convertToUpdateObject(value[elem_struct.prop]);
+                                                //
+                                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(new_object)}`)
+                                                .then((res) => 
+                                                {
+                                                    console.log('Успех');
+                                                    return res.json();
+                                                })
+                                                .then((res) => 
+                                                {
+                                                    field.innerHTML = value;
+                                                    console.log(res);
+                                                })
+                                                //Ошибка
+                                                .catch((err) => 
+                                                {
+                                                    console.log('Ошибка');
+                                                    return err.json();
+                                                })
+                                                .catch((err) => 
+                                                {
+                                                    console.log(err);
+                                                });
+                                            }
+                                        });
+                                    }
+                                };
+            
+                                setContentContext(
                                 {
-                                    left: e.clientX,
-                                    top: e.clientY
+                                    content: [ ChangeButton ],
+                                    points: 
+                                    {
+                                        left: e.clientX,
+                                        top: e.clientY
+                                    }
+                                });
+                            }
+    
+                            return <p 
+                                className={classes.variable} 
+                                onClick={(e) => OnClickVariable(e)}>
+                                {object[elem_struct.prop].toString()}
+                            </p>;
+                        case 'combobox':
+                            getPathsIdsProp();
+
+                            function OnChange(e) {
+                                const new_object = convertToUpdateObject(e.target.value);
+                                console.log('ON CHANGE');
+                                console.log(new_object);
+                                //
+                                console.log(last_id);
+                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(new_object)}`)
+                                .then((res) => 
+                                {
+                                    console.log('Успех');
+                                    console.log(res);
+                                })
+                                .catch((err) => 
+                                {
+                                    console.log('Ошибка');
+                                    console.log(err);
+                                });
+                            }
+
+                            return <SelectOption 
+                            classSelect={classes.choose}
+                            placeholder={object[elem_struct.prop]} 
+                            values={elem_struct.items}
+                            onChainge={(e) => OnChange(e)}
+                            placeholder={object[elem_struct.prop]}/>;
+                        case 'OtherId':
+                            getPathsIdsProp();
+                            //
+                            const OtherId = object[elem_struct.prop];
+
+                            function onChange(e) {
+                                //Выделить в глобальную функцию
+                                let new_object = convertToUpdateObject(Global.ConvertToDBRef(OtherId.$ref, e.target.value));
+                                //
+                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(new_object)}`)
+                                .then((res) => 
+                                {
+                                    console.log('Успех');
+                                    console.log(res);
+                                })
+                                .catch((err) => 
+                                {
+                                    console.log('Ошибка');
+                                    console.log(err);
+                                });
+                            }
+
+                            return <SelectOption 
+                            classSelect={classes.choose}
+                            placeholder={OtherId.$id} 
+                            onChainge={onChange} 
+                            getValues={(values) => GetIds(values, OtherId.$ref)}/>;
+                        case 'massive':
+                            className = classes.massive;
+                            //
+                            const array = object[elem_struct.title];
+                            const array_path = path.concat(elem_struct.title).join('.');
+                            //
+                            array.forEach((element, index) => {
+    
+                                function OnClickRemoveButton(e) {
+                                    e.preventDefault();
+                                    const object = { key: array_path, new_value: element.id };
+                                    fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
+                                    return;
                                 }
+                                //Конвертация элемента массива
+                                function ConvertElementOfArray() {
+                                    return ConvertVariable(
+                                        { [elem_struct.title]: element }, 
+                                        { 
+                                            type: 'object', 
+                                            prop: elem_struct.prop, 
+                                            title: elem_struct.title
+                                        }, path.concat(element.id));
+                                }
+                                //
+                                content.push(<div className={classes.item}>
+                                    {ConvertElementOfArray()}
+                                    <button onClick={(e) => OnClickRemoveButton(e)}>
+                                        Удалить
+                                    </button>
+                                </div>);
+                            });
+                            //Add button
+                            //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
+                            //Объекта который также будет находиться в кнопке
+                            function OnClickAddButton(e, value)
+                            {
+                                e.preventDefault();
+                                const object = { key: array_path, new_value: value };
+                                console.log(object);
+                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
+                                return;
+                            }
+                            //
+                            content.push(<button 
+                                window={
+                                {
+                                    title: 'Добавить',
+                                    //elem_struct.prop содержит все поля для создания нового элемента
+                                    fields: elem_struct.prop, 
+                                    onChainge: OnClickAddButton
+                                }}>
+                                Добавить
+                            </button>);
+                            break;
+                        case 'object':
+                            className = classes.object; 
+                            const new_object = object[elem_struct.title];
+                            //
+                            elem_struct.prop.forEach((element) => {
+                                let title;
+                                if(element.title)
+                                    title = element.title;
+                                else
+                                    title = element.prop;
+                                //
+                                content.push(<>
+                                    <div className={classes.text}>
+                                        {Global.FirstLetter(title)}:
+                                    </div>
+                                    <div className={classes.content}>
+                                        {ConvertVariable(new_object, element, path.concat(elem_struct.title))}
+                                    </div> 
+                                </>);    
+                            });
+                            break;
+                    }
+                    //
+                    if(path.length == 0)
+                    {
+                        content = <div className={className}>
+                            {content}
+                        </div>;
+                        //
+                        function OpenModalButton(e, content, title) {
+                            setContentModal(
+                            { 
+                                content: content, 
+                                title: title 
                             });
                         }
-
-                        return <p 
-                            className={classes.variable} 
-                            onClick={(e) => OnClickVariable(e)}>
-                            {object[elem_struct.prop].toString()}
-                        </p>;
-                        break;
-                    case 'massive':
-                        className = classes.massive;
                         //
-                        const array = object[elem_struct.title];
-                        const array_path = path.concat(elem_struct.title).join('.');
-                        //
-                        array.forEach((element, index) => {
-
-                            function OnClickRemoveButton(e) {
-                                e.preventDefault();
-                                const object = { key: array_path, new_value: element.id };
-                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
-                                return;
-                            }
-                            //Конвертация элемента массива
-                            function ConvertElementOfArray() {
-                                return ConvertVariable(
-                                    { [elem_struct.title]: element }, 
-                                    { 
-                                        type: 'object', 
-                                        prop: elem_struct.prop, 
-                                        title: elem_struct.title
-                                    }, path.concat(element.id));
-                            }
-                            //
-                            content.push(<div className={classes.item}>
-                                {ConvertElementOfArray()}
-                                <button onClick={(e) => OnClickRemoveButton(e)}>
-                                    Удалить
-                                </button>
-                            </div>);
-                        });
-                        //Add button
-                        //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
-                        //Объекта который также будет находиться в кнопке
-                        function OnClickAddButton(e, value)
-                        {
-                            e.preventDefault();
-                            const object = { key: array_path, new_value: value };
-                            console.log(object);
-                            fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
-                            return;
-                        }
-                        //
-                        content.push(<button 
-                            window={
-                            {
-                                title: 'Добавить',
-                                //elem_struct.prop содержит все поля для создания нового элемента
-                                fields: elem_struct.prop, 
-                                onChainge: OnClickAddButton
-                            }}>
-                            Добавить
-                        </button>);
-                        break;
-                    case 'object':
-                        className = classes.object; 
-                        const new_object = object[elem_struct.title];
-                        //
-                        elem_struct.prop.forEach((element) => {
-                            let title;
-                            if(element.title)
-                                title = element.title;
-                            else
-                                title = element.prop;
-                            //
-                            content.push(<>
-                                <div className={classes.text}>
-                                    {Global.FirstLetter(title)}:
-                                </div>
-                                <div className={classes.content}>
-                                    {ConvertVariable(new_object, element, path.concat(elem_struct.title))}
-                                </div> 
-                            </>);    
-                        });
-                        break;
-                }
-
-                if(path.length == 0)
-                {
-                    content = <div className={className}>
+                        return <button onClick={(e) => OpenModalButton(e, content, elem_struct.title)}>
+                            Открыть
+                        </button>;
+                    }
+                    //
+                    return <div className={className}>
                         {content}
                     </div>;
-                    //
-                    return <button onClick={(e) => OpenModalButton(e, content, elem_struct.title)}>
-                        Открыть
-                    </button>;
                 }
-                
-                return <div className={className}>
-                    {content}
-                </div>;
-            }
-            //#endregion
+                //#endregion
 
-            function OpenModalButton(e, content, title) {
-                setContentModal(
-                { 
-                    content: content, 
-                    title: title 
-                });
+                return <tr _id={object._id}>
+                {struct.map((elem_struct) => {
+                    //new 
+                    let title;
+                    if(elem_struct.title && (elem_struct.type == 'object' || elem_struct.type == 'massive'))
+                        title = elem_struct.title;
+                    else
+                        title = elem_struct.prop;
+                    //end new
+                    return <td 
+                        align='center'
+                        column={title}//old
+                        onClick={(e) => OnClickCell(e)}>
+                        {ConvertVariable(object, elem_struct)}
+                    </td>;
+                })}
+                </tr>;
             }
 
-            // NEW
-            return Iterate((object, elem_struct) => { return ConvertVariable(object, elem_struct) });
+            for(let i = 0; i < collection.length; i++)
+            {
+                const object = collection[i];
+                elements.push(GetRow(object));
+            }
+            
+            return elements;
         }
         
-        //Создание таблицы
-        let table;
-        if(collection && collection.length != 0)
-        {
-            //Создание столбцов заголовков
+        //Создание столбцов заголовков
+        function GenerateHeader() {
             const header = [];
             columns.forEach((element) => { 
-                header.push(<th>{Global.FirstLetter(element)}</th>);//ТУТ ОШИБКА
+                header.push(<th>{Global.FirstLetter(element)}</th>);
             });
-            elements.push(<tr>{header}</tr>);
-            //end
-            if(isDifficult)
-                table = Difficult();
-            else
-                table = Simple();
+            //
+            function OnClick(e) {
+                e.preventDefault();
+                setContentContext(
+                { 
+                    content: [ AddButton ],
+                    points: 
+                    {
+                        left: e.clientX,
+                        top: e.clientY
+                    }
+                });
+            }
+            //
+            elements.push(<tr onClick={(e) => OnClick(e)}>{header}</tr>);
         }
+
+        GenerateHeader();
+        //Создание таблицы
         return <table 
+            id='dataTable'
             className={classes.table} 
             cellspacing='0'
             cellpadding='5' 
             border='1'>
-            {table}
+            {GenerateRows()}
         </table>;
     }
 
@@ -449,7 +636,7 @@ const Type = (props) => {
     }
 
     return(
-        <DatabaseLayout>
+        <DatabaseLayout items={items}>
             {GenerateTitle()}
             {GenerateTable()}
             {/*AT FIRST DON`T VISIBLE */}
@@ -460,7 +647,10 @@ const Type = (props) => {
 }
 
 export async function getStaticPaths() {
-    const paths = Local.items.map((element) => { return { params: { type: element.href } } });
+    //ТУТ ИСПРАВИТь
+    const collections = await (await fetch(Global.url + '/api/db/')).json();
+    const paths = collections.map((element) => { return { params: { type: element } } });
+
     return {
         paths: paths,
         fallback: true
@@ -470,14 +660,16 @@ export async function getStaticPaths() {
 export async function getStaticProps(router) {
     //Запрос к бд для получения коллекции из mongoDB
     const type = router.params.type;
+    const items = await (await fetch(Global.url + '/api/db/')).json();
+    //
     const collection = await (await fetch(Global.url + '/api/db/' + type)).json();
     const struct = await (await (fetch(Global.url + '/api/db/' + type + '/struct'))).json();
-
-    console.log(await struct);
-
+    //
     return {
         props: {
+            items: items,
             type: type,
+            //
             collection: collection,
             struct: struct
         }

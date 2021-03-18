@@ -69,7 +69,14 @@
 
             .input
             {
+                @extend %font;
                 width: 100%;
+
+                &.select
+                {
+                    height: 2em;
+                    width: 100%;
+                }
             }
 
             .object

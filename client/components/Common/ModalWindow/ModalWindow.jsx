@@ -1,16 +1,22 @@
 import React, { useState } from 'react';
-//
+////
 import InputNumber from '../../CustomElements/InputNumber.jsx';
 import InputText from '../../CustomElements/InputText.jsx';
 import InputBoolean from '../../CustomElements/InputBoolean.jsx';
+import InputDate from '../../CustomElements/InputDate.jsx';
+import InputTime from '../../CustomElements/InputTime.jsx';
 //
+import ContextMenu from '../ContextMenu/ContextMenu.jsx';
+////
 import Global from '../../../pages/global.js';
 import classes from './ModalWindow.module.scss';
+import SelectOption from '../../CustomElements/SelectOption.jsx';
 
 const ModalWindow = (props) => {
     //state
     const [value, setValue] = useState({}); 
     const [window, setWindow] = useState();
+    const [contextMenu, setContextMenu] = useState();
     //all
     const title = props.title;
 
@@ -25,6 +31,10 @@ const ModalWindow = (props) => {
     function ShowSubModalWindow() {
         return window ? <ModalWindow {...window} onClose={(e) => setWindow()}/>: '';
     }
+
+    function ShowContextMenu() {
+        return contextMenu ? <ContextMenu {...contextMenu}/>: '';
+    }
     
     function GenerateContent() {
         const elements = [];
@@ -37,7 +47,7 @@ const ModalWindow = (props) => {
             for(let i = 0; i < array.length; i++)
             {
                 const item = array[i];
-                if(item.props)
+                if(item && item.props)  
                 {
                     //Находит кнопку которая должна открывать модальное окно
                     if(item.props.window)
@@ -61,6 +71,27 @@ const ModalWindow = (props) => {
         //
         function GenerateField(field, path = []) {
 
+            function SetValueOfPropertie(this_value) {
+                if(path.length > 0)
+                {
+                    if(value[path[0]] == undefined)
+                        value[path[0]] = {};
+                    let object = value[path[0]];
+                    //
+                    for(let i = 1; i < path.length; i++)
+                    {
+                        if(object[path[i]] == undefined)
+                            object[path[i]] = {};
+                        object = object[path[i]];
+                    }
+                    //
+                    object[field.prop] = this_value;
+                }
+                else
+                    value[field.prop] = this_value;
+                console.log(value);
+            }
+
             function GenerateProperties(title) {
                 return {
                     classInput: classes.input,
@@ -70,29 +101,13 @@ const ModalWindow = (props) => {
                     {
                         // setValue() hook здесь может не вызывать, так как здесь идет работа с ссылкой на объект
                         // path указывает на вложенное свойство
-                        if(path.length > 0)
-                        {
-                            if(value[path[0]] == undefined)
-                                value[path[0]] = {};
-                            let object = value[path[0]];
-                            //
-                            for(let i = 1; i < path.length; i++)
-                            {
-                                if(object[path[i]] == undefined)
-                                    object[path[i]] = {};
-                                object = object[path[i]];
-                            }
-                            //
-                            object[field.prop] = this_value;
-                        }
-                        else
-                            value[field.prop] = this_value;
-                        console.log(value);
+                        SetValueOfPropertie(this_value)
                     }
                 };
             };
             
             function OnClickAddButton(e, OnChainge) {
+                console.log(field.prop);
                 setWindow(Object.assign(field.prop, { onChainge: OnChainge }));
             }
 
@@ -108,10 +123,30 @@ const ModalWindow = (props) => {
                     placeholder='Введите число'/>;
                 case 'boolean':
                     //Нужно задать начальное состояние
+                    //ОШИБКА
                     value[field.prop] = false;
                     return <InputBoolean 
                     {...GenerateProperties(field.prop)}
                     placeholder='Введите'/>;
+                case 'date':
+                    return <InputDate
+                    {...GenerateProperties(field.prop)}/>;
+                case 'time':
+                    return <InputTime
+                    {...GenerateProperties(field.prop)}/>;
+                case 'combobox':
+                    return <SelectOption
+                    {...GenerateProperties(field.prop)}
+                    placeholder='Выберите значение'
+                    classSelect={classes.input + ' ' + classes.select}
+                    values={field.items}/>;
+                case 'OtherId':
+                    return <SelectOption
+                    title={field.prop}
+                    placeholder='Выберите айди'
+                    classSelect={classes.input + ' ' + classes.select}
+                    onChainge={(e) => SetValueOfPropertie(Global.ConvertToDBRef(field.ref, e.target.value))}
+                    getValues={(values) => field.getValues(values)}/>;
                 case 'button':
                     //В случаи типа 'button' field.prop хранит в себе объект для создание ModalWindow
                     function OnChainge(e, this_value) {
@@ -203,6 +238,12 @@ const ModalWindow = (props) => {
                 if(element.type == 'number' 
                 && parseInt(object[element.prop]) == 0)
                     continue;
+                // if(!object[element.prop]
+                // && element.type == 'combobox')
+                // {
+                //     alert('Поле ' + element.title + ' не заполнено!');
+                //     return true;
+                // }
                 if(element.type == 'button')
                 {
                     if(object[element.title] == undefined)
@@ -216,9 +257,9 @@ const ModalWindow = (props) => {
                     if(CheckEmptyness(element.prop, object[element.title], path.concat(element.title)))
                         return true;
                 }
-                else if((!object[element.prop] 
+                else if(!object[element.prop] 
                 && element.type != 'boolean'
-                && element.type != 'button'))
+                && element.type != 'button')
                 {
                     alert('Поле ' + element.prop + ' не заполнено!');
                     return true;
@@ -275,6 +316,7 @@ const ModalWindow = (props) => {
                 </div>
             </div>
             {ShowSubModalWindow()}
+            {ShowContextMenu()}
         </>
     )
 }

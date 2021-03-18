@@ -1,0 +1,9 @@
+@import '../../styles/index.scss';
+
+.time
+{
+    .input
+    {
+        @extend %border;
+    }
+}

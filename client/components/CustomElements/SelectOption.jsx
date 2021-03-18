@@ -1,18 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+//
+import Title from './GeneralJsx/Title.jsx';
+//
 import classes from './SelectOption.module.scss';
 
 const SelectOption = (props) => {
     const [values, setValues] = useState(props.values);
     const [selections, setSelections] = useState(0);
     //
+    const onChainge = props.onChainge;
+    //
     const title = props.title;
 
+    useEffect(() => {
+        if(props.getValues)
+            props.getValues(setValues);
+    }, []);
+
     function InsertSelections () {
+
+        function OnChange(e) {
+            const value = e.currentTarget.value;
+            onChainge(e, value);
+        }
 
         function ConvertToElement(element) {
             return <div className={dynamic.class}>
                 {dynamic.buttonLeft}
-                <select className={props.classSelect}>
+                <select className={props.classSelect} onChange={(e) => OnChange(e)}>
                     {element}
                 </select>
                 {dynamic.buttonRight}
@@ -69,7 +84,7 @@ const SelectOption = (props) => {
     }
 
     function GenerateTitle() {
-        return title ? <label>{title}</label>: '';
+        return title ? <Title className={classes.title} title={title}/> : '';
     }
 
     return (

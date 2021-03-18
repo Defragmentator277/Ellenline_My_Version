@@ -13,7 +13,8 @@ const InputNumber = (props) => {
 
     function OnChange(e) {
         const value = parseInt(e.currentTarget.value);
-        onChainge(e, value);
+        if(onChainge)
+            onChainge(e, value);
     }
 
     function GenerateTitle() {

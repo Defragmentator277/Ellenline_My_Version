@@ -8,6 +8,13 @@
 
 }
 
+select.choose
+{
+    // @extend %font;
+    width: fit-content;
+    height: 2em;
+}
+
 .table
 {
     border-color: $primary_color;

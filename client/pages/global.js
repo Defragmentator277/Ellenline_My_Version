@@ -1,5 +1,13 @@
+import { DBRef, ObjectID } from 'bson';
+
 export default class Global {
     static url = 'http://localhost:3000';
+
+    static resorts = {
+        'relax': [ 'pensionats', 'sanatoriums' ],
+        'cruises': [ 'river', 'marine' ],
+        'tours': [ 'oneday', 'multiday' ]
+    }
 
     //Возможно стоит поместить этот массив в БД, а может нет :/
     static GetConvert(type) {
@@ -33,7 +41,7 @@ export default class Global {
         return word[0].toUpperCase() + word.slice(1, word.length);
     }
 
-    static Fetch() {
-        
+    static ConvertToDBRef(ref, id) {
+        return new DBRef(ref, ObjectID(id));
     }
 }

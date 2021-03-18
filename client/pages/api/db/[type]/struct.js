@@ -7,7 +7,6 @@ handler.use(middleware);
 
 handler.get(async (req, res) => {
     const type = req.query.type;
-    // const struct = req.query.struct;
     req.db.collection('structure').find({}).toArray((err, result) => {
         if(err)
             return console.log(err);

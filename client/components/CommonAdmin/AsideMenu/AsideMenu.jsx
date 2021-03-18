@@ -10,6 +10,8 @@ const AsideMenu = (props) => {
     function GenerateItems() {
 
         function GenerateItem(item) {
+            if(!item.items)
+                return;
             return item.items.map((element) => 
             <Link href={`/admin/${root}/${item.href}/${element.href}`}>
                 {element.title}

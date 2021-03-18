@@ -13,7 +13,7 @@ import classes from './index.module.scss';
 const Resort = (props) => {
     const type = props.type;
     //relax, tours, cruises
-    const id = props.id;
+    // const id = props.id;
     const images = props.images;
     const title = props.title;
     const price = props.price;
@@ -94,20 +94,37 @@ const Resort = (props) => {
 }
 
 export async function getStaticPaths() {
-    const res = await fetch(Global.url + '/api/resorts');
-    const resorts = await res.json();
+    // const res = await fetch(Global.url + '/api/resorts');
+    // const resorts = await res.json();
     
+    // const paths = [];
+    // for(let i = 0; i < resorts.length; i++)
+    // {
+    //     const res = await fetch(Global.url + '/api/resorts/' + resorts[i]);
+    //     const answer = await res.json();
+    //     Object.keys(answer).map((element) => {
+    //         answer[element].forEach((thisElem) => {
+    //             paths.push({ params: { type: resorts[i], resort: element, id: thisElem.id.toString() } });
+    //         });
+    //     });
+    // }
+    console.log('GET STATIC PATHS');
     const paths = [];
-    for(let i = 0; i < resorts.length; i++)
+    //
+    const props = Object.keys(Global.resorts);
+    for(let i = 0; i < props.length; i++)
     {
-        const res = await fetch(Global.url + '/api/resorts/' + resorts[i]);
-        const answer = await res.json();
-        Object.keys(answer).map((element) => {
-            answer[element].forEach((thisElem) => {
-                paths.push({ params: { type: resorts[i], resort: element, id: thisElem.id.toString() } });
-            });
-        });
+        const type_ofs = Global.resorts[props[i]];
+        for(let j = 0; j < type_ofs; j++)
+        {
+            const answer = await (await fetch(Global.url + '/api/resorts/' + props[i] + '/' + type_ofs[j])).json();
+            console.log(answer);
+            // answer.forEach((part) => {
+            //     paths.push({ params: { type: props[i], resort: type_ofs[j], id: part._id } });
+            // });
+        }
     }
+    console.log(paths);
     //Macket
     //{ params: { type: '...', resort: '...', id: '...' } }
     return {

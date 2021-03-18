@@ -11,9 +11,6 @@ const ContextMenu = (props) => {
 
     //Close if click 
     useEffect(() => {
-        // document.getElementById('').onclick = (e) => {
-        //     onClickOutside(e);
-        // };
     }); 
 
     function GenerateItems() {

@@ -27,16 +27,6 @@ export default class Local {
             href: 'cities',
             items: this._submenu
         },
-        // {
-        //     title: 'Круизы',
-        //     href: 'cruises',
-        //     items: this._submenu
-        // },
-        // {
-        //     title: 'Туры',
-        //     href: 'tours',
-        //     items: this._submenu
-        // },
         {
             title: 'Отдых',
             href: 'resorts',

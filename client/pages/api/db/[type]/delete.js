@@ -12,8 +12,9 @@ handler.get(async (req, res) => {
     const id = req.query.id;
     req.db.collection(type).deleteOne({ _id: ObjectId(id) }, (err, result) => {
         if(err)
-            return console.log(err);
-        res.status(200);
+            res.json(err);
+        else
+            res.json(result);
     });
 });
 

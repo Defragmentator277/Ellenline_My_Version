@@ -13,7 +13,8 @@ const InputText = (props) => {
 
     function OnChange(e) {
         const value = e.currentTarget.value;
-        onChainge(e, value);
+        if(onChainge)
+            onChainge(e, value);
     }
 
     function GenerateTitle() {

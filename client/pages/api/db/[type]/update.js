@@ -30,11 +30,10 @@ handler.get(async (req, res) => {
         (err, result) => 
         {
             if(err)
-                return console.log(err);
-            res.status(200);
+                res.json(err);
+            else 
+                res.json(result);
         });
-        console.log(prop);
-        res.status(200);
     }
     //Update простого свойства
     else
@@ -69,6 +68,7 @@ handler.get(async (req, res) => {
                 break;
             case '$set':
                 Update(id, prop, '$set');
+                break;
             case '$pull':
                 prop.new_value = { id: prop.new_value };
                 console.log(prop);
@@ -89,9 +89,9 @@ handler.get(async (req, res) => {
             (err, result) => 
             {
                 if(err)
-                    return console.log(err);
-                // console.log(result);
-                res.status(200);
+                    res.json(err);
+                else
+                    res.json(result);
             });
     }
 });

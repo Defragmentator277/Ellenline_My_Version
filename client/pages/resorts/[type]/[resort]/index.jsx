@@ -33,21 +33,14 @@ const Resorts = (props) => {
 //Она необходима, для перехода на страницу сразу из строки поиска
 export async function getStaticPaths() {
     //В этом случаи я получаю все типы отдыха и пререндериваю соотвествующие страницы
-    //(сорри за мой русский speak)
+    const paths = [];
     //
-    const res = await fetch(Global.url + '/api/resorts');
-    const resorts = await res.json();
-    
-    let paths = [];
-    for(let i = 0; i < resorts.length; i++)
-    {
-        const res = await fetch(Global.url + '/api/resorts/' + resorts[i]);
-        const answer = await res.json();
-        paths = paths.concat(Object.keys(answer).map((element) => {
-            return { params: { type: resorts[i], resort: element } };
-        }));
-    }
-
+    Object.keys(Global.resorts).forEach((prop) => {
+        Global.resorts[prop].forEach((element) => {
+            paths.push({ params: { type: prop, resort: element } });
+        })
+    });
+    //
     return {
         paths: paths,
         fallback: true
@@ -58,8 +51,10 @@ export async function getStaticProps(router) {
     //А здесь я получаю информацию об отдыхе, а затем передаю в качестве props`a
     const type = router.params.type;
     const resort = router.params.resort;
+    //
     const res = await fetch(Global.url + '/api/resorts/'+ type + '/' + resort);
     const items = await res.json();
+    //
     return {
         props: {
             type: type,

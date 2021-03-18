@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from 'react';
+//
+import Title from './GeneralJsx/Title.jsx';
+//
 import classes from './InputDate.module.scss';
 
 const InputDate = (props) => {
+    const title = props.title;
+    const onChainge = props.onChainge;
     const [date, setDate] = useState(() => {
         if(!props.date)
         {
@@ -20,17 +25,27 @@ const InputDate = (props) => {
     const [min, setMin] = useState(props.min);
     const [max, setMax] = useState(props.max);
 
-    useEffect(() => {
-        document.getElementById('date').value = date;
-    });
+    // useEffect(() => {
+    //     document.getElementById('date').value = date;
+    // });
+
+    function GenerateTitle() {
+        return title ? <Title title={title}/> : '';
+    }
+
+    function OnChange(e) {
+        const value = e.currentTarget.value;
+        if(onChainge)
+            onChainge(e, new Date(value));
+    }
     
     return (
         <div className={classes.date + ' ' + props.className}>
-            <label>{props.title}</label>
+            {GenerateTitle()}
             <input type="date"
-                   id="date" 
                    min={min}
-                   max={max}/>
+                   max={max}
+                   onChange={(e) => OnChange(e)}/>
         </div>
     )
 }
