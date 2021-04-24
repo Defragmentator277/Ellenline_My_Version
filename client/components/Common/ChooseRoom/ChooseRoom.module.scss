@@ -1,0 +1,47 @@
+@import '../../../styles/index.scss';
+
+.choose_room
+{
+    @extend %border;
+    grid-template-columns: repeat(2, 1fr);
+
+    .slider
+    {
+        height: 50%;
+    }
+
+    .content
+    {
+        display: grid;
+        row-gap: 5px;
+        height: fit-content;
+        padding: 0 10px 5px;
+
+        p, .title
+        {
+            @extend %font;
+            font-size: 1.25em;
+            margin: 5px 0;
+        }
+
+        .persons
+        {
+            display: grid;
+            grid-template-rows: 1fr;
+            grid-auto-columns: min-content;
+            column-gap: 25px;
+
+            i
+            {
+                grid-row: 1;
+                font-size: 2em;
+                width: min-content;
+            }
+        }
+
+        .prices
+        {
+            
+        }
+    }
+}

@@ -8,7 +8,6 @@ import SelectOption from '../../../../components/CustomElements/SelectOption.jsx
 import Global from '../../../global.js';
 import Local from '../local.js';
 import classes from './index.module.scss';
-import { DBRef, ObjectID, ObjectId } from 'bson';
 
 const Type = (props) => {
     const items = props.items ?
@@ -17,9 +16,6 @@ const Type = (props) => {
     const type = props.type;
     const collection = props.collection;
     const struct = props.struct;
-    // const isDifficult = struct.some((element) => { return element.type == 'object' || element.type == 'massive' });
-    //
-    // const [isClient, setIsClient] = useState(false);
     //
     const [contentModal, setContentModal] = useState();
     const [contentContext, setContentContext] = useState();
@@ -32,121 +28,6 @@ const Type = (props) => {
 
     function GenerateTable() {
         const elements = [];
-
-        //Вызывает setValues, функцию заполняющую значения в select
-        function GetIds(setValues, ref) {
-            fetch(`${Global.url}/api/db/${ref}`)
-            .then((res) => 
-            {
-                console.log('Успех');
-                return res.json();
-            })
-            .then((res) => 
-            {
-                setValues(res.map((element) => {
-                    return element._id;
-                }));
-            })
-            .catch((err) => 
-            {
-                console.log('Ошибка');
-                return err.json();
-            })
-            .catch((err) => 
-            {
-                console.log(err);
-            });
-        }
-        //Кнопка Добавить
-        const AddButton =
-        {
-            title: 'Добавить',
-            OnClick: (event) => 
-            {
-                const fields = [];
-                //
-                function ConvertToFields(element) {
-                    switch(element.type)
-                    {
-                        case 'massive':
-                            //В случаи если это массив значит нужно добавить кнопку
-                            //element.prop = [ ... ]
-                            // console.log(element.prop);
-                            return {
-                                type: 'button',
-                                prop: 
-                                {
-                                    title: 'Добавить',
-                                    fields: element.prop.map((element) => ConvertToFields(element))
-                                },
-                                title: element.title
-                            };
-                        //В случаи массива или объекта
-                        case 'object':
-                            let prop = element.prop;
-                            if(Array.isArray(prop))
-                                return {
-                                    type: 'object',
-                                    prop: prop.map((element) => ConvertToFields(element)),
-                                    title: element.title
-                                };
-                            else
-                                //В случаи если это объект рекурсивно добираемся до свойств
-                                return ConvertToFields(prop);
-                        case 'OtherId':
-                            element.getValues = (values) => GetIds(values, element.ref); 
-                            return element;
-                        default:
-                            return element;
-                    }
-                }
-                //
-                struct.forEach((element) => {
-                    //Пропускаем поля c id, т.к. они по дефолту добавлються потом в бд
-                    if(element.prop !== '_id' 
-                    && element.prop !== 'id')
-                    {
-                        fields.push(ConvertToFields(element));
-                    }
-                });
-                //
-                setContentModal(
-                {
-                    title: 'Добавить',
-                    fields: fields,
-                    onChainge: (e, value) => 
-                    {
-                        //All properties
-                        fetch(`${Global.url}/api/db/${type}/insert?object=${JSON.stringify(value)}`)
-                        .then((res) => 
-                        {
-                            console.log('Успех');
-                            return res.json();
-                        })
-                        .then((res) => 
-                        {
-                            //Конвертирование react component`a в dom
-                            // const dom_object = ReactDOMServer.renderToString(GetRow(res.ops[0]));
-                            //А затем добавление его к разметке
-                            // document.getElementById('dataTable').innerHTML += dom_object;
-                            //ПОСЛЕ ВЫПОЛНЕНИЯ НЕ РАБОТАЮТ КНОПКИ ОКРЫТЬ
-                            console.log(res);
-                            location.reload();
-                        })
-                        .catch((err) => 
-                        {
-                            console.log('Ошибка');
-                            return err.json();
-                        })
-                        .catch((err) => 
-                        {
-                            console.log(err);
-                        });
-                        // location.reload();
-                    }
-                });
-            }
-        } 
         //Из ключей создается массив колоннок
         const columns = struct.map((element) => {
             if(element.title)// && (element.type == 'object' || element.type == 'massive'))
@@ -159,8 +40,127 @@ const Type = (props) => {
         //Функция итерации 
         function GenerateRows() {
             let last_id;
+            //Вызывает setValues, функцию заполняющую значения айди из другой коллекции или из внутреннего массива в select
+            function GetIds(setValues, url, field = '_id') {
+                console.log(`${Global.url}/api/db/${url}`);
+                fetch(`${Global.url}/api/db/${url}`)
+                .then((res) => 
+                {
+                    console.log('Успех');
+                    return res.json();
+                })
+                .then((res) => 
+                {
+                    const new_res = res.map((element) => {
+                        return element[field];
+                    });
+                    setValues(new_res);
+                })
+                .catch((err) => 
+                {
+                    console.log('Ошибка');
+                    return err.json();
+                })
+                .catch((err) => 
+                {
+                    console.log(err);
+                });
+            }
+            //Конвертирование элемента для модального окна
+            function ConvertToFields(element) {
+                switch(element.type)
+                {
+                    case 'massive':
+                        //В случаи если это массив значит нужно добавить кнопку
+                        //element.prop = [ ... ]
+                        // console.log(element.prop);
+                        return {
+                            type: 'button',
+                            prop: 
+                            {
+                                title: 'Добавить',
+                                fields: element.prop.map((element) => ConvertToFields(element))
+                            },
+                            title: element.title
+                        };
+                    //В случаи массива или объекта
+                    case 'object':
+                        let prop = element.prop;
+                        if(Array.isArray(prop))
+                            return {
+                                type: 'object',
+                                prop: prop.map((element) => ConvertToFields(element)),
+                                title: element.title
+                            };
+                        else
+                            //В случаи если это объект рекурсивно добираемся до свойств
+                            return ConvertToFields(prop);
+                    case 'OtherId':
+                        element.getValues = (setValues) => GetIds(setValues, element.ref); 
+                        return element;
+                    case 'InnerId':
+                        element.getValues = (setValues) => GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${element.ref}`, 'id');
+                        return element;
+                    default:
+                        return element;
+                }
+            }
+            //Кнопка Добавить
+            const AddButton =
+            {
+                title: 'Добавить',
+                OnClick: (event) => 
+                {
+                    const fields = [];
+                    //
+                    struct.forEach((element) => {
+                        //Пропускаем поля c id, т.к. они по дефолту добавлються потом в бд
+                        if(element.prop !== '_id' 
+                        && element.prop !== 'id')
+                        {
+                            fields.push(ConvertToFields(element));
+                        }
+                    });
+                    //
+                    setContentModal(
+                    {
+                        title: 'Добавить',
+                        fields: fields,
+                        onChainge: (e, value) => 
+                        {
+                            //All properties
+                            fetch(`${Global.url}/api/db/${type}/insert?object=${JSON.stringify(value)}`)
+                            .then((res) => 
+                            {
+                                console.log('Успех');
+                                return res.json();
+                            })
+                            .then((res) => 
+                            {
+                                //Конвертирование react component`a в dom
+                                // const dom_object = ReactDOMServer.renderToString(GetRow(res.ops[0]));
+                                //А затем добавление его к разметке
+                                // document.getElementById('dataTable').innerHTML += dom_object;
+                                //ПОСЛЕ ВЫПОЛНЕНИЯ НЕ РАБОТАЮТ КНОПКИ ОКРЫТЬ
+                                location.reload();
+                            })
+                            .catch((err) => 
+                            {
+                                console.log('Ошибка');
+                                return err.json();
+                            })
+                            .catch((err) => 
+                            {
+                                console.log(err);
+                            });
+                            // location.reload();
+                        }
+                    });
+                }
+            } 
             //Получение строки на основе объекта
             function GetRow(object) {
+                last_id = object._id;
                 //В этой функции происходит основное взаимодествие с БД
                 function OnClickCell(e) {
                     e.preventDefault();
@@ -170,20 +170,16 @@ const Type = (props) => {
                     //В случаи если колонна id
                     if(column == '_id' || column == 'id')
                         return;
-                    // const id = cell.parentNode.getAttribute('_id');
                     const id = object._id;
-                    // struct.forEach(element => )
                     const type_of = struct.find((elem_struct) => elem_struct.prop === column || elem_struct.title === column).type;
-                    // const type_of = typeof object[column];
+                    // last_id = id;
                     //В случаи если объект являеться сложным запоминает айди, но не открывает контекстное меню
                     if(type_of == 'object' ||
                        type_of == 'massive' ||
                        type_of == 'combobox' ||
-                       type_of == 'OtherId')
-                    {
-                        last_id = id;
+                       type_of == 'OtherId' || 
+                       type_of == 'InnerId')
                         return;
-                    }
                     //Buttons
                     //Кнопка изменить
                     const ChangeButton =
@@ -312,6 +308,22 @@ const Type = (props) => {
                         };
                     }
                     //
+                    function onChangeSelection(e, value) {
+                        const new_object = convertToUpdateObject(value);
+                        //
+                        fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(new_object)}`)
+                        .then((res) => 
+                        {
+                            console.log('Успех');
+                            console.log(res);
+                        })
+                        .catch((err) => 
+                        {
+                            console.log('Ошибка');
+                            console.log(err);
+                        });
+                    }
+                    //
                     let className;
                     let content = [];
                     switch(elem_struct.type)
@@ -396,59 +408,37 @@ const Type = (props) => {
                             </p>;
                         case 'combobox':
                             getPathsIdsProp();
-
-                            function OnChange(e) {
-                                const new_object = convertToUpdateObject(e.target.value);
-                                console.log('ON CHANGE');
-                                console.log(new_object);
-                                //
-                                console.log(last_id);
-                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(new_object)}`)
-                                .then((res) => 
-                                {
-                                    console.log('Успех');
-                                    console.log(res);
-                                })
-                                .catch((err) => 
-                                {
-                                    console.log('Ошибка');
-                                    console.log(err);
-                                });
-                            }
-
+                            //
+                            const ComboboxValue = object[elem_struct.prop];
+                            //
                             return <SelectOption 
                             classSelect={classes.choose}
-                            placeholder={object[elem_struct.prop]} 
+                            placeholder={ComboboxValue} 
                             values={elem_struct.items}
-                            onChainge={(e) => OnChange(e)}
+                            onChainge={(e, value) => onChangeSelection(e, value)}
                             placeholder={object[elem_struct.prop]}/>;
                         case 'OtherId':
                             getPathsIdsProp();
                             //
                             const OtherId = object[elem_struct.prop];
-
-                            function onChange(e) {
-                                //Выделить в глобальную функцию
-                                let new_object = convertToUpdateObject(Global.ConvertToDBRef(OtherId.$ref, e.target.value));
-                                //
-                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(new_object)}`)
-                                .then((res) => 
-                                {
-                                    console.log('Успех');
-                                    console.log(res);
-                                })
-                                .catch((err) => 
-                                {
-                                    console.log('Ошибка');
-                                    console.log(err);
-                                });
-                            }
-
+                            //
                             return <SelectOption 
                             classSelect={classes.choose}
                             placeholder={OtherId.$id} 
-                            onChainge={onChange} 
-                            getValues={(values) => GetIds(values, OtherId.$ref)}/>;
+                            onChainge={(e, value) => onChangeSelection(e, Global.ConvertToDBRef(OtherId.$ref, value))} 
+                            isOnce={true}
+                            getValues={(setValues) => GetIds(setValues, OtherId.$ref)}/>;
+                        case 'InnerId':
+                            getPathsIdsProp();
+                            //
+                            const InnerId = object[elem_struct.prop];
+                            //
+                            return <SelectOption 
+                            classSelect={classes.choose}
+                            placeholder={InnerId}
+                            onChainge={(e, value) => onChangeSelection(e, value)}
+                            isOnce={true}
+                            getValues={(setValues) => GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${elem_struct.ref}`, 'id')}/>;
                         case 'massive':
                             className = classes.massive;
                             //
@@ -498,7 +488,7 @@ const Type = (props) => {
                                 {
                                     title: 'Добавить',
                                     //elem_struct.prop содержит все поля для создания нового элемента
-                                    fields: elem_struct.prop, 
+                                    fields: elem_struct.prop.map((element) => ConvertToFields(element)), 
                                     onChainge: OnClickAddButton
                                 }}>
                                 Добавить
@@ -570,7 +560,30 @@ const Type = (props) => {
                 })}
                 </tr>;
             }
-
+        
+            //Создание столбцов заголовков
+            function GenerateHeader() {
+                const header = [];
+                columns.forEach((element) => { 
+                    header.push(<th>{Global.FirstLetter(element)}</th>);
+                });
+                //
+                function OnClick(e) {
+                    e.preventDefault();
+                    setContentContext(
+                    { 
+                        content: [ AddButton ],
+                        points: 
+                        {
+                            left: e.clientX,
+                            top: e.clientY
+                        }
+                    });
+                }
+                //
+                elements.push(<tr onClick={(e) => OnClick(e)}>{header}</tr>);
+            }
+            GenerateHeader();
             for(let i = 0; i < collection.length; i++)
             {
                 const object = collection[i];
@@ -579,31 +592,6 @@ const Type = (props) => {
             
             return elements;
         }
-        
-        //Создание столбцов заголовков
-        function GenerateHeader() {
-            const header = [];
-            columns.forEach((element) => { 
-                header.push(<th>{Global.FirstLetter(element)}</th>);
-            });
-            //
-            function OnClick(e) {
-                e.preventDefault();
-                setContentContext(
-                { 
-                    content: [ AddButton ],
-                    points: 
-                    {
-                        left: e.clientX,
-                        top: e.clientY
-                    }
-                });
-            }
-            //
-            elements.push(<tr onClick={(e) => OnClick(e)}>{header}</tr>);
-        }
-
-        GenerateHeader();
         //Создание таблицы
         return <table 
             id='dataTable'

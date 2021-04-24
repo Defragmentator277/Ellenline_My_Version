@@ -23,7 +23,7 @@
         column-gap: 15px;
         row-gap: 25px;
         grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(3, auto);   
+        grid-template-rows: repeat(2, auto);   
 
         .parents, .childs, .date
         {
@@ -49,27 +49,22 @@
         
         .tickets
         {
-            grid-column-start: 1;
-            grid-column-end: 3;
+            grid-column: 1;
         }
 
-        .code
+        .price, .capacity
         {
-            display: grid;
-            // grid-template-rows: repeat(2, 1fr);
-            height: 2.4em;
-            align-self: center;
-            row-gap: 1.5px;
-            input 
-            {
-                width: 100%;
-            }
-        }
-
-        .price
-        {
+            @extend %font;
+            grid-column: 2;
             font-size: 1.5em;
             align-self: center;
+        }
+
+        .rooms
+        {
+            height: fit-content;
+            grid-column-start: 1;
+            grid-column-end: 3;
         }
     }
 
@@ -79,22 +74,34 @@
         display: grid;
         margin-left: 10px;
         margin-right: 20px;
-        row-gap: 20px;
+        row-gap: 5px;
         grid-template-rows: repeat(5, min-content(1fr));
         
-        .fio, .e_mail, .telephone, .button
+        .fio, .e_mail, .telephone
         {
+            justify-self: center;
             height: min-content;
+            padding: 5px;
+            max-width: 100%;
+            min-width: 50%;
+        }
+
+        .button
+        {
+            @extend %button;
             padding: 5px;
         }
 
-        p
+        .text
         {
-            padding: 5px 10px;
-            background-color: lightgray;
-            span 
+            p
             {
-                color: red;
+                padding: 5px 10px;
+                background-color: lightgray;
+                span 
+                {
+                    color: red;
+                }
             }
         }
     }
@@ -115,7 +122,7 @@
         .info_going
         {
 
-            .price.tours
+            .price
             {
                 grid-column-start: 1;
                 grid-column-end: 3;
@@ -135,9 +142,15 @@
 
         .info_going
         {
+            grid-template-columns: 1fr;
             grid-template-rows: repeat(4, auto);
 
-            .parents, .childs, .code, .price
+            .time
+            {
+                grid-column: 1;
+            }
+
+            .parents, .childs, .code, .price, .tickets, .capacity, .time
             {
                 grid-column-start: 1;
                 grid-column-end: 3;

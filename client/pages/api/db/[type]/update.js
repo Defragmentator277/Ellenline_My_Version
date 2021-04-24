@@ -11,6 +11,7 @@ handler.get(async (req, res) => {
     //all incoming
     const type = req.query.type;
     const id = req.query.id;
+    const operator = req.query.operator || '$set';
     const prop = JSON.parse(req.query.prop);
     //
     const collection = req.db.collection(type);
@@ -23,7 +24,7 @@ handler.get(async (req, res) => {
             _id: ObjectId(id), 
             [prop.path + '.id']: prop.id
         },
-        { $set: 
+        { [operator]: 
         {
             [prop.path + '.$.' + prop.key]: prop.new_value
         }},
@@ -38,8 +39,7 @@ handler.get(async (req, res) => {
     //Update простого свойства
     else
     {
-        //prop: { key: ..., new_value: ..., [...operator] = '$set' }
-        const operator = req.query.operator || '$set';
+        //prop: { key: ..., new_value: ..., } [...operator] = '$set' 
         switch(operator)
         {
             case '$push':

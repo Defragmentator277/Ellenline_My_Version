@@ -17,16 +17,10 @@ const List = (props) => {
             for(let i = 0; i < items.length; i++)
             {
                 let element = items[i];
-                // element.price = 'от ' + element.price;
+                element.id = element._id;
                 elements.push(<ListItem category={resort}
                                         path={path}
                                         {...element}/>);
-                                        // id={element._id}
-                                        // title={element.name}
-                                        // image={element.image}
-                                        // adress={element.adress}
-                                        // price={element.price}
-                                        // services={element.services}/>);
             }
         }
         return elements;

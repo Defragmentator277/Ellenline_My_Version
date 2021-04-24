@@ -5,22 +5,17 @@ import Title from './GeneralJsx/Title.jsx'
 import classesInput from './GeneralScss/Input.module.scss'
 
 const InputText = (props) => {
+    const placeholder = props.placeholder || '+70000000000';
+    // props = props.settings;
     const [value, setValue] = useState(props.value);
-    const placeholder = props.placeholder;
     const title = props.title;
     const onChainge = props.onChainge;
     const required = props.required;
-    //
-    const regex = props.regex;
 
     function OnChange(e) {
         const value = e.currentTarget.value;
-        let new_value = value;
-        if(regex && !regex.test(value))
-            new_value = null;
-        setValue(new_value);
         if(onChainge)
-            onChainge(e, new_value);
+            onChainge(e, value);
     }
 
     function GenerateTitle() {
@@ -29,9 +24,10 @@ const InputText = (props) => {
 
     function GenerateInput() {
         return <input className={classesInput.input + ' ' + props.classInput}   
-        value={value}
+        type='tel'
         placeholder={placeholder}
         required={required}
+        pattern='\+7[0-9]{10}'
         onChange={(e) => OnChange(e)}/>
     }
 

@@ -4,24 +4,31 @@ import classes from './Timetable.module.scss';
 const Timetable = (props) => {
     const timetable = props.timetable;
 
-    function ConvertDay(massive) {
-        const elements = [];
-        for(let i = 0; i < massive.length; i++)
-        {
-            elements.push(<div className={classes.event}>
-                <span>{massive[i][0]}</span><p>{massive[i][1]}</p>
-            </div>)
-        }
-        return elements;
+    function ConvertDay(day) {
+        // const elements = [];
+        // for(let i = 0; i < massive.length; i++)
+        // {
+        //     elements.push(<div className={classes.event}>
+        //         <span>{}</span><p>{}</p>
+        //     </div>)
+        // }
+        // return elements;
+        return <div className={classes.event}>
+            <span>{day.time.start + ' - ' + day.time.end}</span>
+            <p>{day.description}</p>
+        </div>
     }
 
     function InsertItems() {
         const elements = [];
         for(let i = 0; i < timetable.length; i++)
         {
+            const all_day = timetable[i];
+            //Macket
+            //all_day = { time: { start: ..., end: ... }, day: ..., description: ..., id: ... }
             elements.push(<div className={classes.days}>
-                <h1>{i + 1} день</h1>
-                {ConvertDay(timetable[i])}
+                <h1>{all_day.day} день</h1>
+                {ConvertDay(all_day)}
             </div>);
         }
         return elements;

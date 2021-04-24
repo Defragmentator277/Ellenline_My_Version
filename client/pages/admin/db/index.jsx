@@ -23,6 +23,7 @@ const Db = (props) => {
 export async function getStaticProps(router) {
     //Запрос к бд для получения коллекции из mongoDB
     const collections = await (await fetch(Global.url + '/api/db/')).json();
+    console.log(collections);
 
     return {
         props: {

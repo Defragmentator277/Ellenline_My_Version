@@ -11,22 +11,28 @@ import Global from '../../../../global.js';
 import classes from './index.module.scss';
 
 const Resort = (props) => {
+    console.log('ON CLIENT');
+    console.log(props.items);
+    //
     const type = props.type;
+    const resort = props.resort;
     //relax, tours, cruises
-    // const id = props.id;
+    const id = props.id;
     const images = props.images;
     const title = props.title;
     const price = props.price;
     const services = props.services;
     const text= props.text;
-    const address = props.address;
+    const adress = props.adress;
     const points = props.points;
-    //relax
-    const stars = props.stars;
     //tours, cruises
     const info = props.info;
     const timetable = props.timetable;
-    const duration = props.duration;
+    //tours
+    const timetable_schedule = props.timetable_schedule;
+    //relax
+    const stars = props.stars;
+    const rooms = props.rooms;
 
     function GenerateTimetable() {
         switch(type) 
@@ -70,11 +76,11 @@ const Resort = (props) => {
                 type={type}
                 //
                 stars={stars}
-                duration={duration}/>
+                duration={timetable?.length || null}/>
 
                 <Providers 
                 services={services} 
-                address={address}
+                address={adress}
                 type={type}
                 //
                 info={info}
@@ -82,54 +88,41 @@ const Resort = (props) => {
 
                 {GenerateTimetable()}
 
-                {GenerateMap()}
+                {/* {GenerateMap()} */}
 
                 <FormBooking 
                 className={classes.form}
                 price={price}
-                type={type}/>
+                type={type}
+                id={id}
+                //
+                timetable={timetable_schedule}
+                rooms={rooms}/>
             </div>
         </ClientLayout>
     )
 }
 
 export async function getStaticPaths() {
-    // const res = await fetch(Global.url + '/api/resorts');
-    // const resorts = await res.json();
-    
-    // const paths = [];
-    // for(let i = 0; i < resorts.length; i++)
-    // {
-    //     const res = await fetch(Global.url + '/api/resorts/' + resorts[i]);
-    //     const answer = await res.json();
-    //     Object.keys(answer).map((element) => {
-    //         answer[element].forEach((thisElem) => {
-    //             paths.push({ params: { type: resorts[i], resort: element, id: thisElem.id.toString() } });
-    //         });
-    //     });
-    // }
-    console.log('GET STATIC PATHS');
     const paths = [];
     //
     const props = Object.keys(Global.resorts);
     for(let i = 0; i < props.length; i++)
     {
         const type_ofs = Global.resorts[props[i]];
-        for(let j = 0; j < type_ofs; j++)
+        for(let j = 0; j < type_ofs.length; j++)
         {
             const answer = await (await fetch(Global.url + '/api/resorts/' + props[i] + '/' + type_ofs[j])).json();
-            console.log(answer);
-            // answer.forEach((part) => {
-            //     paths.push({ params: { type: props[i], resort: type_ofs[j], id: part._id } });
-            // });
+            answer.forEach((part) => {
+                paths.push({ params: { type: props[i], resort: type_ofs[j], id: part._id } });
+            });
         }
     }
-    console.log(paths);
     //Macket
     //{ params: { type: '...', resort: '...', id: '...' } }
     return {
         paths: paths,
-        fallback: true
+        fallback: false
     };
 }
 
@@ -137,26 +130,35 @@ export async function getStaticProps(router) {
     const type = router.params.type;
     const resort = router.params.resort;
     const id = router.params.id;
+    //
     const res = await fetch(Global.url + '/api/resorts/' + type + '/' + resort + '/' + id);
-    const item = await res.json();
+    const items = await res.json();
+    const item = items[0];
+    //
     return {
         props: {
+            items: items, //FOR DEBUGGING DELETE LATE
             type: type,
+            resort: resort,
             //relax, tours, cruises
-            id: item.id,
-            images: item.images,
-            title: item.title,
-            price: item.price,
-            services: item.services,
-            text: item.text,
-            address: item.address,
-            points: item.points,
-            //relax
-            stars: item.stars || null,
+            id: item._id || null,
+            title: item.name || null,
+            images: item.images || null,
+            price: item.price || null,
+            services: item.services || null,
+            text: item.description || null,
+            adress: item.adress || null,
+            points: item.points || null,
+            //NOT NULL UP
             //tours, cruises
             info: item.info || null,
             timetable: item.timetable || null,
-            duration: item.duration || null
+            duration: item.duration || null,
+            //tours
+            timetable_schedule: item.timetable_schedule || null,
+            //relax
+            stars: item.stars || null,
+            rooms: item.rooms || null
         }
     };
 }

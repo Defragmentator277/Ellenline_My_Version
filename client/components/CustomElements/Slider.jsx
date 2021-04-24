@@ -5,6 +5,8 @@ const Slider = (props) => {
     //images is massive, full of src like: http://mlp, ./images/image/jpg
     const[images, setImages] = useState(props.images);
     const[index, setIndex] = useState(props.index ? props.index : 0);
+    //
+    const OnChainge = props.onChainge;
 
     function AddImages() {
         let elements = [];
@@ -19,22 +21,20 @@ const Slider = (props) => {
     }
 
     function OnClick(e) {
-        // console.log(e.target == <i></i>);
         if(e.currentTarget.classList.contains(classes.right))
         {
             //right
             if(index < images.length - 1)
                 setIndex(index + 1);
-            console.log('right');
         }
         else
         {
             //left
             if(index > 0)
                 setIndex(index - 1);
-            console.log('left');
         }
-        console.log(index);
+        if(OnChainge)
+            OnChainge(index);
     }
 
     return (

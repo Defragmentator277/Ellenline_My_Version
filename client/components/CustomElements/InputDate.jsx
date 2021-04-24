@@ -36,7 +36,7 @@ const InputDate = (props) => {
     function OnChange(e) {
         const value = e.currentTarget.value;
         if(onChainge)
-            onChainge(e, new Date(value));
+            onChainge(e, new Date(value).toISOString());
     }
     
     return (

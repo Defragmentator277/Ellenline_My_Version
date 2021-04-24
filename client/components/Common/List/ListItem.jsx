@@ -17,7 +17,6 @@ const ListItem = (props) => {
         let elements = [];
         if(services && services.length != 0)
         {
-            let offset = 0;
             for(let i = 0; i < services.length; i++)
             {
                 let service = services[i];

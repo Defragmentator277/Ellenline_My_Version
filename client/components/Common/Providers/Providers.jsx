@@ -65,26 +65,30 @@ const Providers = (props) => {
 
         //#region For tours
         function ConvertTourInfo() {
+            const languages = info.languages.map((element) => element.language).join(', ');
+            const countries = info.countries.map((element) => element.name).join(', ');
+            const routes = info.routes.map((element) => 'Автобусные туры ' + element.route).join(', ');
+            const array_points = [ points.x, points.y ]; 
             return <>
                 <i class="fa fa-map-o" aria-hidden="true"></i>
                 <div className={classes.map}>
                     <PresentationMap 
                     className={classes.ymap}
-                    points={[{coordinates: points, 
+                    points={[{coordinates: array_points, 
                         hintContent: '', 
                         balloonContentBody: ''}]}/>
                 </div>
                 <i class="fa fa-language" aria-hidden="true"></i>
                 <div className={classes.languages}>
-                    <p>{info.languages.join(', ')}</p>
+                    <p>{languages}</p>
                 </div>
                 <i class="fa fa-globe" aria-hidden="true"></i>
                 <div className={classes.countries}>
-                    <p>{info.countries.join(', ')}</p>
+                    <p>{countries}</p>
                 </div>
                 <i class="fa fa-road" aria-hidden="true"></i>
                 <div className={classes.routes}>
-                    <p>{info.routes.map((element) => 'Автобусные туры ' + element).join(', ')}</p>
+                    <p>{routes}</p>
                 </div>
             </>
         }

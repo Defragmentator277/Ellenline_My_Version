@@ -10,7 +10,6 @@ const PresentationMap = (props) => {
     }
     else
     {
-        
         mapState = {center: props.cityCoordinates, zoom: 10};
     }
   
@@ -43,24 +42,6 @@ const PresentationMap = (props) => {
                         }}
                     ></GeoObject>)): ''}
             </Clusterer>
-
-                {/* <Placemark geometry={[59.87026977960634, 30.26204491830366]}
-                properties={{
-                    hintContent: "Эллинлайн",
-                    balloonContent: 'ул. Зайцева, 3, корп. 2, Санкт-Петербург'
-                }}
-                modules={[
-                    'geoObject.addon.balloon', 'geoObject.addon.hint'
-                ]}
-
-                options={{
-                    iconImageHref:'images/logo-header.svg',
-                    iconImageSize: [30, 42],
-                    iconImageOffset: [-5, -38]
-                }}>
-
-
-                </Placemark> */}
 
             </Map>
           

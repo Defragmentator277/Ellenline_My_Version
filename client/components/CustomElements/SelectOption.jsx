@@ -9,19 +9,22 @@ const SelectOption = (props) => {
     const [selections, setSelections] = useState(0);
     //
     const onChainge = props.onChainge;
+    const isOnce = props.isOnce;
     //
     const title = props.title;
 
+    //MAYBE THIS IS BAD FOR TABLE IN ADMIN CMS 
     useEffect(() => {
         if(props.getValues)
             props.getValues(setValues);
-    }, []);
+    }, isOnce ? [] : null);
 
     function InsertSelections () {
 
         function OnChange(e) {
             const value = e.currentTarget.value;
-            onChainge(e, value);
+            if(onChainge)
+                onChainge(e, value);
         }
 
         function ConvertToElement(element) {

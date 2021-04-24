@@ -1,0 +1,22 @@
+{
+    "AdminAuthorization": [
+        {
+            "type": "string",
+            "prop": "login"
+        },
+        {
+            "type": "string",
+            "prop": "password"
+        }
+    ],
+    "ClientAuthorization": [
+        {
+            "type": "string",
+            "prop": "login"
+        },
+        {
+            "type": "string",
+            "prop": "password"
+        }
+    ]
+}

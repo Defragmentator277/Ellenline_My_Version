@@ -35,6 +35,17 @@ const InfoSection = (props) => {
 
     function GenerateInfo() {
 
+        function GenerateDays() {
+            let word = duration + ' ';
+            if(duration == 1)
+                word += ' День';
+            else if(duration >= 2 && duration <= 4)
+                word += ' Дня';
+            else
+                word += ' Дней';
+            return word;
+        }
+
         function GenerateStars() {
             const elements = [];
             for(let i = 0; i < stars; i++)
@@ -49,7 +60,7 @@ const InfoSection = (props) => {
             case 'tours':
             case 'cruises'://duration == timetable.lenght
                 return <div className={classes.duration}>
-                    <h1>{duration} Дней</h1>
+                    <h1>{GenerateDays()}</h1>
                     <span>продолжительность</span>
                 </div>
             case 'relax':

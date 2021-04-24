@@ -5,28 +5,33 @@ import InputText from '../../CustomElements/InputText.jsx';
 import InputBoolean from '../../CustomElements/InputBoolean.jsx';
 import InputDate from '../../CustomElements/InputDate.jsx';
 import InputTime from '../../CustomElements/InputTime.jsx';
+import SelectOption from '../../CustomElements/SelectOption.jsx';
 //
 import ContextMenu from '../ContextMenu/ContextMenu.jsx';
 ////
 import Global from '../../../pages/global.js';
+import Presets from './ModalWindowPresets.json';;
 import classes from './ModalWindow.module.scss';
-import SelectOption from '../../CustomElements/SelectOption.jsx';
 
 const ModalWindow = (props) => {
     //state
     const [value, setValue] = useState({}); 
     const [window, setWindow] = useState();
     const [contextMenu, setContextMenu] = useState();
+    const up_value = props.up_value;
     //all
     const title = props.title;
 
+    //Преднастройка имеет самый высокий приоритет
+    const preset = props.preset;
     //Задаються поля (string, number, boolean, object, 'button') модульного окна или его содержимое 
-    const fields = props.fields;
+    const fields = preset ? Presets[preset] : props.fields;
     //originally if type not undefined
     const onChainge = props.onChainge;
     //from the beginning
     const children = props.children;
     const onClose = props.onClose;
+    const buttons = props.buttons || { close: true };
 
     function ShowSubModalWindow() {
         return window ? <ModalWindow {...window} onClose={(e) => setWindow()}/>: '';
@@ -37,8 +42,7 @@ const ModalWindow = (props) => {
     }
     
     function GenerateContent() {
-        const elements = [];
-        //
+        
         function GenerateSubModalWindow(items) {
             let array = items.props.children;
             if(!Array.isArray(array))
@@ -69,148 +73,181 @@ const ModalWindow = (props) => {
             return array;
         }
         //
-        function GenerateField(field, path = []) {
 
-            function SetValueOfPropertie(this_value) {
-                if(path.length > 0)
-                {
-                    if(value[path[0]] == undefined)
-                        value[path[0]] = {};
-                    let object = value[path[0]];
-                    //
-                    for(let i = 1; i < path.length; i++)
+        function GenerateFields(fields) {
+
+            function GenerateField(field, path = []) {
+
+                function SetValueOfPropertie(this_value, last_field = field.prop) {
+                    if(path.length > 0)
                     {
-                        if(object[path[i]] == undefined)
-                            object[path[i]] = {};
-                        object = object[path[i]];
-                    }
-                    //
-                    object[field.prop] = this_value;
-                }
-                else
-                    value[field.prop] = this_value;
-                console.log(value);
-            }
-
-            function GenerateProperties(title) {
-                return {
-                    classInput: classes.input,
-                    title: title,
-                    onChainge: 
-                    (e, this_value) => 
-                    {
-                        // setValue() hook здесь может не вызывать, так как здесь идет работа с ссылкой на объект
-                        // path указывает на вложенное свойство
-                        SetValueOfPropertie(this_value)
-                    }
-                };
-            };
-            
-            function OnClickAddButton(e, OnChainge) {
-                console.log(field.prop);
-                setWindow(Object.assign(field.prop, { onChainge: OnChainge }));
-            }
-
-            switch(field.type)
-            {
-                case 'string':
-                    return <InputText 
-                    {...GenerateProperties(field.prop)}
-                    placeholder='Введите текст'/>;
-                case 'number':
-                    return <InputNumber 
-                    {...GenerateProperties(field.prop)}
-                    placeholder='Введите число'/>;
-                case 'boolean':
-                    //Нужно задать начальное состояние
-                    //ОШИБКА
-                    value[field.prop] = false;
-                    return <InputBoolean 
-                    {...GenerateProperties(field.prop)}
-                    placeholder='Введите'/>;
-                case 'date':
-                    return <InputDate
-                    {...GenerateProperties(field.prop)}/>;
-                case 'time':
-                    return <InputTime
-                    {...GenerateProperties(field.prop)}/>;
-                case 'combobox':
-                    return <SelectOption
-                    {...GenerateProperties(field.prop)}
-                    placeholder='Выберите значение'
-                    classSelect={classes.input + ' ' + classes.select}
-                    values={field.items}/>;
-                case 'OtherId':
-                    return <SelectOption
-                    title={field.prop}
-                    placeholder='Выберите айди'
-                    classSelect={classes.input + ' ' + classes.select}
-                    onChainge={(e) => SetValueOfPropertie(Global.ConvertToDBRef(field.ref, e.target.value))}
-                    getValues={(values) => field.getValues(values)}/>;
-                case 'button':
-                    //В случаи типа 'button' field.prop хранит в себе объект для создание ModalWindow
-                    function OnChainge(e, this_value) {
-                        let object = value;
-                        let part;
+                        if(value[path[0]] == undefined)
+                            value[path[0]] = {};
+                        let object = value[path[0]];
                         //
-                        if(path.length > 0)
+                        for(let i = 1; i < path.length; i++)
                         {
-                            part = path[0];
+                            if(object[path[i]] == undefined)
+                                object[path[i]] = {};
+                            object = object[path[i]];
+                        }
+                        //
+                        object[last_field] = this_value;
+                    }
+                    else
+                        value[last_field] = this_value;
+                }
+    
+                function GetValueOfPropertie(path) {
+                    if(!up_value)
+                        return null;
+                    if(path.length > 0)
+                    {
+                        if(up_value[path[0]] == undefined)
+                            return null;
+                        let object = up_value[path[0]];
+                        //
+                        for(let i = 1; i < path.length; i++)
+                        {
+                            if(object[path[i]] == undefined)
+                                return null;
+                            object = object[path[i]];
+                        }
+                        //
+                        return object;
+                    }   
+                    else
+                        return up_value;
+                }
+    
+                function GenerateProperties(title) {
+                    return {
+                        classInput: classes.input,
+                        title: title,
+                        onChainge: 
+                        (e, this_value) => 
+                        {
+                            // setValue() hook здесь может не вызывать, так как здесь идет работа с ссылкой на объект
+                            // path указывает на вложенное свойство
+                            SetValueOfPropertie(this_value)
+                        }
+                    };
+                };
+                
+                function OnClickAddButton(e, OnChainge) {
+                    setWindow(Object.assign(field.prop, { onChainge: OnChainge, up_value: up_value || value }));
+                }
+    
+                switch(field.type)
+                {
+                    case 'string':
+                        return <InputText 
+                        {...GenerateProperties(field.prop)}
+                        placeholder='Введите текст'/>;
+                    case 'number':
+                        return <InputNumber 
+                        {...GenerateProperties(field.prop)}
+                        placeholder='Введите число'/>;
+                    case 'boolean':
+                        //Нужно задать начальное состояние
+                        SetValueOfPropertie(false);
+                        return <InputBoolean 
+                        {...GenerateProperties(field.prop)}
+                        placeholder='Введите'/>;
+                    case 'date':
+                        return <InputDate
+                        {...GenerateProperties(field.prop)}/>;
+                    case 'time':
+                        return <InputTime
+                        {...GenerateProperties(field.prop)}/>;
+                    case 'combobox':
+                        return <SelectOption
+                        {...GenerateProperties(field.prop)}
+                        placeholder='Выберите значение'
+                        classSelect={classes.input + ' ' + classes.select}
+                        values={field.items}/>;
+                    case 'InnerId':
+                        const ids = GetValueOfPropertie(field.ref.split('.'))?.map((element) => element.id) || [];
+                        //
+                        return <SelectOption
+                        title={field.prop}
+                        placeholder='Выберите айди'
+                        classSelect={classes.input + ' ' + classes.select}
+                        onChainge={(e, value) => SetValueOfPropertie(value)}
+                        isOnce={true}
+                        values={ids}
+                        getValues={(values) => field.getValues(values)}/>;
+                    case 'OtherId':
+                        return <SelectOption
+                        title={field.prop}
+                        placeholder='Выберите айди'
+                        classSelect={classes.input + ' ' + classes.select}
+                        onChainge={(e, value) => SetValueOfPropertie(Global.ConvertToDBRef(field.ref, value))}
+                        isOnce={true}
+                        getValues={(values) => field.getValues(values)}/>;
+                    case 'button':
+                        //В случаи типа 'button' field.prop хранит в себе объект для создание ModalWindow
+                        function OnChainge(e, this_value) {
+                            let object = value;
+                            let part;
                             //
-                            if(value[part] == undefined)
-                                value[part] = {};
-                            object = value[part];
-                            //
-                            for(let i = 1; i < path.length; i++)
+                            if(path.length > 0)
                             {
-                                part = path[i];
-                                if(object[part] == undefined)
-                                    object[part] = {};
-                                object = object[part];
+                                part = path[0];
+                                //
+                                if(value[part] == undefined)
+                                    value[part] = {};
+                                object = value[part];
+                                //
+                                for(let i = 1; i < path.length; i++)
+                                {
+                                    part = path[i];
+                                    if(object[part] == undefined)
+                                        object[part] = {};
+                                    object = object[part];
+                                }
+                            }
+                            //
+                            part = field.title;
+                            //
+                            if(object[part] == undefined)
+                            {
+                                this_value.id = 0;
+                                object[part] = [ this_value ];
+                            }
+                            else
+                            {
+                                this_value.id = object[part].length;
+                                object[part].push(this_value);
                             }
                         }
+                        // SetValueOfPropertie([], field.title);
+                        return <div className={classes.massive}>
+                            <h1 className={classes.title}>{field.title}</h1>
+                            <button className={classes.button} onClick={(e) => OnClickAddButton(e, OnChainge)}>
+                                Добавить
+                            </button>
+                        </div>;
+                    case 'object':
+                        const array = [];
                         //
-                        part = field.title;
+                        field.prop.forEach(element => {
+                            array.push(GenerateField(element, path.concat(field.title)));
+                        });
                         //
-                        if(object[part] == undefined)
-                        {
-                            this_value.id = 0;
-                            object[part] = [ this_value ];
-                        }
-                        else
-                        {
-                            this_value.id = object[part].length;
-                            object[part].push(this_value);
-                        }
-                    }
-                    //
-                    return <div className={classes.massive}>
-                        <h1 className={classes.title}>{field.title}</h1>
-                        <button className={classes.button} onClick={(e) => OnClickAddButton(e, OnChainge)}>
-                            Добавить
-                        </button>
-                    </div>;
-                case 'object':
-                    const array = [];
-                    //
-                    field.prop.forEach(element => {
-                        array.push(GenerateField(element, path.concat(field.title)));
-                    });
-                    //
-                    return <div className={classes.object}>
-                        <p className={classes.title}>
-                            {field.title}
-                        </p>
-                        {array}
-                    </div>;
-                default:
-                    console.log('THIS TYPE DON`T SUPPORT');
-                    return <div>NOTHING DEFAULT</div>;
+                        return <div className={classes.object}>
+                            <p className={classes.title}>
+                                {field.title}
+                            </p>
+                            {array}
+                        </div>;
+                    default:
+                        console.log('THIS TYPE DON`T SUPPORT');
+                        return <div>NOTHING DEFAULT</div>;
+                }
             }
-        }
-
-        if(fields && fields.length != 0)
-        {
+            //
+            const elements = [];
             for(let i = 0; i < fields.length; i++)
             {
                 let field = fields[i];
@@ -220,9 +257,16 @@ const ModalWindow = (props) => {
             } 
             return elements;
         }
+
+        //Опции генерации модульного окна
+        if(fields && fields.length != 0)
+        {
+            return GenerateFields(fields);
+        }
         else
         {
-            GenerateSubModalWindow(children);
+            if(children)
+                GenerateSubModalWindow(children);
             return children;
         }
     }
@@ -248,18 +292,20 @@ const ModalWindow = (props) => {
                 {
                     if(object[element.title] == undefined)
                     {
+                        //Доработать
+                        if(!element.min || element.min == 0)
+                            object[element.title] = [];
                         alert('Заполните массив ' + element.title + ' хотя бы одним значением!');
                         return true;
                     }
                 }   
-                if(element.type == 'object')
+                else if(element.type == 'object')
                 {
                     if(CheckEmptyness(element.prop, object[element.title], path.concat(element.title)))
                         return true;
                 }
                 else if(!object[element.prop] 
-                && element.type != 'boolean'
-                && element.type != 'button')
+                && element.type != 'boolean')
                 {
                     alert('Поле ' + element.prop + ' не заполнено!');
                     return true;
@@ -277,19 +323,26 @@ const ModalWindow = (props) => {
             }
             if(CheckEmptyness(fields))
                 return;
-            onChainge(e, value);
-            onClose(e);
+            if(onChainge)
+                onChainge(e, value);
+            onClose(e, value);
         }
 
-        switch(fields) 
-        {
-            default:
-                return <button onClick={(e) => ConfirmButton(e)}>
-                    Потвердить
-                </button>
-            case undefined:
-                return;
-        }
+        //Массив кнопок
+        const new_buttons = [];
+        //Опции генерации модульного окна
+        if(children || buttons.close)
+            new_buttons.push(
+            <button onClick={(e) => onClose(e)}>
+                Закрыть
+            </button>);
+        if(preset || fields)
+            new_buttons.push(
+            <button onClick={(e) => ConfirmButton(e)}>
+                Потвердить
+            </button>);
+        //
+        return new_buttons;
         //Может создать кнопку назад?
     }
 
@@ -308,9 +361,6 @@ const ModalWindow = (props) => {
                     <div className={classes.separator}></div>
 
                     <div className={classes.buttons}>
-                        <button onClick={(e) => onClose(e)}>
-                            Закрыть
-                        </button>
                         {GenerateButtons()}
                     </div>
                 </div>

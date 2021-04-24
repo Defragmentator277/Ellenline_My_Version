@@ -8,7 +8,9 @@ handler.use(middleware);
 
 handler.get(async (req, res) => {
     const type = req.query.type;
-    req.db.collection(type).find({}).toArray((err, collection) => {
+    const condition = req.query.condition || {};
+
+    req.db.collection(type).find(condition).toArray((err, collection) => {
         if(err)
             return console.log(err);
         res.json(collection);
