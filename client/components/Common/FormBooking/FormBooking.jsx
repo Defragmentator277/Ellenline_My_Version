@@ -61,8 +61,8 @@ const FormBooking = (props) => {
     }
     //#endregion
 
-    //#region Variables 
-    const [dateArrival, setDateArrival] = useState(type == 'tours' ? GetDates()[0] : null);
+    //#region Variables THIS ALL VERY BAD REFACTORING NEDEED useEffect hook maybe can help
+    const [dateArrival, setDateArrival] = useState(type == 'tours' ? GetDates()[0] : new Date());
     //
     const [times, setTimes] = useState(type == 'tours' ? GetTimes(dateArrival) : null);
     const [time, setTime] = useState(type == 'tours' ? times[0] : null);
@@ -70,17 +70,54 @@ const FormBooking = (props) => {
     const [trip, setTrip] = useState(type == 'tours' ? GetTrip(dateArrival, time) : null);
     //
     const [tickets, setTickets] = useState(NaN);
-    let setInputTickets = setTickets;// MAYBE THIS VERY BAD
+    let setInputTickets = setTickets;
     //#endregion
     /////////////////TOURS
 
     /////////////////RELAX
     const rooms = props.rooms;
-    const [dateLeave, setDateLeave] = useState();
+    const [dateLeave, setDateLeave] = useState(new Date(new Date() - (-new Date(1000 * 60 * 60 * 24))));
+    const [reservation, setReservation] = useState(); 
+    
+    //#region Functions
+    function GetNewPrice() {
+        let new_price = 0;
+        if(dateArrival && dateLeave && reservation)
+        {
+            new_price += reservation.food.price || 0;
+            const days = (new Date(dateLeave) - new Date(dateArrival)) / 1000 / 60 / 60 / 24;
+            for(let i = 0; i < days; i++)
+            {
+                let new_date = new Date(new Date(dateLeave) - (1000 * 60 * 60 * 24 * i));
+                let day = new_date.getDay();
+                const prices = reservation.room.prices;
+                //Выходной 
+                if(day == 0 || day == 6)
+                    new_price += prices.on_weekends;
+                //Будний день
+                else
+                    new_price += prices.usual;
+                //В случаи если был добавлен дополнительный взрослый
+                if(reservation.number_of.extra.adult)
+                    new_price += prices.extra.adult;
+                //В случаи если был добавлен дополнительный ребенок
+                if(reservation.number_of.extra.child)
+                    new_price += prices.extra.child;
+            }
+        }
+        return new_price;
+    }
+    //#endregion
+
+    // useEffect(() => {
+    //     setDateArrival(new Date());
+    //     setDateLeave(new Date(new Date() - (-new Date(1000 * 60 * 60 * 24))));
+    // }, []);
     /////////////////RELAX
 
     /////////////////PREPARE VARIABLES
     /////////////////PREPARE VARIABLES
+    
 
     function GenerateInfoGoing() {
         //
@@ -92,6 +129,7 @@ const FormBooking = (props) => {
                         <span>Осталось свободных мест:</span>
                         <h1>{trip.number_of_seats.available}</h1>
                     </div> : '';
+                case 'cruises':
                 case 'relax':
                     break;
             }
@@ -106,7 +144,10 @@ const FormBooking = (props) => {
                         <h1>{(price * (tickets || 0)).toLocaleString()} руб.</h1>
                     </div>;
                 case 'relax':
-                    break;
+                    return <div className={classes.price}>
+                        <span>Итого</span>
+                        <h1>{GetNewPrice()} руб.</h1>
+                    </div>;
             }
         
             //WAS CLASS  + ' ' + sections.price_behavior
@@ -118,33 +159,57 @@ const FormBooking = (props) => {
             right_top: undefined,
             left_bottom: undefined,
             right_bottom: undefined
-            // title_time: undefined, // title first date
-            // date_or_time: undefined, 
-            // room_or_tickets: undefined,
-            // price_behavior: undefined
         };
         //
         switch(type)
         {
-            case 'relax':
             case 'cruises':
+
+            case 'relax':
+                //#region For relax functions
+                function OnChangeDateLeave(e, value) {
+                    console.log(value);
+                    //В случаи ошибки
+                    if(new Date(value) <= new Date(dateArrival))
+                    {
+                        alert('Дата отъезда должна быть меньше даты заезда!');
+                        return false;
+                    }
+                    setDateLeave(value);
+                    return true;
+                }
+                //
+                function OnChangeDateArrival(e, value) {
+                    console.log(value);
+                    //В случаи ошибки
+                    if(new Date(value) >= new Date(dateLeave))
+                    {
+                        alert('Дата заезда должна быть меньше даты отъезда!');
+                        return false;
+                    }
+                    setDateArrival(value);
+                    return true;
+                }
+                // 
+                function OnChangeRoom(reserv) {
+                    setReservation(reserv);
+                }
+                //#endregion
+                const thisDay = dateArrival;    
                 sections.left_top = <InputDate className={classes.date}
                     title='Дата заезда'
-                    date={dateLeave}/>;
+                    date={dateArrival}
+                    min={dateArrival}
+                    onChainge={OnChangeDateArrival}/>;
+                //
+                const nextDay = dateLeave;
                 sections.right_top = <InputDate className={classes.date}
                     title='Дата отъезда'
-                    date={dateLeave}/>;
-                sections.left_bottom = <ChooseRoom className={classes.rooms} rooms={rooms}/>;
-                //LATE CHAINGE TO SELECT ENTERED
-                // sections.left_bottom = <SelectOption 
-                //     className={classes.parents}
-                //     values={[ '1 взрослый', '2 взрослый' ]} 
-                //     placeholder='Взрослые'/>;
-                // sections.right_bottom = <SelectOption 
-                //     className={classes.childs}
-                //     type='dynamic' 
-                //     values={[ 'Волк одиночка', 'Ребёнок', 'Питомец' ]}
-                //     placeholder='Волк одиночка'/>;
+                    date={dateLeave}
+                    min={dateLeave}
+                    onChainge={OnChangeDateLeave}/>;
+                //
+                sections.left_bottom = <ChooseRoom className={classes.rooms} rooms={rooms} onChainge={OnChangeRoom}/>;
                 break;
             case 'tours':
                 //#region For tours functions
@@ -274,22 +339,64 @@ const FormBooking = (props) => {
             alert('Поле ФИО должно быть формата: Фамилия Имя Отчество');
             return;
         }
+        //Аналогично
         //Создание связи между автобусным туром и клиентом
         function CreateReservation(id_user) {
-            const prop = { 
-                key: 'clients',
-                new_value: {
-                    id_timetable_departure: trip.id,
-                    id_user: Global.ConvertToDBRef('users', id_user),
-                    tickets: tickets,
-                    price: price * tickets,
-                }
-            };
-            console.log()
-            fetch(`${Global.url}/api/db/${type}/update?id=${id}&prop=${JSON.stringify(prop)}&operator=$push`)
+            let prop;
+            switch(type)
+            {
+                case 'tours':
+                    //Глубокое копирование объекта
+                    const new_trip = JSON.parse(JSON.stringify(trip));
+                    delete new_trip.number_of_seats;   
+                    prop = { 
+                        key: 'tours_orders',
+                        new_value: {
+                            id_tour: Global.ConvertToDBRef('tours', id),
+                            timetable_departure: new_trip,
+                            tickets: tickets,
+                            price: price * tickets,
+                            status: 0
+                            // id_timetable_departure: trip.id,
+                            // id_user: Global.ConvertToDBRef('users', id_user),
+                            // tickets: tickets,
+                            // price: price * tickets,
+
+                        }
+                    };
+                    break;
+                case 'relax':
+                    //Глубокое копирование объекта
+                    const new_room = JSON.parse(JSON.stringify(reservation.room));
+                    delete new_room.number_of.rooms;
+                    prop = {
+                        key: 'relax_orders',
+                        new_value: {
+                            id_relax: Global.ConvertToDBRef('relax', id),
+                            room: new_room,
+                            number_of: reservation.number_of,
+                            type_of_food: reservation.food.type,
+                            date_arrival: dateArrival,
+                            date_leave: dateLeave,
+                            price: GetNewPrice(),
+                            status: 0
+                            // id_room: reservation.id_room,
+                            // id_user: Global.ConvertToDBRef('users', id_user),
+                            // number_of: reservation.number_of,
+                            // date_arrival: dateArrival,
+                            // date_leave: dateLeave,
+                            // price: GetNewPrice()
+                        }
+                    }
+                    break;
+            }
+            // console.log('NEW ORDER OBJECT');
+            // console.log(prop);
+            // return;
+            fetch(`${Global.url}/api/db/users/update?id=${id_user}&prop=${JSON.stringify(prop)}&operator=$push`)
             .then((res) => 
             {
-                console.log('Успех автобусный тур забронирован');
+                console.log('Успех выбранный отдых забронирован');
                 return res.json();
             })
             .then((res) => 
@@ -307,6 +414,7 @@ const FormBooking = (props) => {
                 console.log(err);
             });
         }
+        //Аналогично
         //Идентификация пользователя в слуачи совпадение email-ov
         function IdentifyUser() {
             fetch(`${Global.url}/api/db/users`)
@@ -330,15 +438,21 @@ const FormBooking = (props) => {
                 console.log(err);
             });
         }
+        //Аналогично
         //Создание аккаунт пользователю, если существует идентифицирует
         function CreateUser() {
             const inital = fio.trim().split(' ');
             const user = {
+                login: 'user_login',
+                password: 'user_password',
                 name: inital[0],
                 surname: inital[1],
                 middle_name: inital[2],
                 email: email,
-                telephone: telephone
+                telephone: telephone,
+                tours_orders: [],
+                relax_orders: [],
+                cruises_orders: []
             };
             fetch(`${Global.url}/api/db/users/insert?object=${JSON.stringify(user)}`)
             .then((res) => 
@@ -353,6 +467,7 @@ const FormBooking = (props) => {
                     console.log('Данный пользователь уже существует!');
                     alert('Рады снова вас видеть ' + fio.trim() + '!');
                     IdentifyUser();
+
                 }
                 else
                 {
@@ -371,25 +486,19 @@ const FormBooking = (props) => {
             });
         }
         //Уменьшение сидение в автобусе
-        function DecrementSeats(key, isPos = false, next, prop_next) {
-            const prop = { 
-                id: trip.id,
-                path: 'timetable_departure',
-                key: 'number_of_seats.' + key,
-                new_value: (isPos ? 1 : -1 ) * tickets
-            };
-            //
+        function DecrementSeats(prop, next, prop_next) {
             fetch(`${Global.url}/api/db/${type}/update?id=${id}&prop=${JSON.stringify(prop)}&operator=${'$inc'}`)
             .then((res) => 
             {
-                console.log('Успех значение ' + key + (isPos ? ' увеличенно' : ' уменьшенно') + '!');
+                console.log('Успех значение ' + prop.key + (prop.new_value >= 0 ? ' увеличенно' : ' уменьшенно') + '!');
                 return res.json();
             })
             .then((res) => 
             {
                 console.log(res);
                 if(prop_next)
-                    next(prop_next.key, prop_next.isPos, prop_next.next, prop_next.prop_next);
+                    // next(prop_next.key, prop_next.isPos, prop_next.next, prop_next.prop_next);
+                    next(prop_next.prop, prop_next.next, prop_next.prop_next)
                 else
                     next();
             })
@@ -403,8 +512,21 @@ const FormBooking = (props) => {
                 console.log(err);
             });
         }
-        //
-        DecrementSeats('available', false, DecrementSeats, { key: 'occupied', isPos: true, next: CreateUser });
+
+        //Вызов api машрута в зависимости от типа отдыха
+        switch(type)
+        {
+            case 'tours':
+                DecrementSeats({ id: trip.id, path: 'timetable_departure', key: 'number_of_seats.available', new_value: -1 * tickets }, DecrementSeats, 
+                       { prop: { id: trip.id, path: 'timetable_departure', key: 'number_of_seats.occupied', new_value: tickets }, next: CreateUser });
+                break;
+            case 'relax':
+                DecrementSeats({ id: reservation.id_room, path: 'rooms', key: 'number_of.rooms.available', new_value: -1 }, DecrementSeats, 
+                       { prop: { id: reservation.id_room, path: 'rooms', key: 'number_of.rooms.occupied', new_value: 1 }, next: CreateUser });
+                break;
+            case 'cruises':
+                break;
+        }
     }
 
     return(

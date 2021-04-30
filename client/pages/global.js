@@ -44,4 +44,30 @@ export default class Global {
     static ConvertToDBRef(ref, id) {
         return new DBRef(ref, ObjectID(id));
     }
+    
+    //Вызывает setValues, функцию заполняющую значения айди из другой коллекции или из внутреннего массива в select
+    static GetIds(setValues, url, field = '_id') {
+        fetch(`${Global.url}/api/db/${url}`)
+        .then((res) => 
+        {
+            console.log('Успех');
+            return res.json();
+        })
+        .then((res) => 
+        {
+            const new_res = res.map((element) => {
+                return element[field];
+            });
+            setValues(new_res);
+        })
+        .catch((err) => 
+        {
+            console.log('Ошибка');
+            return err.json();
+        })
+        .catch((err) => 
+        {
+            console.log(err);
+        });
+    }
 }

@@ -107,6 +107,7 @@ handler.get(async (req, res) => {
                 timetable: { $first: '$timetable' },
                 timetable_schedule: { $push: '$timetable_schedule' }
             }},
+            //Получение туров которые еще не начились
         ];
     }
     else
@@ -115,6 +116,9 @@ handler.get(async (req, res) => {
         [
             { $match: { _id: ObjectId(id) } },
             { $unwind: '$rooms'},
+            //Где есть свободные места
+            { $match: { 'rooms.number_of.rooms.available': { $gte: 1 } } },
+            //
             { $group: 
             {
                 _id: '$_id',
@@ -143,7 +147,6 @@ handler.get(async (req, res) => {
             }},
         ];
     }
-    //For tours only
     req.db.collection(type).aggregate(pipeline).toArray(
     (err, result) => {
         console.log("ON SERVER");

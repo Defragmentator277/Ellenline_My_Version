@@ -59,6 +59,50 @@ const ModalWindow = (props) => {
                         //В этом случаи item = button
                         function OnClickButton(e) {
                             //item.props.window = { title: ..., fields: ..., onChainge: (e, value) => { ... } }
+                            const str = item.props.window.toGetInnerIds;
+                            //Конвертирование элемента для модального окна
+                            function ConvertToFieldsAddButtonMassive(element) {
+                                switch(element.type)
+                                {
+                                    case 'massive':
+                                        //В случаи если это массив значит нужно добавить кнопку
+                                        //element.prop = [ ... ]
+                                        // console.log(element.prop);
+                                        return {
+                                            type: 'button',
+                                            prop: 
+                                            {
+                                                title: 'Добавить',
+                                                fields: element.prop.map((element) => ConvertToFieldsAddButtonMassive(element))
+                                            },
+                                            title: element.title
+                                        };
+                                    //В случаи массива или объекта
+                                    case 'object':
+                                        let prop = element.prop;
+                                        if(Array.isArray(prop))
+                                            return {
+                                                type: 'object',
+                                                prop: prop.map((element) => ConvertToFieldsAddButtonMassive(element)),
+                                                title: element.title
+                                            };
+                                        else
+                                            //В случаи если это объект рекурсивно добираемся до свойств
+                                            return ConvertToFieldsAddButtonMassive(prop);
+                                    case 'OtherId':
+                                        element.getValues = (setValues) => Global.GetIds(setValues, element.ref); 
+                                        return element;
+                                    case 'InnerId':
+                                        // const str
+                                        console.log(str);
+                                        element.getValues = (setValues) => Global.GetIds(setValues, str + `&key=${element.ref}`, 'id');
+                                        return element;
+                                    default:
+                                        return element;
+                                }
+                            }
+
+                            item.props.window.fields = item.props.window.fields.map((element) => ConvertToFieldsAddButtonMassive(element));
                             setWindow(item.props.window);
                         }
                         //
@@ -130,6 +174,7 @@ const ModalWindow = (props) => {
                             // setValue() hook здесь может не вызывать, так как здесь идет работа с ссылкой на объект
                             // path указывает на вложенное свойство
                             SetValueOfPropertie(this_value)
+                            return true;
                         }
                     };
                 };

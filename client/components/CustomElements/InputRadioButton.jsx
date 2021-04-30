@@ -2,18 +2,19 @@ import React, { useState } from 'react';
 //
 import Title from './GeneralJsx/Title.jsx';
 //
-import classesInput from './GeneralScss/Input.module.scss'
-import classes from './InputBoolean.module.scss';
+import classes from './InputRadioButton.module.scss';
 
-const InputBoolean = (props) => {
-    const placeholder = props.placeholder;
+const InputRadioButton = (props) => {
     const [value, setValue] = useState(props.value);
     const title = props.title;
-    const name = props.name;
-    const onChainge = props.onChainge;
+    const checked = props.checked;
+    const group = props.group;
+    const onChainge = props.onChainge;  
 
     function OnChange(e) {
-        onChainge(e, e.currentTarget.checked);
+        const value = e.currentTarget.value;
+        if(onChainge)
+            onChainge(e, value);
         setValue(value);
     }
 
@@ -22,12 +23,7 @@ const InputBoolean = (props) => {
     }
 
     function GenerateInput() {
-        return <input 
-        className={classes.input + ' ' + classesInput.input}
-        type='checkbox'
-        checked={value}
-        name={name}
-        onChange={(e) => OnChange(e)}/>;
+        return <input className={classes.input} type='radio' name={group} value={value} checked={checked} onChange={OnChange}/>;
     }
 
     return (
@@ -35,7 +31,7 @@ const InputBoolean = (props) => {
             {GenerateInput()}
             {GenerateTitle()}
         </div>
-    )
+    );
 }
 
-export default InputBoolean;
+export default InputRadioButton;

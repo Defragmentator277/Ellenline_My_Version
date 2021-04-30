@@ -35,39 +35,13 @@ const Type = (props) => {
             else
                 return element.prop;
         });
-        //По клику на клетку запоминает последний айди
 
         //Функция итерации 
         function GenerateRows() {
+            //По клику на клетку запоминает последний айди
             let last_id;
-            //Вызывает setValues, функцию заполняющую значения айди из другой коллекции или из внутреннего массива в select
-            function GetIds(setValues, url, field = '_id') {
-                console.log(`${Global.url}/api/db/${url}`);
-                fetch(`${Global.url}/api/db/${url}`)
-                .then((res) => 
-                {
-                    console.log('Успех');
-                    return res.json();
-                })
-                .then((res) => 
-                {
-                    const new_res = res.map((element) => {
-                        return element[field];
-                    });
-                    setValues(new_res);
-                })
-                .catch((err) => 
-                {
-                    console.log('Ошибка');
-                    return err.json();
-                })
-                .catch((err) => 
-                {
-                    console.log(err);
-                });
-            }
             //Конвертирование элемента для модального окна
-            function ConvertToFields(element) {
+            function ConvertToFieldsAddButton(element) {
                 switch(element.type)
                 {
                     case 'massive':
@@ -79,7 +53,7 @@ const Type = (props) => {
                             prop: 
                             {
                                 title: 'Добавить',
-                                fields: element.prop.map((element) => ConvertToFields(element))
+                                fields: element.prop.map((element) => ConvertToFieldsAddButton(element))
                             },
                             title: element.title
                         };
@@ -89,18 +63,19 @@ const Type = (props) => {
                         if(Array.isArray(prop))
                             return {
                                 type: 'object',
-                                prop: prop.map((element) => ConvertToFields(element)),
+                                prop: prop.map((element) => ConvertToFieldsAddButton(element)),
                                 title: element.title
                             };
                         else
                             //В случаи если это объект рекурсивно добираемся до свойств
-                            return ConvertToFields(prop);
+                            return ConvertToFieldsAddButton(prop);
                     case 'OtherId':
-                        element.getValues = (setValues) => GetIds(setValues, element.ref); 
+                        element.getValues = (setValues) => Global.GetIds(setValues, element.ref); 
                         return element;
                     case 'InnerId':
-                        element.getValues = (setValues) => GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${element.ref}`, 'id');
-                        return element;
+                        element.getValues = (setValues) => Global.GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${element.ref}`, 'id');
+                        // element.getValues = (setValues) => setValues([]);
+                        // return element;
                     default:
                         return element;
                 }
@@ -118,7 +93,7 @@ const Type = (props) => {
                         if(element.prop !== '_id' 
                         && element.prop !== 'id')
                         {
-                            fields.push(ConvertToFields(element));
+                            fields.push(ConvertToFieldsAddButton(element));
                         }
                     });
                     //
@@ -137,11 +112,7 @@ const Type = (props) => {
                             })
                             .then((res) => 
                             {
-                                //Конвертирование react component`a в dom
-                                // const dom_object = ReactDOMServer.renderToString(GetRow(res.ops[0]));
-                                //А затем добавление его к разметке
-                                // document.getElementById('dataTable').innerHTML += dom_object;
-                                //ПОСЛЕ ВЫПОЛНЕНИЯ НЕ РАБОТАЮТ КНОПКИ ОКРЫТЬ
+                                console.log(res);
                                 location.reload();
                             })
                             .catch((err) => 
@@ -153,14 +124,13 @@ const Type = (props) => {
                             {
                                 console.log(err);
                             });
-                            // location.reload();
                         }
                     });
                 }
             } 
             //Получение строки на основе объекта
             function GetRow(object) {
-                last_id = object._id;
+                const this_id = object._id;
                 //В этой функции происходит основное взаимодествие с БД
                 function OnClickCell(e) {
                     e.preventDefault();
@@ -171,8 +141,8 @@ const Type = (props) => {
                     if(column == '_id' || column == 'id')
                         return;
                     const id = object._id;
+                    last_id = id;
                     const type_of = struct.find((elem_struct) => elem_struct.prop === column || elem_struct.title === column).type;
-                    // last_id = id;
                     //В случаи если объект являеться сложным запоминает айди, но не открывает контекстное меню
                     if(type_of == 'object' ||
                        type_of == 'massive' ||
@@ -204,7 +174,8 @@ const Type = (props) => {
                                     .then((res) => 
                                     {
                                         console.log(res);
-                                        cell.innerHTML = value[column];
+                                        // cell.innerHTML = value[column];
+                                        location.reload();
                                     })
                                     .catch((err) => 
                                     {
@@ -229,13 +200,15 @@ const Type = (props) => {
                             .then((res) => 
                             {
                                 console.log('Успех');
-                                //Удаление объекта из таблицы
-                                document.getElementById('dataTable').removeChild(cell.parentNode);
+                                //Приводит к несоотвествиям данных
+                                // //Удаление объекта из таблицы
+                                // document.getElementById('dataTable').removeChild(cell.parentNode);
                                 return res.json();
                             })
                             .then((res) => 
                             {
                                 console.log(res);
+                                location.reload();
                             })
                             //
                             .catch((err) => 
@@ -263,6 +236,7 @@ const Type = (props) => {
                 }
                 //#region For Difficult generation
                 function ConvertVariable(object, elem_struct, path = []) {
+                    // last_id = 
                     const this_path = [];
                     let prop_path, id, last_prop;
                     //
@@ -343,7 +317,6 @@ const Type = (props) => {
     
                             function OnClickVariable(e) {
                                 e.preventDefault();
-                                const field = e.currentTarget;
     
                                 if(elem_struct.prop == 'id' ||
                                    elem_struct.prop == '_id')
@@ -372,7 +345,7 @@ const Type = (props) => {
                                                 })
                                                 .then((res) => 
                                                 {
-                                                    field.innerHTML = value;
+                                                    // field.innerHTML = value;k
                                                     console.log(res);
                                                 })
                                                 //Ошибка
@@ -427,7 +400,7 @@ const Type = (props) => {
                             placeholder={OtherId.$id} 
                             onChainge={(e, value) => onChangeSelection(e, Global.ConvertToDBRef(OtherId.$ref, value))} 
                             isOnce={true}
-                            getValues={(setValues) => GetIds(setValues, OtherId.$ref)}/>;
+                            getValues={(setValues) => Global.GetIds(setValues, OtherId.$ref)}/>;
                         case 'InnerId':
                             getPathsIdsProp();
                             //
@@ -438,8 +411,10 @@ const Type = (props) => {
                             placeholder={InnerId}
                             onChainge={(e, value) => onChangeSelection(e, value)}
                             isOnce={true}
-                            getValues={(setValues) => GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${elem_struct.ref}`, 'id')}/>;
+                            getValues={(setValues) => Global.GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${elem_struct.ref}`, 'id')}/>;
                         case 'massive':
+                            // getPathsIdsProp();
+                            //
                             className = classes.massive;
                             //
                             const array = object[elem_struct.title];
@@ -450,8 +425,26 @@ const Type = (props) => {
                                 function OnClickRemoveButton(e) {
                                     e.preventDefault();
                                     const object = { key: array_path, new_value: element.id };
-                                    fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`);
-                                    return;
+                                    fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`)
+                                    .then((res) => 
+                                    {
+                                        console.log('Успех');
+                                        return res.json();
+                                    })
+                                    .then((res) => 
+                                    {
+                                        console.log(res);
+                                        location.reload();
+                                    })
+                                    .catch((err) => 
+                                    {
+                                        console.log('Ошибка');
+                                        return err.json();
+                                    })
+                                    .catch((err) => 
+                                    {
+                                        console.log(err);
+                                    });
                                 }
                                 //Конвертация элемента массива
                                 function ConvertElementOfArray() {
@@ -478,18 +471,38 @@ const Type = (props) => {
                             {
                                 e.preventDefault();
                                 const object = { key: array_path, new_value: value };
-                                console.log(object);
-                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`);
+                                fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`)
+                                .then((res) => 
+                                {
+                                    console.log('Успех');
+                                    return res.json();
+                                })
+                                .then((res) => 
+                                {
+                                    console.log(res);
+                                    location.reload();
+                                })
+                                .catch((err) => 
+                                {
+                                    console.log('Ошибка');
+                                    return err.json();
+                                })
+                                .catch((err) => 
+                                {
+                                    console.log(err);
+                                });
                                 return;
                             }
+                            const new_id = this_id;
                             //
                             content.push(<button 
                                 window={
                                 {
                                     title: 'Добавить',
-                                    //elem_struct.prop содержит все поля для создания нового элемента
-                                    fields: elem_struct.prop.map((element) => ConvertToFields(element)), 
-                                    onChainge: OnClickAddButton
+                                    //elem_struct.prop содержит все поля для создания нового элемента 
+                                    fields: elem_struct.prop,
+                                    onChainge: OnClickAddButton,
+                                    toGetInnerIds: `${type}/sub_func/getInnerIds?id=${new_id}`
                                 }}>
                                 Добавить
                             </button>);
@@ -542,22 +555,24 @@ const Type = (props) => {
                 }
                 //#endregion
 
+                const iddddd = object._id;
+
                 return <tr _id={object._id}>
-                {struct.map((elem_struct) => {
-                    //new 
-                    let title;
-                    if(elem_struct.title && (elem_struct.type == 'object' || elem_struct.type == 'massive'))
-                        title = elem_struct.title;
-                    else
-                        title = elem_struct.prop;
-                    //end new
-                    return <td 
-                        align='center'
-                        column={title}//old
-                        onClick={(e) => OnClickCell(e)}>
-                        {ConvertVariable(object, elem_struct)}
-                    </td>;
-                })}
+                    {struct.map((elem_struct) => {
+                        //new 
+                        let title;
+                        if(elem_struct.title && (elem_struct.type == 'object' || elem_struct.type == 'massive'))
+                            title = elem_struct.title;
+                        else
+                            title = elem_struct.prop;
+                        //end new
+                        return <td 
+                            align='center'
+                            column={title}//old
+                            onClick={(e) => OnClickCell(e)}>
+                            {ConvertVariable(object, elem_struct, [])}
+                        </td>;
+                    })}
                 </tr>;
             }
         

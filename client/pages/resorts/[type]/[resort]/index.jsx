@@ -17,6 +17,9 @@ const Resorts = (props) => {
     const resort = props.resort;
     const items = props.items;
 
+    console.log('ON CLIENT');
+    console.log(items);
+
     return (
         <ClientLayout title={Global.GetConvert(type)[resort]}>
             <List {...props} path={type}/>

@@ -25,16 +25,22 @@ const Slider = (props) => {
         {
             //right
             if(index < images.length - 1)
+            {
                 setIndex(index + 1);
+                if(OnChainge)
+                    OnChainge(index + 1);
+            }
         }
         else
         {
             //left
             if(index > 0)
+            {
                 setIndex(index - 1);
+                if(OnChainge)
+                    OnChainge(index - 1);
+            }
         }
-        if(OnChainge)
-            OnChainge(index);
     }
 
     return (

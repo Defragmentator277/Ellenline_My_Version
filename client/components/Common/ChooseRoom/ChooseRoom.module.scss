@@ -7,7 +7,7 @@
 
     .slider
     {
-        height: 50%;
+        height: 500px;
     }
 
     .content
@@ -17,11 +17,27 @@
         height: fit-content;
         padding: 0 10px 5px;
 
-        p, .title
+        p
         {
             @extend %font;
             font-size: 1.25em;
             margin: 5px 0;
+            // word-break: break-all;
+        }
+
+        .title
+        {
+            font-size: 1.5em;
+
+            p
+            {
+                font-size: 1em;
+            }
+        }
+
+        & > .title
+        {
+            font-size: 1.75em;
         }
 
         .persons
@@ -31,17 +47,75 @@
             grid-auto-columns: min-content;
             column-gap: 25px;
 
+
             i
             {
                 grid-row: 1;
+
                 font-size: 2em;
                 width: min-content;
             }
         }
 
+        .corpus
+        {
+            .title, .text
+            {
+                display: inline-block;
+            }
+
+            .text
+            {
+                margin-left: 7.5px;
+            }
+        }
+
         .prices
         {
-            
+            // display: grid;
+            // grid-template-columns: fit-content(0) fit-content;
+            // column-gap: 15px;
+
+            // .left
+            // {
+            //     grid-column: 1;
+            // }
+
+            .right
+            {
+                // grid-column: 2;
+                margin-left: 25px;
+            }
+        }
+
+        .food
+        {
+            .type_food
+            {
+                margin-left: 25px;
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 1024px)
+{
+    .choose_room
+    {
+        .slider
+        {
+            height: 450px;
+        }
+    }
+}
+
+@media screen and (max-width: 425px)
+{
+    .choose_room
+    {s
+        .slider
+        {
+            height: 300px;
         }
     }
 }

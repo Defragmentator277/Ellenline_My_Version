@@ -41,6 +41,9 @@ handler.get(async (req, res) => {
             { $unwind: '$timetable_schedule' },
             { $set: { 'date_compare': { $cmp: [ { $toDate: '$timetable_schedule.date' }, { $toDate: Date.now() } ] } } },
             { $match: { 'date_compare': { $gte: 0 } } },
+            //Где есть свободные места
+            { $match: { 'timetable_schedule.number_of_seats.available': { $gte: 1 } } },
+            //
             { $group: 
             {
                 _id: '$_id',
@@ -58,7 +61,6 @@ handler.get(async (req, res) => {
         pipeline = 
         [
             { $match: { type: Global.GetConvert(type)[resorts] } },
-            { $unwind: '$rooms' },
             // { $unwind: '$services.rooms'},
             { $unwind: '$images'},
             { $group: 
@@ -67,9 +69,23 @@ handler.get(async (req, res) => {
                 title: { $first: '$name' },
                 image: { $first: '$images.src' },
                 adress: { $first: '$adress' },
+                // min_price: { $min: '$rooms.prices.usual' },
+                services: { $first: '$services.available' },
+                rooms: { $first: '$rooms'}
+            }},
+            { $unwind: '$rooms' },
+            //Где есть свободные места
+            { $match: { 'rooms.number_of.rooms.available': { $gte: 1 } } },
+            { $group: 
+            {
+                _id: '$_id',
+                title: { $first: '$title' },
+                image: { $first: '$image' },
+                adress: { $first: '$adress' },
                 min_price: { $min: '$rooms.prices.usual' },
-                services: { $first: '$services.available' }
-            }}
+                services: { $first: '$services' },
+                rooms: { $push: '$rooms'}
+            }},
         ];
     }
     req.db.collection(type).aggregate(pipeline).toArray((err, collection) => {

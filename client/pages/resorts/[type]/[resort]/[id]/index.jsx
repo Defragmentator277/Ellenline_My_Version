@@ -76,7 +76,7 @@ const Resort = (props) => {
                 type={type}
                 //
                 stars={stars}
-                duration={timetable?.length || null}/>
+                duration={timetable ? timetable[timetable.length - 1].day : null}/>
 
                 <Providers 
                 services={services} 

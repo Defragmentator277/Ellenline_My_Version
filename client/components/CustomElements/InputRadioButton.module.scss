@@ -3,7 +3,7 @@
 .wrapper
 {
     display: grid;
-    grid-template-columns: fit-content(0) max-content;
+    grid-template-columns: fit-content(0) 1fr;
     column-gap: 5px;
 
     .input

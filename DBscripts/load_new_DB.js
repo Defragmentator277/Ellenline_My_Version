@@ -71,33 +71,33 @@ db.structure.insertOne(
             GetField('string', 'src')
         ], 'images'),
         //
-        {
-            type: 'massive',
-            prop: 
-            [
-                GetField('InnerId', 'id_room', undefined, 'rooms'),
-                GetField('OtherId', 'id_user', undefined, 'users'),
-                GetField('object',
-                [
-                    GetField('number', 'adult'),
-                    GetField('number', 'child'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'adult'),
-                        GetField('number', 'child')
-                    ], 'extra')
-                ], 'number_of'),
-                {
-                    type: 'combobox',
-                    prop: 'type_of_food',
-                    items: [ 'bb', 'hb', 'fb']
-                },
-                GetField('date', 'date_arrival'),
-                GetField('date', 'date_leave'),
-                GetField('number', 'price')
-            ],
-            title: 'clients'
-        },
+        // {
+        //     type: 'massive',
+        //     prop: 
+        //     [
+        //         GetField('InnerId', 'id_room', undefined, 'rooms'),
+        //         GetField('OtherId', 'id_user', undefined, 'users'),
+        //         GetField('object',
+        //         [
+        //             GetField('number', 'adult'),
+        //             GetField('number', 'child'),
+        //             GetField('object', 
+        //             [
+        //                 GetField('boolean', 'adult'),
+        //                 GetField('boolean', 'child')
+        //             ], 'extra')
+        //         ], 'number_of'),
+        //         {
+        //             type: 'combobox',
+        //             prop: 'type_of_food',
+        //             items: [ 'bb', 'hb', 'fb']
+        //         },
+        //         GetField('date', 'date_arrival'),
+        //         GetField('date', 'date_leave'),
+        //         GetField('number', 'price')
+        //     ],
+        //     title: 'clients'
+        // },
         //
         GetField('massive', [
             GetField('string', 'category'),
@@ -107,13 +107,13 @@ db.structure.insertOne(
                 [
                     GetField('number', 'adult'),
                     GetField('number', 'child')
-                ], 'of_seats'),
+                ], 'seats'),
                 GetField('object',
                 [
                     GetField('number', 'available'),
                     GetField('number', 'occupied')
-                ], 'of_rooms')
-            ], 'number'),
+                ], 'rooms')
+            ], 'number_of'),
             GetField('string', 'corpus'),
             GetField('object', 
             [
@@ -156,12 +156,7 @@ db.structure.insertOne(
         GetField('string', 'adress'),
         GetField('OtherId', 'id_locality', undefined, 'localities'),
         GetField('OtherId', 'id_motorship', undefined, 'motorships'),
-        //
-        GetField('massive', 
-        [
-            GetField('date', 'date'),
-            GetField('time', 'time'),
-        ], 'timetable_departure'),
+        ,
         GetField('object', 
         [
             GetField('number', 'x'),
@@ -198,13 +193,13 @@ db.structure.insertOne(
                 [
                     GetField('number', 'adult'),
                     GetField('number', 'child')
-                ], 'of_seats'),
+                ], 'seats'),
                 GetField('object',
                 [
                     GetField('number', 'available'),
                     GetField('number', 'occupied')
-                ], 'of_rooms')
-            ], 'number'),
+                ], 'rooms')
+            ], 'number_of'),
             GetField('string', 'corpus'),
             GetField('object', 
             [
@@ -216,8 +211,24 @@ db.structure.insertOne(
                     GetField('number', 'child')
                 ], 'extra')
             ], 'prices'),
-            GetField('string', 'image')
+            GetField('boolean', 'pets'),
+            GetField('object', 
+            [
+                GetField('number', 'bb'),
+                GetField('number', 'hb'),
+                GetField('number', 'fb'),
+            ],
+            'prices_of_food'),
+            GetField('string', 'image'),
+            //
+            GetField('InnerId', 'id_timetable_departure', undefined, 'timetable_departure')
         ], 'rooms'),
+        //
+        GetField('massive', 
+        [
+            GetField('date', 'date'),
+            GetField('time', 'time')
+        ], 'timetable_departure'),
         //
         GetField('massive',
         [
@@ -252,17 +263,6 @@ db.structure.insertOne(
         GetField('string', 'description'),
         GetField('number', 'price'),
         GetField('string', 'adress'),
-        {
-            type: 'massive',
-            prop:
-            [
-                GetField('InnerId', 'id_timetable_departure', undefined, 'timetable_departure'),
-                GetField('OtherId', 'id_user', undefined, 'users'),
-                GetField('number', 'tickets'),
-                GetField('number', 'price')
-            ],
-            title: 'clients'
-        },
         //
         {
             type: 'massive',
@@ -363,25 +363,210 @@ db.structure.insertOne(
     ],
     'users': [
         GetField('ObjectId', '_id'),
+        //Authorization
+        GetField('string', 'login'),
+        GetField('string', 'password'),
         //
         GetField('string', 'name'),
         GetField('string', 'surname'),
         GetField('string', 'middle_name'),
-        //Index on this field 
         GetField('string', 'email'),
-        GetField('string', 'telephone')
+        GetField('string', 'telephone'),
+        {
+            type: 'massive',
+            prop:
+            [
+                GetField('OtherId', 'id_tour', undefined, 'tours'),
+                //Copy object instead of create reference, this method increase speed, but add unnecesseary data
+                //object timetable_departure
+                GetField('object',
+                [
+                    GetField('date', 'date'),
+                    GetField('time', 'time'),
+                    // GetField('object',
+                    // [   
+                    //     GetField('number', 'available'),
+                    //     GetField('number', 'occupied')
+                    // ], 'number_of_seats'),
+                ], 'timetable_departure'),
+                //
+                GetField('number', 'tickets'),
+                GetField('number', 'price'),
+                //INSERT COMBOBOX INSTEAD OF NUMBER
+                GetField('number', 'status')
+            ],
+            title: 'tours_orders'
+        },
+        {
+            type: 'massive',
+            prop:
+            [
+                GetField('OtherId', 'id_relax', undefined, 'relax'),
+                //Copy object instead of create reference, this method increase speed, but add unnecesseary data
+                //object rooms
+                GetField('object',
+                [
+                    GetField('string', 'category'),
+                    GetField('object', 
+                    [
+                        GetField('object',
+                        [
+                            GetField('number', 'adult'),
+                            GetField('number', 'child')
+                        ], 'seats'),
+                        // GetField('object',
+                        // [
+                        //     GetField('number', 'available'),
+                        //     GetField('number', 'occupied')
+                        // ], 'rooms')
+                    ], 'number_of'),
+                    GetField('string', 'corpus'),
+                    GetField('object', 
+                    [
+                        GetField('number', 'usual'),
+                        GetField('number', 'on_weekends'),
+                        GetField('object', 
+                        [
+                            GetField('number', 'adult'),
+                            GetField('number', 'child')
+                        ], 'extra')
+                    ], 'prices'),
+                    GetField('boolean', 'pets'),
+                    GetField('object', 
+                    [
+                        GetField('number', 'bb'),
+                        GetField('number', 'hb'),
+                        GetField('number', 'fb'),
+                    ],
+                    'prices_of_food'),
+                    GetField('string', 'image'),
+                ], 'room'),
+                //
+                GetField('object',
+                [
+                    GetField('number', 'adult'),
+                    GetField('number', 'child'),
+                    GetField('object', 
+                    [
+                        GetField('boolean', 'adult'),
+                        GetField('boolean', 'child')
+                    ], 'extra')
+                ], 'number_of'),
+                {
+                    type: 'combobox',
+                    prop: 'type_of_food',
+                    items: [ 'bb', 'hb', 'fb']
+                },
+                GetField('date', 'date_arrival'),
+                GetField('date', 'date_leave'),
+                GetField('number', 'price'),
+                //INSERT COMBOBOX INSTEAD OF NUMBER
+                GetField('number', 'status')
+            ],
+            title: 'relax_orders'
+        },
+        {
+            type: 'massive',
+            prop:
+            [
+                GetField('OtherId', 'id_cruise', undefined, 'cruises'),
+                //Copy object instead of create reference, this method increase speed, but add unnecesseary data
+                //object room
+                GetField('object',
+                [
+                    GetField('string', 'category'),
+                    GetField('object', 
+                    [
+                        GetField('object',
+                        [
+                            GetField('number', 'adult'),
+                            GetField('number', 'child')
+                        ], 'seats'),
+                        // GetField('object',
+                        // [
+                        //     GetField('number', 'available'),
+                        //     GetField('number', 'occupied')
+                        // ], 'rooms')
+                    ], 'number_of'),
+                    GetField('string', 'corpus'),
+                    GetField('object', 
+                    [
+                        GetField('number', 'usual'),
+                        GetField('number', 'on_weekends'),
+                        GetField('object', 
+                        [
+                            GetField('number', 'adult'),
+                            GetField('number', 'child')
+                        ], 'extra')
+                    ], 'prices'),
+                    GetField('boolean', 'pets'),
+                    GetField('object', 
+                    [
+                        GetField('number', 'bb'),
+                        GetField('number', 'hb'),
+                        GetField('number', 'fb'),
+                    ],
+                    'prices_of_food'),
+                    GetField('string', 'image'),
+                    //Instead of InnerId copy object
+                    // GetField('InnerId', 'id_timetable_departure', undefined, 'timetable_departure')
+                    GetField('object',
+                    [
+                        GetField('date', 'date'),
+                        GetField('time', 'time'),
+                    ], 'timetable_departure'),
+                ], 'room'),
+                //
+                GetField('object',
+                [
+                    GetField('number', 'adult'),
+                    GetField('number', 'child'),
+                    GetField('object', 
+                    [
+                        GetField('boolean', 'adult'),
+                        GetField('boolean', 'child')
+                    ], 'extra')
+                ], 'number_of'),
+                {
+                    type: 'combobox',
+                    prop: 'type_of_food',
+                    items: [ 'bb', 'hb', 'fb']
+                },
+                GetField('number', 'price'),
+                //INSERT COMBOBOX INSTEAD OF NUMBER
+                GetField('number', 'status')
+            ],
+            title: 'cruises_orders'
+        },
     ]
 });
+//status: 0 - booked without money, 1 - booked with half money, 2 - booked with all money
 
 //Создание инедксов 
 //Новый пользователь определяется по почте, если пользователя с такой почтой нету в системе, он создаст нового пользователя
 db.users.createIndex({ 'email': 1 }, { 'unique': true });
+// After complete personal account page 
+// db.users.createIndex({ 'login': 1 }, { 'unique': true });
+//
 db.admins.createIndex({ 'login': 1 }, { 'unique': true });
 
 
 
 
 //Заполнение изначальными данными
-db.admins.insertOne({ login: 'login', password: 'password', name: 'fd', surname: 'sdf', middle_name: 'sdf' });
-db.countries.insertOne({ name: 'Россия', description: 'Описание великой и ужасной'});
+db.admins.insertOne({ login: 'login', password: 'password', name: 'Паша', surname: 'Совельевич', middle_name: 'Морозов' });
+db.users.insertOne(
+{ 
+    login: 'user_login', 
+    password: 'user_password', 
+    name: 'Даниил', 
+    surname: 'Зимин', 
+    middle_name: 'Вячеславович', 
+    email: 'denzimin1@gmail.com', 
+    telephone: '89516636513', 
+    tours_orders: [], 
+    relax_orders: [],
+    cruises_orders: []
+});
+db.countries.insertOne({ name: 'Россия', description: 'Описание великой и ужасной' });
 // db.localities.insertOne({ name: 'Санкт-Петебург', description: 'Самый красивый город нашей страный' });
