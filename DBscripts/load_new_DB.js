@@ -156,7 +156,6 @@ db.structure.insertOne(
         GetField('string', 'adress'),
         GetField('OtherId', 'id_locality', undefined, 'localities'),
         GetField('OtherId', 'id_motorship', undefined, 'motorships'),
-        ,
         GetField('object', 
         [
             GetField('number', 'x'),
@@ -176,13 +175,7 @@ db.structure.insertOne(
                 GetField('string', 'icon'),
                 GetField('string', 'text')
             ], 
-            'common'),
-            //
-            GetField('massive', [ 
-                GetField('string', 'icon'),
-                GetField('string', 'text')
-            ], 
-            'rooms'),
+            'cabin'),
         ], 'services'),
         //
         GetField('massive', [
@@ -250,7 +243,14 @@ db.structure.insertOne(
         GetField('ObjectId', '_id'),
         GetField('string', 'name'),
         GetField('string', 'description'),
-        GetField('string', 'type'),
+        //info object
+        GetField('number', 'year'),
+        GetField('number', 'capacity'),
+        GetField('number', 'length'),// in meters
+        GetField('number', 'width'),// in meters
+        GetField('number', 'heigth'),// in meters
+        GetField('number', 'speed'),// in meters/hour
+        GetField('string', 'class'),// in meters
         //
         GetField('massive', [
             GetField('string', 'src')

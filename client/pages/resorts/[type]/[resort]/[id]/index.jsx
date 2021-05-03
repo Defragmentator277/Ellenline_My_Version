@@ -13,6 +13,7 @@ import classes from './index.module.scss';
 const Resort = (props) => {
     console.log('ON CLIENT');
     console.log(props.items);
+    // return (<></>);
     //
     const type = props.type;
     const resort = props.resort;

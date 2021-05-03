@@ -16,8 +16,7 @@ handler.get(async (req, res) => {
 
     if(type === 'tours')
     {
-        pipeline = 
-        [
+        pipeline = [
             { $match: { _id: ObjectId(id) } },
             //Timetable sort
             { $unwind: '$timetable' },
@@ -110,10 +109,9 @@ handler.get(async (req, res) => {
             //Получение туров которые еще не начились
         ];
     }
-    else
+    else if(type === 'relax')
     {
-        pipeline = 
-        [
+        pipeline = [
             { $match: { _id: ObjectId(id) } },
             { $unwind: '$rooms'},
             //Где есть свободные места
@@ -145,6 +143,65 @@ handler.get(async (req, res) => {
                 foreignField: '_id',
                 as: 'locality'
             }},
+        ];
+    }
+    else
+    {
+        pipeline = [
+            { $match: { _id: ObjectId(id) } },
+            { $unwind: '$rooms'},
+            //Где есть свободные места
+            { $match: { 'rooms.number_of.rooms.available': { $gte: 1 } } },
+            // //Получение круизов которые еще не начились
+            { $unwind: '$timetable_departure' },
+            { $set: { 'date_compare': { $cmp: [ { $toDate: '$timetable_departure.date' }, { $toDate: Date.now() } ] } } },
+            { $match: { 'date_compare': { $gte: 0 } } },
+            //Где есть свободные места
+            { $set: { 'id_compare': { $cmp: [ { $toInt: '$rooms.id_timetable_departure' } , '$timetable_departure.id' ] } } },
+            { $match: { 'id_compare': { $eq: 0 } } },
+            //
+            { $group: 
+            {
+                _id: '$_id',
+                name: { $first: '$name' },
+                adress: { $first: '$adress' },
+                description: { $first: '$description' },
+                stars: { $first: '$stars'},
+                images: { $first: '$images.src' },
+                services: { $first: '$services' },
+                //
+                price: { $min: '$rooms.prices.usual' },
+                points: { $first: '$points' },
+                rooms: { $push: '$rooms' },
+                timetable: { $first: '$timetable' },
+                timetable_schedule: { $addToSet: '$timetable_departure'},
+                motorship: { $first: { $objectToArray: '$id_motorship' } },
+                locality: { $first: { $objectToArray: '$id_locality' } }
+            }},
+            //Get locality info
+            { $unwind: '$locality' },
+            { $match: { 'locality.k': { $eq: '$id'} } },
+            { $set: { 'locality': { $toObjectId: '$locality.v' } } },
+            { $lookup:
+            {
+                from: 'localities',
+                localField: 'locality',
+                foreignField: '_id',
+                as: 'locality'
+            }},
+            { $unwind: '$locality' },
+            //Get motorship info
+            { $unwind: '$motorship' },
+            { $match: { 'motorship.k': { $eq: '$id'} } },
+            { $set: { 'motorship': { $toObjectId: '$motorship.v' } } },
+            { $lookup:
+            {
+                from: 'motorships',
+                localField: 'motorship',
+                foreignField: '_id',
+                as: 'info'
+            }},
+            { $unwind: '$info' },
         ];
     }
     req.db.collection(type).aggregate(pipeline).toArray(

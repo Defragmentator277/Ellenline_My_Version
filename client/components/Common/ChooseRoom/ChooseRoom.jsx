@@ -7,8 +7,10 @@ import InputBoolean from '../../CustomElements/InputBoolean.jsx';
 import classes from './ChooseRoom.module.scss';
 
 const ChooseRoom = (props) => {
+    const [rooms, setRooms] = useState(props.rooms);
     const [index, setIndex] = useState(0);
-    const rooms = props.rooms;
+    // const [room, setRoom] = useState(rooms[index]);
+    const getValues = props.getValues;
     const room = rooms[index];
     //
     const start_state = {
@@ -47,6 +49,8 @@ const ChooseRoom = (props) => {
 
     useEffect(() => {
         GenerateReservationDependOnIndex(0);
+        // if(getValues)
+        //     getValues(setRooms);
     }, [])
 
     useEffect(() => {
@@ -252,3 +256,13 @@ const ChooseRoom = (props) => {
 }
 
 export default ChooseRoom;
+// export default React.memo(ChooseRoom, (prevProps, nextProps) => {
+//     console.log('shouldComponentUpdate()'),
+//     console.log(prevProps);
+//     console.log(nextProps);
+//     console.log(prevProps.rooms != nextProps.rooms);
+//     return prevProps.rooms != nextProps.rooms;
+//     if(prevProps.rooms != nextProps.rooms)
+//         return false;
+//     return prevProps == nextProps;
+// });

@@ -28,6 +28,7 @@ const Type = (props) => {
 
     function GenerateTable() {
         const elements = [];
+
         //Из ключей создается массив колоннок
         const columns = struct.map((element) => {
             if(element.title)// && (element.type == 'object' || element.type == 'massive'))

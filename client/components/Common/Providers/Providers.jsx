@@ -1,4 +1,5 @@
 import React from 'react';
+import YouTubePlayer from 'react-player/youtube';
 //
 import PresentationMap from '../Map/PresentationMap';
 //
@@ -44,20 +45,23 @@ const Providers = (props) => {
         //#region For cruises
         function ConvertShipInfo() {
             const words = 
-            [ 
-                ['Год постройки:', ' г.'],
-                ['Количество пассажиров:', ' чел.'],
-                ['Пассажирских палуб:', ''],
-                ['Длина:', ''],
-                ['Ширина:', ''],
-                ['Осадка:', ''],
-                ['Скорость:', ''],
-                ['Проход теплохода:', '']
-            ];
+            { 
+                name: ['Название:', ' '],
+                year: ['Год постройки:', ' г.'],
+                capacity: ['Количество пассажиров:', ' чел.'],
+                length: ['Длина:', ' м.'],
+                width: ['Ширина:', ' м.'],
+                heigth: ['Высота:', ' м.'],
+                speed: ['Скорость:', ' м/ч.'],
+                class: ['Класс лайнера:', ' '],
+            };
             const elements = [];
-            Object.keys(info).forEach((element, index) => {
-                elements.push(<span>{words[index][0]}</span>);
-                elements.push(<p>{info[element] + words[index][1]}</p>);
+            Object.keys(info).forEach((element) => {
+                if(words[element])
+                {
+                    elements.push(<span>{words[element][0]}</span>); // left
+                    elements.push(<p>{info[element] + words[element][1]}</p>); //right
+                }
             });
             return elements;
         }

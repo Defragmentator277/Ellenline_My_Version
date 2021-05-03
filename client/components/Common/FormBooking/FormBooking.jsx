@@ -62,12 +62,12 @@ const FormBooking = (props) => {
     //#endregion
 
     //#region Variables THIS ALL VERY BAD REFACTORING NEDEED useEffect hook maybe can help
-    const [dateArrival, setDateArrival] = useState(type == 'tours' ? GetDates()[0] : new Date());
+    const [dateArrival, setDateArrival] = useState(type == 'tours' || type == 'cruises' ? GetDates()[0] : new Date());
     //
-    const [times, setTimes] = useState(type == 'tours' ? GetTimes(dateArrival) : null);
-    const [time, setTime] = useState(type == 'tours' ? times[0] : null);
+    const [times, setTimes] = useState(type == 'tours' || type == 'cruises' ? GetTimes(dateArrival) : null);
+    const [time, setTime] = useState(type == 'tours' || type == 'cruises' ? times[0] : null);
     //
-    const [trip, setTrip] = useState(type == 'tours' ? GetTrip(dateArrival, time) : null);
+    const [trip, setTrip] = useState(type == 'tours' || type == 'cruises' ? GetTrip(dateArrival, time) : null);
     //
     const [tickets, setTickets] = useState(NaN);
     let setInputTickets = setTickets;
@@ -75,7 +75,8 @@ const FormBooking = (props) => {
     /////////////////TOURS
 
     /////////////////RELAX
-    const rooms = props.rooms;
+    const [rooms, setRooms] = useState(type == 'cruises' ? props.rooms.filter((element) => element.id_timetable_departure == trip.id) : prop.rooms);
+    // const [rooms, setRooms] = useState(props.rooms);
     const [dateLeave, setDateLeave] = useState(new Date(new Date() - (-new Date(1000 * 60 * 60 * 24))));
     const [reservation, setReservation] = useState(); 
     
@@ -109,14 +110,29 @@ const FormBooking = (props) => {
     }
     //#endregion
 
-    // useEffect(() => {
-    //     setDateArrival(new Date());
-    //     setDateLeave(new Date(new Date() - (-new Date(1000 * 60 * 60 * 24))));
-    // }, []);
+    // if(type === 'cruises')
+    //     useEffect(() => {
+    //         console.log(trip);
+    //         // console.log(rooms);
+    //         const new_rooms = rooms.filter((element) => {
+    //             // console.log('S');
+    //             // console.log(parseInt(element.id_timetable_departure));
+    //             // console.log(trip.id);
+    //             // console.log(parseInt(element.id_timetable_departure) == trip.id);
+    //             // console.log('E');
+
+    //             return parseInt(element.id_timetable_departure) == trip.id;
+    //         });
+    //         setRooms(new_rooms);
+    //         // setDateArrival(new Date());
+    //         // setDateLeave(new Date(new Date() - (-new Date(1000 * 60 * 60 * 24))));
+    //     }, []);
+    console.log(rooms);
     /////////////////RELAX
 
-    /////////////////PREPARE VARIABLES
-    /////////////////PREPARE VARIABLES
+    /////////////////CRUISES
+    
+    /////////////////CRUISES
     
 
     function GenerateInfoGoing() {
@@ -164,12 +180,59 @@ const FormBooking = (props) => {
         switch(type)
         {
             case 'cruises':
-
+                console.log(timetable);
+                //#region For cruises function
+                function TimeOnChaingeCruises(e) {
+                    setInputTickets(NaN);
+                    const time = e.currentTarget.value;
+                    setTime(time);
+                    const trip = GetTrip(dateArrival, time);
+                    setRooms(props.rooms.filter((element) => parseInt(element.id_timetable_departure) == trip.id));
+                    setTrip(trip);
+                }
+                //
+                function DateOnChaingeCruises(e) {
+                    setInputTickets(NaN);
+                    const date = e.currentTarget.value;
+                    setDateArrival(date);
+                    const times = GetTimes(date);
+                    setTimes(times);
+                    setTime(times[0]);
+                    const trip = GetTrip(date, times[0]);
+                    setRooms(props.rooms.filter((element) => parseInt(element.id_timetable_departure) == trip.id));
+                    setTrip(trip);
+                }
+                function GetValuesForTimeCruises(setter) {
+                    setter(times);
+                }
+                // 
+                function OnChangeRoomCruises(reserv) {
+                    setReservation(reserv);
+                }
+                //#endregion
+                sections.left_top = <SelectOption 
+                    className={classes.time}
+                    title='Выберите дату'
+                    values={GetDates()}
+                    onChainge={DateOnChaingeCruises}/>;
+                //
+                sections.right_top = <SelectOption
+                    className={classes.time}
+                    title='Выберите время'
+                    placeholder={time}
+                    getValues={(setter) => GetValuesForTimeCruises(setter)}
+                    onChainge={TimeOnChaingeCruises}/>;
+                //
+                // console.log(trip.id);
+                const elements = [];
+                timetable.forEach((element) => {
+                    elements.push(<ChooseRoom className={classes.rooms + ((element.id == trip.id) ? ' ' + classes.delete: '')} rooms={props.rooms.filter((element_in) => parseInt(element_in.id_timetable_departure) == element.id)}/>);
+                });
+                sections.left_bottom = elements;
+                break;
             case 'relax':
                 //#region For relax functions
                 function OnChangeDateLeave(e, value) {
-                    console.log(value);
-                    //В случаи ошибки
                     if(new Date(value) <= new Date(dateArrival))
                     {
                         alert('Дата отъезда должна быть меньше даты заезда!');
@@ -180,8 +243,6 @@ const FormBooking = (props) => {
                 }
                 //
                 function OnChangeDateArrival(e, value) {
-                    console.log(value);
-                    //В случаи ошибки
                     if(new Date(value) >= new Date(dateLeave))
                     {
                         alert('Дата заезда должна быть меньше даты отъезда!');
@@ -195,21 +256,20 @@ const FormBooking = (props) => {
                     setReservation(reserv);
                 }
                 //#endregion
-                const thisDay = dateArrival;    
+                //   
                 sections.left_top = <InputDate className={classes.date}
                     title='Дата заезда'
                     date={dateArrival}
                     min={dateArrival}
                     onChainge={OnChangeDateArrival}/>;
                 //
-                const nextDay = dateLeave;
                 sections.right_top = <InputDate className={classes.date}
                     title='Дата отъезда'
                     date={dateLeave}
                     min={dateLeave}
                     onChainge={OnChangeDateLeave}/>;
                 //
-                sections.left_bottom = <ChooseRoom className={classes.rooms} rooms={rooms} onChainge={OnChangeRoom}/>;
+                sections.left_bottom =  <ChooseRoom className={classes.rooms} rooms={rooms} onChainge={OnChangeRoom}/>;
                 break;
             case 'tours':
                 //#region For tours functions
