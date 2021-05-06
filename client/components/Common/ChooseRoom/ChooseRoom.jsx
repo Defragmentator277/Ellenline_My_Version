@@ -12,6 +12,7 @@ const ChooseRoom = (props) => {
     // const [room, setRoom] = useState(rooms[index]);
     const getValues = props.getValues;
     const room = rooms[index];
+    const type = props.type;
     //
     const start_state = {
         // id_room: room.id,
@@ -64,7 +65,7 @@ const ChooseRoom = (props) => {
         }
         //
         const images = rooms.map((element) => element.image);
-
+        //
         return <Slider className={classes.slider} images={images} index={index} onChainge={OnChainge}/>;
     }
 
@@ -87,21 +88,22 @@ const ChooseRoom = (props) => {
                 for(let i = 0; i < seats[prop]; i++)
                 {
                     function OnMouseDown(e) {
-                        if(i == 0)
+                        if(i == 0 && prop == 'adult')
                             return;
                         const new_obj = Object.assign({}, reservation);
                         if(new_obj.number_of[prop] != i + 1)
                             new_obj.number_of[prop] = i + 1;
                         else
-                            new_obj.number_of[prop] = 0;
+                            new_obj.number_of[prop] = prop == 'adult' ? 1 : 0;
                         setReservation(new_obj);
                     }
 
                     let color;
                     if(reservation.number_of[prop] > i)
                         color = { color: 'black' };
-    
-                    elements.push(<i class={"fa fa-" + GetConvert()} aria-hidden="true" onMouseDown={OnMouseDown} style={color}></i>);
+                    
+                    // WAS DELETED  onMouseDown={OnMouseDown} ANS ALSO style={color}
+                    elements.push(<i class={"fa fa-" + GetConvert()} onMouseDown={OnMouseDown} style={color} aria-hidden="true"></i>);
                 }
             }
 
@@ -114,23 +116,79 @@ const ChooseRoom = (props) => {
         }
 
         function GenerateCapacityRooms() {
+            function GenerateInfoBasedOnType() {
+                switch(type)
+                {
+                    case 'relax':
+                        return 'комнат';
+                    case 'cruises':
+                        return 'кают';
+                    default:
+                        return;
+                }
+            }
+
             const capacity = room.number_of.rooms;
 
             return <div className={classes.capacity}>
-                <p>Доступно комнат {capacity.available} из {capacity.available + capacity.occupied}</p>
+                <p>Доступно {GenerateInfoBasedOnType()} {capacity.available} из {capacity.available + capacity.occupied}</p>
             </div>;
         }
 
         function GenerateCorpus() {
+            function GenerateInfoBasedOnType() {
+                switch(type)
+                {
+                    case 'relax':
+                        return 'Корпус';
+                    case 'cruises':
+                        return 'Палуба';
+                    default:
+                        return;
+                }
+            }
+
+
             if(room.corpus)
                 return <div className={classes.corpus}>
-                    <p className={classes.title}>Корпус:</p>
+                    <p className={classes.title}>{GenerateInfoBasedOnType()}:</p>
                     <p className={classes.text}>{room.corpus}</p>
                 </div>;
         }
 
         function GeneratePrices() {
             const prices = room.prices;
+
+            function GenerateUsualPrice() {
+                const words = {
+                    title: null,
+                    usual_price: null
+                };
+                //
+                switch(type)
+                {
+                    case 'relax':
+                        words.title = 'ночь';
+                        words.usual_price = 'В будние дни:';
+                        // return 'ночь';
+                        break;
+                    case 'cruises':
+                        words.title = 'круиз';
+                        words.usual_price = 'Вместе с каютой:';
+                        // return 'круиз';
+                        break;
+                }
+                //
+                return <>
+                    <div className={classes.title}>
+                        <p>Цена за {words.title}</p> 
+                    </div>
+                    <div className={classes.right}>
+                        {prices.usual ? <p>{words.usual_price} {prices.usual} руб.</p>: null}
+                        {prices.on_weekends ? <p>В выходные дни: {prices.on_weekends} руб.</p> : null}
+                    </div>
+                </>;
+            }
 
             function GenerateAdditionalSeat() {
                 const extra = prices.extra;
@@ -155,13 +213,7 @@ const ChooseRoom = (props) => {
 
 
             return <div className={classes.prices}>
-                <div className={classes.title}>
-                    <p>Цена за ночь</p> 
-                </div>
-                <div className={classes.right}>
-                    <p>В будние дни: {prices.usual} руб.</p>
-                    <p>В выходные дни: {prices.on_weekends} руб.</p>
-                </div>
+                {GenerateUsualPrice()}
                 {GenerateAdditionalSeat()}
             </div>
         }
@@ -225,8 +277,7 @@ const ChooseRoom = (props) => {
                         title={title} 
                         value={food_types[i]}
                         checked={reservation.food.type === food_types[i]}
-                        onChainge={OnChainge}
-                        group='food'/>);
+                        onChainge={OnChainge}/>);
                 }
                 return <FoodSection>
                     {elements}

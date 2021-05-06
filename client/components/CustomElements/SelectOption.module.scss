@@ -23,17 +23,22 @@
         }
     }
 
-    label
-    {
-        display: block;
-        margin-bottom: 5px;
-        white-space: nowrap;
-        @extend %font;
-    }
+    // option
+    // {
+    //     font-size: 1.5em;
+    // }
+    // label
+    // {
+    //     display: block;
+    //     margin-bottom: 5px;
+    //     white-space: nowrap;
+    //     @extend %font;
+    // }
     
     select
     {
         height: 3em;
+        font-size: .75em;
         width: 100%;
     }
 

@@ -10,6 +10,7 @@ const SelectOption = (props) => {
     //
     const onChainge = props.onChainge;
     const isOnce = props.isOnce;
+    const index = props.index;
     //
     const title = props.title;
 
@@ -30,7 +31,7 @@ const SelectOption = (props) => {
         function ConvertToElement(element) {
             return <div className={dynamic.class}>
                 {dynamic.buttonLeft}
-                <select className={props.classSelect} onChange={(e) => OnChange(e)}>
+                <select className={classes.select + ' ' + props.classSelect} onChange={(e) => OnChange(e)}>
                     {element}
                 </select>
                 {dynamic.buttonRight}

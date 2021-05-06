@@ -7,9 +7,12 @@ import classes from './ChooseResort.module.scss';
 
 
 const ChooseResort = (props) => {
-    const OnClick = props.onClick;
     const path = props.path;
     const convert = props.convert;
+    //
+    const searchInfo = props.searchInfo;
+    //
+    const OnClick = props.onClick;
     
     function ToLink(type)
     {
@@ -22,7 +25,7 @@ const ChooseResort = (props) => {
 
     return(
         <div className={classes.resort + ' ' + props.className}>
-            <SearchRelax className={classes.search}/>
+            <SearchRelax className={classes.search} searchInfo={searchInfo}/>
             <div className={classes.choose}>
                 <div className={classes.left}>
                     {ToLink(Object.keys(convert)[1])}
