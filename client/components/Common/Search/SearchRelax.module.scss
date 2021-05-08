@@ -4,65 +4,96 @@
 {
 
     display: grid;
-    grid-template-areas: 'name stars country city price';
-    grid-template-columns: repeat(5, 1fr);
+    grid-auto-columns: 1fr;
+    // grid-template-areas: 'name stars country city'
+    //                      'price price price price';
+    // grid-template-rows: repeat(2, 1fr);
+    // grid-template-columns: repeat(4, 1fr);
     column-gap: 10px;
     row-gap: 15px;
 }
-.country, .city, .input, .stars, .price{
+.country, .city, .name, .stars, .price
+{
     @extend %grid_center;
     width: 100%;
-    // height: 3em;
     font-size: 1.5em;
 }
-.country{
-    grid-area: country;
-    // font-size: 1.5em;
+.name
+{
+    grid-column: 1;
+}
+.stars
+{
+    grid-column: 2;
+}
+.country
+{
+    grid-column: 3;
 }
 .city
 {
-    grid-area: city;
-    // font-size: 1.5em;
+    grid-column: 4;
 }
-.input{
+.price
+{
+    grid-column-start: 1;
+    grid-column-end: 3;
 
-    grid-area: name;
-    /* width: 50vw; */
-    /* height: 10vh; */
-}
-.stars{
-
-    grid-area: stars;
-}
-.price{
-
-    grid-area: price;
+    .title
+    {
+        font-size: 1.25em;
+    }
 }
 @media screen and (max-width: 1024px)
 {
-    .search{
-        // grid-template-columns: 50% 50%;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(3, 1fr);
-        grid-template-areas:'name stars'
-                            'country city'
-                            'price price';
-    }
-    .search .country, .search .city, .input, .search .stars{
-        font-size: 1.5em;
+    .search
+    {
+        .country, .city, .name, .stars, .price
+        {
+            font-size: 1.5em;
+        }
+
+        .country
+        {
+            grid-column: 1;
+        }
+        .city
+        {
+            grid-column: 2;
+        }
+        .price
+        {
+            grid-column-start: 1;
+            grid-column-end: 3;
+        }
     }
 }
 @media screen and (max-width: 425px)
 {
-    .search{
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(4, 1fr);
-        grid-template-areas: 'name'
-                             'stars'
-                             'country'
-                             'city';
-    }
-    .search .country, .search .city, .input, .search .stars{
-        font-size: 1em;
+    .search
+    {
+        .country, .city, .name, .stars, .price
+        {
+            font-size: 1em;
+        }
+
+        .stars
+        {
+            grid-column: 2;
+        }
+        .country
+        {
+            grid-column: 1;
+        }
+        .city
+        {
+            grid-column: 2;
+        }
+        .price
+        {
+            row-gap: 5px;
+            grid-template-columns: none;
+            grid-template-rows: repeat(2, 1fr);
+        }
     }
 }

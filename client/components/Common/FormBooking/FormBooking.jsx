@@ -227,7 +227,7 @@ const FormBooking = (props) => {
                     const properties = {
                         type: 'cruises',
                         className: classes.rooms,
-                        rooms: GetFilteredRooms()//props.rooms.filter((element_in) => parseInt(element_in.id_timetable_departure) == element.id)
+                        rooms: props.rooms.filter((element_in) => parseInt(element_in.id_timetable_departure) == element.id)
                     };
                     //
                     if(element.id == trip.id)
@@ -235,6 +235,7 @@ const FormBooking = (props) => {
                     else
                         properties.className += ' ' + classes.delete;
                     //
+                    console.log(properties);
                     elements.push(<ChooseRoom {...properties}/>);
                 });
                 sections.left_bottom = elements;

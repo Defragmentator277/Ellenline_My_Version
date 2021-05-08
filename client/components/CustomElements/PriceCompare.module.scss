@@ -1,34 +1,20 @@
-@import '../../styles//index.scss';
+@import '../../styles/index.scss';
 
-.inputPrice{
-
+.compare
+{
     display: grid;
-    grid-template-areas: 
-    'input more'
-    'input equally'
-    'input less';
-    justify-items: center
-}
-.more, .equally, .less{
+    grid-template-columns: repeat(2, 1fr);
+    column-gap: 5px;
 
-    @extend %as_button;
-    color: $primary_color;
-    font-size: 1.3em;
-    font-family: 'Mediator Serif Regular';
-    width: 100%;
-    text-align: center;
-}
-.more{
+    .title
+    {
+        @extend %grid_center;
+    }
 
-    grid-area: more;
-    border-bottom: 5px solid $primary_color;
-}
-.equally{
-
-    grid-area: equally;
-    border-bottom: 5px solid $primary_color;
-}
-.less{
-
-    grid-area: less;
+    .minimum, .maximum
+    {
+        display: grid;
+        grid-template-columns: min-content 1fr;
+        column-gap: 5px;
+    }
 }

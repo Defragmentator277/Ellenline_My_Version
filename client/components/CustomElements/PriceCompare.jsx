@@ -1,38 +1,60 @@
-import classes from './InputNumber.module.scss'
-import this_classes from './PriceCompare.module.scss'
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+//
+import InputNumber from './InputNumber.jsx';
+//
+import classes from './PriceCompare.module.scss'
 
 const PriceCompare = (props) => {
-    const [value, setValue] = useState(props.value ? props.value : NaN);
+    // const [price, setPrice] = useState(props.value || { min: undefined, max: undefined });
+    const [min, setMin] = useState(props.min);
+    const [max, setMax] = useState(props.max);
 
-    function CheckValue(e) {
-        let new_value = parseInt(e.target.value);
-        if(new_value < props.min)
-        {
-            setValue(props.min);
-        }
-        else if(new_value > props.max)
-        {
-            setValue(props.max);    
-        }
-        else 
-        {
-            setValue(new_value);
-        }
+    const OnChainge = props.onChainge;
+
+    useEffect(() => {
+        console.log('PRICE IN PRICE COMPARE');
+        const price = { min: min, max: max };
+        console.log(price);
+        if(OnChainge)
+            OnChainge(price);
+    });
+    
+    function MinimumOnChainge(e, value, setter) {
+        // console.log(value);
+        // console.log(value > max);
+        if(value > max)
+            value = max;
+        setMin(value);
+        setter(value);
+        // setPrice(price => price.min = value);
     }
 
+    function MaximumOnChainge(e, value, setter) {
+        if(value < min)
+            value = min;
+        setMax(value);
+        setter(value);
+        // setPrice(price => price.max = value);
+    }
 
     return (
-        <div className={classes.inputNumber + ' ' + this_classes.inputPrice +  ' ' + props.className}>
-        <input className={classes.input + ' ' + props.classInput}  
-               type="number"
-               placeholder={props.placeholder} 
-               value={value} 
-               min={props.min} max={props.max} onChange={(e) => CheckValue(e)}/>
-             <div className={this_classes.more}>{'>'}</div>
-             <div className={this_classes.equally}>=</div>
-             <div className={this_classes.less}>{'<'}</div>
-        </div> 
+        <div className={classes.compare + ' ' + props.className}>
+            <InputNumber
+            className={classes.minimum} 
+            classTitle={classes.title + ' ' + props.classTitle}
+            title='От'
+            min='0'
+            value={min}
+            onChainge={MinimumOnChainge}/>
+            {/*  */}
+            <InputNumber
+            className={classes.maximum}
+            classTitle={classes.title + ' ' + props.classTitle}
+            title='До'
+            min='0'
+            value={max}
+            onChainge={MaximumOnChainge}/>
+        </div>
     )
 }
 

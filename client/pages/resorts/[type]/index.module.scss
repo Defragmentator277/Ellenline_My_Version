@@ -1,0 +1,113 @@
+@import '../../../styles/index.scss';
+
+
+.resort
+{
+    display: grid;
+    height: auto;
+    padding-top: 20px;
+    padding-left: 15px;
+    padding-right: 25px;
+    padding: 20px 25px 20px 15px;
+    grid-template-rows: 1fr; 
+    grid-template-areas: 'search'
+                         'choose';
+    gap: 35px;
+
+    .search
+    {
+        grid-area: search;
+    }
+
+    
+    .choose
+    {
+        @extend %font;
+        grid-area: choose;
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        // column-gap: 10px;
+        gap: 10px;
+
+        .left, .right
+        {
+            text-align: center;
+            width: 100%;
+
+            h1
+            {
+                @extend %border;
+                @extend %button;
+                font-size: 1.5em;
+                color: black;
+                margin: 0;
+                padding: 5px 25px;
+            }
+            
+        }
+    }
+}
+
+@media screen and (max-width: 1024px)
+{
+    .resort
+    {
+
+        .choose
+        {
+            
+            .left, .right
+            {
+
+                h1
+                {
+                    font-size: 1.5em;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px)
+{
+    .resort
+    {
+        
+        .choose
+        {
+            grid-template-columns: none;
+            grid-template-rows: repeat(2, 1fr);
+            padding: 0;
+
+            .left, .right
+            {
+
+                h1
+                {
+                    font-size: 1.1em;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 425px)
+{
+    .resort
+    {
+        
+        .choose
+        {
+            grid-template-columns: none;
+            grid-template-rows: repeat(2, 1fr);
+            padding: 0;
+
+            .left, .right
+            {
+
+                h1
+                {
+                    font-size: .85em;
+                }
+            }
+        }
+    }
+}

@@ -27,17 +27,19 @@ const InputNumber = (props) => {
         let new_value = value;
         //
         if(value >= max)
-            new_value = max;
+            new_value = parseInt(max);
         else if(value <= min)
-            new_value = min;
-        setValue(new_value);
+            new_value = parseInt(min);
         //
+        setValue(new_value);
         if(onChainge)
-            onChainge(e, new_value);
+            onChainge(e, new_value, setValue);
+        // else
+        //
     }
 
     function GenerateTitle() {
-        return title ? <Title title={title}/> : '';
+        return title ? <Title className={props.classTitle} title={title}/> : '';
     }
 
     function GenerateInput() {
