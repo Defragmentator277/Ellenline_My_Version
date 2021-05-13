@@ -9,7 +9,6 @@ const handler = nextConnect();
 handler.use(middleware);
 
 handler.get(async (req, res) => {
-    console.log('WE IN GET CITIE...');
 
     req.db.collection('localities').aggregate([
         { $replaceRoot: { newRoot: 
@@ -47,12 +46,12 @@ handler.get(async (req, res) => {
     ]).toArray((err, collection) => {
         if(err)
         {
-            console.log(err);
+            // console.log(err);
             res.json(err);
         }
         else
         {
-            console.log(res);
+            // console.log(res);
             res.json(collection);
         }
     });

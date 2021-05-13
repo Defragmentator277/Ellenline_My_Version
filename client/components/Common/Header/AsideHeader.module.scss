@@ -1,7 +1,7 @@
 @import './../../../styles/index.scss';
 //show animation variables
 $show_time: 1s;
-$easing: linear;
+$easing: cubic-bezier(0.33, 1, 0.68, 1);
 //Start width nav panel from left
 $start_width: 45px;
 
@@ -51,6 +51,7 @@ $start_width: 45px;
         & > img
         {
             opacity: 1;
+            transition: opacity $show_time 0.35s $easing;
         }
 
         & > i
@@ -87,6 +88,7 @@ $start_width: 45px;
         //
         transition: 
         transform $show_time $easing;
+
     }
 
 

@@ -3,9 +3,10 @@
 .booking 
 {
     display: grid;
-    padding: 15px 0;
+    padding: 15px 200px;
     row-gap: 25px;
-    grid-template-columns: repeat(2, 1fr);
+    // grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr;
     border: 5px solid $primary_color; 
    
 
@@ -79,28 +80,31 @@
         display: grid;
         margin-left: 10px;
         margin-right: 20px;
-        row-gap: 5px;
-        grid-template-rows: repeat(5, min-content(1fr));
+        width: 100%;
+        padding: 0 25px;
+        grid-template-rows: repeat(2, min-content(1fr));
         
-        .fio, .e_mail, .telephone
-        {
-            justify-self: center;
-            height: min-content;
-            padding: 5px;
-            max-width: 100%;
-            min-width: 50%;
-        }
+        // .fio, .e_mail, .telephone
+        // {
+        //     justify-self: center;
+        //     height: min-content;
+        //     padding: 5px;
+        //     max-width: 100%;
+        //     min-width: 50%;
+        // }
 
         .button
         {
             @extend %button;
             padding: 5px;
+            margin: 10px 0;
         }
 
         .text
         {
             p
             {
+                display: block;
                 padding: 5px 10px;
                 background-color: lightgray;
                 span 
@@ -116,7 +120,7 @@
 {
     .booking
     {
-        grid-template-columns: 1fr;
+        padding: 15px 0;
 
         .info_going, .info_person
         {
@@ -132,11 +136,6 @@
                 grid-column-start: 1;
                 grid-column-end: 3;
             }
-        }
-
-        .info_person
-        {
-            width: 100%;
         }
     }
 }   

@@ -188,7 +188,8 @@ const ModalWindow = (props) => {
                     case 'string':
                         return <InputText 
                         {...GenerateProperties(field.prop)}
-                        placeholder='Введите текст'/>;
+                        placeholder='Введите текст'
+                        isPassword={field.secret}/>;
                     case 'number':
                         return <InputNumber 
                         {...GenerateProperties(field.prop)}
@@ -369,8 +370,12 @@ const ModalWindow = (props) => {
             if(CheckEmptyness(fields))
                 return;
             if(onChainge)
-                onChainge(e, value);
-            onClose(e, value);
+            {
+                if(!onChainge(e, value))
+                    onClose(e, value);
+            }
+            else
+                onClose(e, value);  
         }
 
         //Массив кнопок
@@ -393,7 +398,7 @@ const ModalWindow = (props) => {
 
     return (
         <>
-            <div className={classes.modal_overlay}>
+            <div className={classes.modal_overlay + ' ' + props.modal_overlay}>
                 <div className={classes.modal}>
                     <h1 className={classes.title}>{title}</h1>
                     

@@ -1,28 +1,67 @@
 import React, {Component, useEffect, useState} from 'react';
-import dynamic from 'next/dynamic';
+import { useRouter } from 'next/router'; 
 //Jsx
 import ClientLayout from '../../../../layouts/ClientLayout.jsx';
+import ListItem from './ListItem.jsx';
 //Js, scss
 import Global from '../../../global.js';
 import classes from './index.module.scss';
 
-const List = dynamic(() => import('../../../../components/Common/List/List.jsx'), 
-{ 
-    // ssr: false | для отключения server sider rendering
-    // loader: место для прелоадера
-});
-
 const Resorts = (props) => {
+    const router = useRouter();
+    const [condition, setCondition] = useState();
+    //
     const type = props.type;
-    const resort = props.resort;
+    const resort = props.resort; 
     const items = props.items;
 
-    console.log('ON CLIENT');
+    console.log('ITEMS');
     console.log(items);
+
+    useEffect(() => {
+        setCondition(router.query.condition && JSON.parse(router.query.condition));
+    }, [router]);
+
+    function InsertItems() {
+        const elements = [];
+        if(condition && items && items.length != 0)
+        {
+            for(let i = 0; i < items.length; i++)
+            {
+                let element = items[i];
+                element.id = element._id;
+                if(condition)
+                {
+                    if(condition.name && !new RegExp(condition.name, 'i').test(element.title))
+                        continue;
+                    //
+                    if(condition.stars && condition.stars == element.stars)
+                        continue;
+                    //
+                    if(condition.locality && condition.locality._id != element.locality._id)
+                        continue;
+                    else if(condition.country && condition.country._id.$id != element.locality.id_country.$id)
+                        continue;
+                    //
+                    const price = condition.price;
+                    if((price.min && element.min_price < price.min) || 
+                       (price.max && element.min_price > price.max))
+                        continue;
+                    //
+                }
+                elements.push(<ListItem category={resort}
+                                        path={type}
+                                        {...element}/>);
+            }
+        }
+        return elements;
+    }
 
     return (
         <ClientLayout title={Global.GetConvert(type)[resort]}>
-            <List {...props} path={type}/>
+            <div className={classes.list}>
+                {InsertItems()}           
+            </div>
         </ClientLayout>
     )
 }
@@ -58,6 +97,9 @@ export async function getStaticProps(router) {
     const res = await fetch(Global.url + '/api/resorts/'+ type + '/' + resort);
     const items = await res.json();
     //
+    // const condition = router.params.condition;
+    console.log('ON GET STATIC PROPS');
+    console.log(JSON.stringify(router, null, 2));
     return {
         props: {
             type: type,

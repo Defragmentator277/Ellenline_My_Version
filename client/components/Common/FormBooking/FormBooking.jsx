@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useCookies } from 'react-cookie';
 //
 import SelectOption from '../../CustomElements/SelectOption.jsx';
 import InputText from '../../CustomElements/InputText.jsx';
@@ -8,6 +9,7 @@ import InputNumber from '../../CustomElements/InputNumber.jsx';
 import InputTelephone from '../../CustomElements/InputTelephone.jsx';
 import InputEmail from '../../CustomElements/InputEmail.jsx';
 import ChooseRoom from '../ChooseRoom/ChooseRoom.jsx';
+import ModalWindow from '../ModalWindow/ModalWindow.jsx';
 //
 import Global from '../../../pages/global.js';
 import classes from './FormBooking.module.scss';
@@ -15,6 +17,9 @@ import classes from './FormBooking.module.scss';
 const FormBooking = (props) => {
     /////////////////ALL
     //#region Variables
+    const [cookies, setCookie] = useCookies('account');
+    const [window, setWindow] = useState();
+    //
     const timetable = props.timetable;
     const price = props.price;
     //
@@ -109,7 +114,7 @@ const FormBooking = (props) => {
     }
     //#endregion
 
-    const [rooms, setRooms] = useState(type == 'cruises' ? GetFilteredRooms() : prop.rooms);
+    const [rooms, setRooms] = useState(type == 'cruises' ? GetFilteredRooms() : props.rooms);
     const [dateLeave, setDateLeave] = useState(new Date(new Date() - (-new Date(1000 * 60 * 60 * 24))));
     const [reservation, setReservation] = useState(); 
     /////////////////RELAX
@@ -328,62 +333,57 @@ const FormBooking = (props) => {
     }
 
     function GenerateBookingForm() {
-        function FioOnChainge(e, value) {
-            setFio(value);
-        }
+        function GenerateButtonOrText() {
+            const account = cookies.account;
+            if(account && account.role == 'users')
+            {
+                return <Button 
+                className={classes.button} 
+                type='submit' 
+                value='Забронировать'/>;
+            }
+            else
+            {
+                return <div className={classes.text}>
+                    <p>Для того чтобы забронировать тур вам нужно <span>авторизироваться!</span></p>
+                </div>
+            }
 
-        function EmailOnChainge(e, value) {
-            setEmail(value);
-        }
-
-        function TelephoneOnChainge(e, value) {
-            setTelephone(value);
         }
 
         return <div className={classes.info_person}>
-            <InputText 
-            className={classes.fio} 
-            title='ФИО' 
-            required='true'
-            placeholder='Имя Фамилия Отчество'
-            onChainge={FioOnChainge}/>
-            {/*  */}
-            <InputEmail 
-            className={classes.e_mail} 
-            title='E-mail' 
-            required='true' 
-            placeholder='mymail@mail.ru'
-            onChainge={EmailOnChainge}/>
-            {/*  */}
-            <InputTelephone 
-            className={classes.telephone} 
-            title='Телефон' 
-            required='true'
-            onChainge={TelephoneOnChainge}/>
-            {/*  */}
-            <Button 
-            className={classes.button} 
-            type='submit' 
-            value='Забронировать'/>
-            {/*  */}
-            <div className={classes.text}>
-                <p>
-                    Здесь какой-то очень важный <span>текст</span>
-                </p>
-            </div>
+            {GenerateButtonOrText()}
         </div>;
     }
 
     function SubmitOnClick(e) {
         e.preventDefault();
         //
-        if(!/^[a-zA-Zа-яА-Я]+ [a-zA-Zа-яА-Я]+ [a-zA-Zа-яА-Я]+$/.test(fio))
+        let payment;
+        setWindow(
         {
-            alert('Поле ФИО должно быть формата: Фамилия Имя Отчество');
-            return;
-        }
+            title: 'Выберите опцию для оплаты',
+            preset: 'PaymentSelection',
+            onChainge: (e, value) => {
+                payment = value.payment;
+                //Вызов api машрута в зависимости от типа отдыха
+                switch(type)
+                {
+                    case 'tours':
+                        DecrementSeats({ id: trip.id, path: 'timetable_departure', key: 'number_of_seats.available', new_value: -1 * tickets }, DecrementSeats, 
+                               { prop: { id: trip.id, path: 'timetable_departure', key: 'number_of_seats.occupied', new_value: tickets }, next: CreateReservation });
+                        break;
+                    case 'relax':
+                    case 'cruises':
+                        DecrementSeats({ id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.available', new_value: -1 }, DecrementSeats, 
+                               { prop: { id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.occupied', new_value: 1 }, next: CreateReservation });
+                        break;
+                }
+            }
+        })
         //Создание связи между автобусным туром и клиентом
-        function CreateReservation(id_user) {
+        function CreateReservation() {
+            const id_user = cookies.account._id;
             let prop;
             switch(type)
             {
@@ -398,7 +398,7 @@ const FormBooking = (props) => {
                             timetable_departure: new_trip,
                             tickets: tickets,
                             price: price * tickets,
-                            status: 0
+                            status: payment
                         }
                     };
                     break;
@@ -416,7 +416,7 @@ const FormBooking = (props) => {
                             date_arrival: dateArrival,
                             date_leave: dateLeave,
                             price: GetRelaxPrice(),
-                            status: 0
+                            status: payment
                         }
                     }
                     break;
@@ -437,7 +437,7 @@ const FormBooking = (props) => {
                             number_of: reservation.number_of,
                             type_of_food: reservation.food.type,
                             price: GetCruisePrice(),
-                            status: 0
+                            status: payment
                         }
                     }
                     break;
@@ -452,75 +452,6 @@ const FormBooking = (props) => {
             {
                 console.log(res);
                 alert('Спасибо за вашу покупку, мы свяжемся с вами в ближайшее время!');
-            })
-            .catch((err) => 
-            {
-                console.log('Ошибка');
-                return err.json();
-            })
-            .catch((err) => 
-            {
-                console.log(err);
-            });
-        }
-        //Идентификация пользователя в слуачи совпадение email-ov
-        function IdentifyUser() {
-            fetch(`${Global.url}/api/db/users`)
-            .then((res) => 
-            {
-                console.log('Успех идентификации пользователя');
-                return res.json();
-            })
-            .then((res) => 
-            {
-                console.log(res);
-                CreateReservation(res.find((element) => element.email == email)._id);
-            })
-            .catch((err) => 
-            {
-                console.log('Ошибка идентификации пользователя');
-                return err.json();
-            })
-            .catch((err) => 
-            {
-                console.log(err);
-            });
-        }
-        //Создание аккаунт пользователю, если существует идентифицирует
-        function CreateUser() {
-            const inital = fio.trim().split(' ');
-            const user = {
-                login: 'user_login',
-                password: 'user_password',
-                name: inital[0],
-                surname: inital[1],
-                middle_name: inital[2],
-                email: email,
-                telephone: telephone,
-                tours_orders: [],
-                relax_orders: [],
-                cruises_orders: []
-            };
-            fetch(`${Global.url}/api/db/users/insert?object=${JSON.stringify(user)}`)
-            .then((res) => 
-            {
-                console.log('Успех');
-                return res.json();
-            })
-            .then((res) => 
-            {
-                if(res.code == 11000)
-                {
-                    console.log('Данный пользователь уже существует!');
-                    alert('Рады снова вас видеть ' + fio.trim() + '!');
-                    IdentifyUser();
-
-                }
-                else
-                {
-                    console.log('Была созданна запись с новым пользователем!');
-                    CreateReservation(res.insertedId);
-                }
             })
             .catch((err) => 
             {
@@ -561,32 +492,21 @@ const FormBooking = (props) => {
         }
 
 
-        //Вызов api машрута в зависимости от типа отдыха
-        switch(type)
-        {
-            case 'tours':
-                DecrementSeats({ id: trip.id, path: 'timetable_departure', key: 'number_of_seats.available', new_value: -1 * tickets }, DecrementSeats, 
-                       { prop: { id: trip.id, path: 'timetable_departure', key: 'number_of_seats.occupied', new_value: tickets }, next: CreateUser });
-                break;
-            case 'relax':
-            case 'cruises':
-                DecrementSeats({ id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.available', new_value: -1 }, DecrementSeats, 
-                       { prop: { id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.occupied', new_value: 1 }, next: CreateUser });
-                break;
-            // case 'cruises':
-            //     DecrementSeats({ id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.available', new_value: -1 }, DecrementSeats, 
-            //            { prop: { id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.occupied', new_value: 1 }, next: CreateUser });
-            //     break;
-        }
     }
 
-    return(
+    function GenerateModalWindow() {
+        return window ? <ModalWindow {...window} onClose={() => setWindow()}/> : '';
+    }
+
+    return(<>
         <form className={classes.booking + ' ' + props.className} onSubmit={SubmitOnClick}>
             {/* SEPARATOR */}
             {GenerateInfoGoing()}
             {/* SEPARATOR */}
             {GenerateBookingForm()}
         </form>
+        {GenerateModalWindow()}
+    </>
     )
 }
 

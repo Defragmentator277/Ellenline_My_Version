@@ -6,7 +6,54 @@
         },
         {
             "type": "string",
-            "prop": "password"
+            "prop": "password",
+            "secret": true
+        },
+        {
+            "type": "combobox",
+            "prop": "role",
+            "items": [ "Менеджер", "Администратор" ]
+        }
+    ],
+    "AdminRegistration": [
+        {
+            "type": "string",
+            "prop": "login"
+        },
+        {
+            "type": "string",
+            "prop": "password",
+            "secret": true
+        },
+        {
+            "type": "string",
+            "prop": "repeat_password",
+            "secret": true
+        },
+        {
+            "type": "string",
+            "prop": "name"
+        },
+        {
+            "type": "string",
+            "prop": "surname"
+        },
+        {
+            "type": "string",
+            "prop": "middle_name"
+        },
+        {
+            "type": "string",
+            "prop": "email"
+        },
+        {
+            "type": "string",
+            "prop": "telephone"
+        },
+        {
+            "type": "combobox",
+            "prop": "role",
+            "items": [ "Мужской", "Женский" ]
         }
     ],
     "ClientAuthorization": [
@@ -16,7 +63,56 @@
         },
         {
             "type": "string",
-            "prop": "password"
+            "prop": "password",
+            "secret": true
+        }
+    ],
+    "ClientRegistration": [
+        {
+            "type": "string",
+            "prop": "login"
+        },
+        {
+            "type": "string",
+            "prop": "password",
+            "secret": true
+        },
+        {
+            "type": "string",
+            "prop": "repeat_password",
+            "secret": true
+        },
+        {
+            "type": "string",
+            "prop": "name"
+        },
+        {
+            "type": "string",
+            "prop": "surname"
+        },
+        {
+            "type": "string",
+            "prop": "middle_name"
+        },
+        {
+            "type": "string",
+            "prop": "email"
+        },
+        {
+            "type": "string",
+            "prop": "telephone"
+        },
+        {
+            "type": "combobox",
+            "prop": "role",
+            "items": [ "Мужской", "Женский" ]
+        }
+    ],
+    "PaymentSelection": [
+        {
+            "type": "combobox",
+            "prop": "payment",
+            "items": [ "Полная оплата по карте", "Оплата половины суммы", "Оплата по прибытию" ]
         }
     ]
 }

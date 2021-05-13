@@ -25,7 +25,7 @@ const PriceCompare = (props) => {
         if(value > max)
             value = max;
         setMin(value);
-        setter(value);
+        // setter(value);
         // setPrice(price => price.min = value);
     }
 
@@ -33,7 +33,7 @@ const PriceCompare = (props) => {
         if(value < min)
             value = min;
         setMax(value);
-        setter(value);
+        // setter(value);
         // setPrice(price => price.max = value);
     }
 

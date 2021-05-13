@@ -1,9 +1,12 @@
 import React, {Component, useEffect, useState} from 'react';                                                               
-import Link from 'next/link';
-import dynamic from 'next/dynamic';
+import Router from 'next/router';
 //
 import ClientLayout from '../../../layouts/ClientLayout.jsx';
-import SearchRelax from '../../../components/Common/Search/SearchRelax.jsx';
+// import SearchRelax from '../../../components/Common/Search/SearchRelax.jsx';
+import InputText from '../../../components/CustomElements/InputText.jsx';
+import InputNumber from '../../../components/CustomElements/InputNumber.jsx';
+import SelectOption from '../../../components/CustomElements/SelectOption.jsx';
+import PriceCompare from '../../../components/CustomElements/PriceCompare.jsx';
 //
 import Global from '../../global.js';
 import classes from './index.module.scss';
@@ -15,33 +18,142 @@ import classes from './index.module.scss';
 
 const Relax = (props) => {
     const type = props.type;
-    const convert = Global.GetConvert(type);
     const searchInfo = props.searchInfo;
+    // const [filters, setFilters] = useState({});
+    // let filters = {};
+    //{ name:... , stars:... , country:... , locality:... , price: { min: ..., max:... } }
+    //
+    const convert = Global.GetConvert(type);
 
-    console.log('searchInfo');
-    console.log(searchInfo);
-    
+    //#region Variables and get functions
+    //NAME
+    const [name, setName] = useState();
+    let setterNames = () => {};
+    //STARS
+    const [stars, setStars] = useState();
+    //COUNTRIES
+    function GetCountries() {
+        return searchInfo.map((element) => element.name);
+    }
+    const [country, setCountry] = useState();
+    //CITIES
+    function GetLocalities(country) {
+        return searchInfo.find((element) => element.name == country).localities.map((element) => element.name);
+    }
+    const [locality, setLocality] = useState();
+    let setterCities = () => {};
+    //PRICE
+    // const [price, setPrice] = useState({ min: NaN, max: NaN });
+    const [minPrice, setMinPrice] = useState(0);
+    const [maxPrice, setMaxPrice] = useState();
+    //#endregion
+
+    //#region [Propertie]OnChainge functions
+    function NameOnChainge(e, value, setter) {
+        setName(value);
+    }
+
+    function CountryOnChainge(e, value) {
+        const cities = GetLocalities(value);
+        //
+        if(locality)
+        {
+            //Нахождение индекса combobox`a города, т.к. при смене страны он(индекс) не меняется нужно 
+            //указать тоже значение явно
+            const index = searchInfo
+            .find((element) => element == country).localities
+            .findIndex((element) => element == locality);
+            //
+            setLocality(cities[index]);
+        }
+        setCountry(searchInfo.find((element) => element.name == value));
+        setterCities(cities);
+    }
+
+    function LocalityOnChainge(e, value) {
+        setLocality(searchInfo.find((element) => element == country).localities
+                          .find((element) => element.name == value));
+    }
+
+    function StarsOnChainge(e, value) {
+        setStars(value);
+    }
+
+    function PriceOnChainge(value) {
+        setMinPrice(value.min);
+        setMaxPrice(value.max);
+    }
+    //#endregion
+
     function ToLink(path)
     {
-        let content = <h1 type={path}>{convert[path]}</h1>;
-        // if(OnClick)
-        //     return content;
-        // else
-            return <Link href={`/resorts/${type}/${path}`}>{content}</Link>;
+        function OnClick(e) {
+            e.preventDefault();
+            //
+            const condition = {
+                name: name,
+                stars: stars,
+                country: country,
+                locality: locality,
+                price: { min: minPrice, max: maxPrice }
+            };
+            //
+            Router.push(`/resorts/${type}/${path}?condition=${JSON.stringify(condition)}`);
+        }
+        //
+        let content = <h1 onClick={OnClick}>{convert[path]}</h1>;
+        // return <Link href={`/resorts/${type}/${path}?condition=${condition}`}>{content}</Link>;
+        return content;
     }
 
-    function FilterOnChainge(value) {
-        console.log('FILTER CHAINGED');
-        console.log(value);
+    function GenerateStars() {
+        switch(type)
+        {
+            case 'relax':
+                return <InputNumber 
+                className={classes.stars} 
+                placeholder="Кол-во ★" 
+                min="1" max="5"
+                onChainge={StarsOnChainge}/>;
+            default:
+                return;
+        }
     }
+
+    const not_relax_class = type != 'relax' ? classes.not_relax : '';
 
     return (
         <ClientLayout title={convert[Object.keys(convert)[0]]}>
-            <div className={classes.resort + ' ' + props.className}>
-                <SearchRelax 
-                className={classes.search} 
-                searchInfo={searchInfo}
-                onChainge={FilterOnChainge}/>
+            <div className={classes.resort}>
+                <div className={classes.search + ' ' + props.className}>
+                    <InputText 
+                    className={classes.name + ' ' + not_relax_class} 
+                    value={name} 
+                    placeholder="Название"
+                    onChainge={NameOnChainge}/>
+                    {/*  */}
+                    {GenerateStars()}
+                    {/*  */}
+                    <SelectOption 
+                    className={classes.country} 
+                    values={GetCountries()} 
+                    placeholder='Страна'
+                    onChainge={CountryOnChainge}/>
+                    {/*  */}
+                    <SelectOption
+                    className={classes.city} 
+                    placeholder='Город'
+                    onChainge={LocalityOnChainge}
+                    getValues={(setter) => setterCities = setter}/>
+                    {/*  */}
+                    <PriceCompare 
+                    className={classes.price} 
+                    classTitle={classes.title}
+                    placeholder='Цена'
+                    min={minPrice}
+                    max={maxPrice}
+                    onChainge={PriceOnChainge}/>
+                </div>
                 {/* ROW */}
                 <div className={classes.choose}>
                     <div className={classes.left}>
@@ -52,10 +164,6 @@ const Relax = (props) => {
                     </div>
                 </div>
             </div>
-            {/* <ChooseResort 
-            path={type} 
-            convert={convert}
-            searchInfo={searchInfo}/> */}
         </ClientLayout>
     )
 }

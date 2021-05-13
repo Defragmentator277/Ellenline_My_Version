@@ -8,12 +8,16 @@ handler.use(middleware);
 
 handler.get(async (req, res) => {
     const type = req.query.type;
-    const condition = req.query.condition || {};
+    const condition = req.query.condition ? JSON.parse(req.query.condition) : {};
+    console.log(condition);  
 
     req.db.collection(type).find(condition).toArray((err, collection) => {
+        console.log(err);
+        console.log(collection);
         if(err)
-            return console.log(err);
-        res.json(collection);
+            res.json(err);
+        else
+            res.json(collection);
     });
 });
 

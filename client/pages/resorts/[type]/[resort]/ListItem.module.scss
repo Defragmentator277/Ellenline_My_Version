@@ -1,15 +1,7 @@
-@import '../../../styles/index.scss';
+@import '../../../../styles/index.scss';
 
-/* a {
-    text-decoration: none;
-    color: white
-}
-
-a:active .list_item{
-    color: black;
-} */
-
-.list_item {
+.list_item 
+{
     position: relative;
     height: 100%;   
     width: 100%;
@@ -34,7 +26,8 @@ a:active .list_item{
     background-color: $primary_color;
 }
 
-.top::after, .bottom::before{
+.top::after, .bottom::before
+{
     z-index: 0;
     display: block;
     position: absolute;

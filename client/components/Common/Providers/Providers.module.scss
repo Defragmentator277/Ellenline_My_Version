@@ -146,6 +146,7 @@
 
         i
         {
+            @extend %grid_center;
             padding: 0 5px;
             font-size: 3em;
         }
@@ -208,7 +209,7 @@
             grid-column-start: unset;
             grid-column-end: unset;
 
-            i, h1
+            h1
             {
                 align-self: flex-end;
             }
@@ -225,6 +226,10 @@
         
         .sections
         {
+            h1
+            {
+                font-size: 1.75em;
+            }
 
             //For tours page
             &.tours
@@ -254,6 +259,14 @@
                     }
                 }
             }    
+        }
+
+        .address
+        {
+            h1
+            {
+                font-size: 1.9em;
+            }
         }
     }
 }

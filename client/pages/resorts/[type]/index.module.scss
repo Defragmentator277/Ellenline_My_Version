@@ -17,6 +17,48 @@
     .search
     {
         grid-area: search;
+        display: grid;
+        grid-auto-columns: 1fr;
+        column-gap: 10px;
+        row-gap: 15px;
+
+        .country, .city, .name, .stars, .price
+        {
+            @extend %grid_center;
+            width: 100%;
+            font-size: 1.5em;
+        }
+        .name
+        {
+            grid-column: 1;
+            
+            &.not_relax
+            {
+                grid-column-end: 3;
+            }
+        }
+        .stars
+        {
+            grid-column: 2;
+        }
+        .country
+        {
+            grid-column: 3;
+        }
+        .city
+        {
+            grid-column: 4;
+        }
+        .price
+        {
+            grid-column-start: 1;
+            grid-column-end: 3;
+        
+            .title
+            {
+                font-size: 1.25em;
+            }
+        }
     }
 
     
@@ -52,6 +94,27 @@
 {
     .resort
     {
+        .search
+        {
+            .country, .city, .name, .stars, .price
+            {
+                font-size: 1.5em;
+            }
+    
+            .country
+            {
+                grid-column: 1;
+            }
+            .city
+            {
+                grid-column: 2;
+            }
+            .price
+            {
+                grid-column-start: 1;
+                grid-column-end: 3;
+            }
+        }
 
         .choose
         {
@@ -93,7 +156,32 @@
 {
     .resort
     {
-        
+        .search
+        {
+            .country, .city, .name, .stars, .price
+            {
+                font-size: 1em;
+            }
+
+            .stars
+            {
+                grid-column: 2;
+            }
+            .country
+            {
+                grid-column: 1;
+            }
+            .city
+            {
+                grid-column: 2;
+            }
+            .price
+            {
+                row-gap: 5px;
+                grid-template-columns: none;
+                grid-template-rows: repeat(2, 1fr);
+            }
+        }
         .choose
         {
             grid-template-columns: none;

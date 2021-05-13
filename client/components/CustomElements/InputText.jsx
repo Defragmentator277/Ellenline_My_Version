@@ -10,6 +10,8 @@ const InputText = (props) => {
     const title = props.title;
     const onChainge = props.onChainge;
     const required = props.required;
+    const classTitle = props.classTitle;
+    const isPassword = props.isPassword;
     //
     const regex = props.regex;
 
@@ -20,15 +22,16 @@ const InputText = (props) => {
             new_value = null;
         setValue(new_value);
         if(onChainge)
-            onChainge(e, new_value);
+            onChainge(e, new_value, setValue);
     }
 
     function GenerateTitle() {
-        return title ? <Title title={title}/> : '';
+        return title ? <Title title={title} className={classTitle}/> : '';
     }
 
     function GenerateInput() {
         return <input className={classesInput.input + ' ' + props.classInput}   
+        type={isPassword ? 'password' : ''}
         value={value}
         placeholder={placeholder}
         required={required}

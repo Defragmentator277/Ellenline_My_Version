@@ -143,9 +143,13 @@ const Type = (props) => {
                         return;
                     const id = object._id;
                     last_id = id;
-                    const type_of = struct.find((elem_struct) => elem_struct.prop === column || elem_struct.title === column).type;
+                    const field_struct = struct.find((elem_struct) => elem_struct.prop === column || elem_struct.title === column);
+                    const type_of = field_struct.type;
+                    console.log(column);
+                    console.log(field_struct);
                     //В случаи если объект являеться сложным запоминает айди, но не открывает контекстное меню
-                    if(type_of == 'object' ||
+                    if(field_struct.secret ||
+                       type_of == 'object' ||
                        type_of == 'massive' ||
                        type_of == 'combobox' ||
                        type_of == 'OtherId' || 
@@ -319,7 +323,8 @@ const Type = (props) => {
                             function OnClickVariable(e) {
                                 e.preventDefault();
     
-                                if(elem_struct.prop == 'id' ||
+                                if(elem_struct.secret ||
+                                   elem_struct.prop == 'id' ||
                                    elem_struct.prop == '_id')
                                     return;
                                     
@@ -378,7 +383,7 @@ const Type = (props) => {
                             return <p 
                                 className={classes.variable} 
                                 onClick={(e) => OnClickVariable(e)}>
-                                {object[elem_struct.prop].toString()}
+                                {elem_struct.secret ? '*******' : object[elem_struct.prop].toString()}
                             </p>;
                         case 'combobox':
                             getPathsIdsProp();

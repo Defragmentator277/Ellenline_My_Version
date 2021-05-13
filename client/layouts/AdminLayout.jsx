@@ -12,7 +12,7 @@ import Context from './AdminLayoutContext.js';
 
 const AdminLayout = (props) => {
     const title = props.title || 'Эллинлайн';
-    const [cookies, setCookie, removeCookie] = useCookies('admin_account');
+    const [cookies, setCookie, removeCookie] = useCookies('account');
 
     function GenerateContent() {
         return <>
@@ -31,7 +31,13 @@ const AdminLayout = (props) => {
         function OnCloseModalWindow(e, value) {
             const login = value.login;
             const password = value.password;
-            fetch(`${Global.url}/api/authentication?login=${login}&password=${password}&type_of_users=${'admins'}`,
+            if(value.role == 'Менеджер')
+                value.role = 'managers';
+            else if(value.role == 'Администратор')
+                value.role = 'admins';
+            const role = value.role;
+            //
+            fetch(`${Global.url}/api/authentication?login=${login}&password=${password}&type_of_users=${role}`,
             { method: 'POST' })
             .then((res) => 
             {
@@ -43,7 +49,8 @@ const AdminLayout = (props) => {
                 if(res[0])
                 {
                     alert('Вы успешно авторизовались!');
-                    setCookie('admin_account', value);
+                    res[0].role = role;
+                    setCookie('account', res[0]);
                     location.reload();
                 }
                 else
@@ -60,13 +67,14 @@ const AdminLayout = (props) => {
             });
         }
 
-        if(cookies.admin_account)
-            return;
-        else
+        console.log(cookies.account);
+
+        if(!cookies.account || cookies.account.role != 'admins')
             return <ModalWindow 
             title='Авторизируйтесь'
             preset='AdminAuthorization' 
             buttons={{ close: false }}
+            modal_overlay={classes.modal_overlay}
             onClose={OnCloseModalWindow}/>;
     }
 

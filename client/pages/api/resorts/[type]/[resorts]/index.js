@@ -34,9 +34,23 @@ handler.get(async (req, res) => {
                 min_price: { $first: '$price' },
                 services: { $first: '$services.included'},
                 days: { $first: '$days' },
-                timetable_schedule: { $first: '$timetable_departure' }
+                timetable_schedule: { $first: '$timetable_departure' },
+                //
+                locality: { $first: { $objectToArray: '$id_locality' } }
             }},
             { $match: { days: operator }},
+            //Get locality info
+            { $unwind: '$locality' },
+            { $match: { 'locality.k': { $eq: '$id'} } },
+            { $set: { locality: { $toObjectId: '$locality.v' } } },
+            { $lookup:
+            {
+                from: 'localities',
+                localField: 'locality',
+                foreignField: '_id',
+                as: 'locality'
+            }},
+            { $unwind: '$locality' },
             //Получение туров которые еще не начились
             { $unwind: '$timetable_schedule' },
             { $set: { 'date_compare': { $cmp: [ { $toDate: '$timetable_schedule.date' }, { $toDate: Date.now() } ] } } },
@@ -52,7 +66,9 @@ handler.get(async (req, res) => {
                 adress: { $first: '$adress' },
                 min_price: { $first: '$min_price' },
                 services: { $first: '$services'},
-                timetable_schedule: { $push: '$timetable_schedule' }
+                timetable_schedule: { $push: '$timetable_schedule' },
+                //
+                locality: { $first: '$locality'}
             }},
         ];
     }
@@ -70,8 +86,22 @@ handler.get(async (req, res) => {
                 adress: { $first: '$adress' },
                 services: { $first: '$services.available' },
                 rooms: { $first: '$rooms'},
-                timetable_schedule: { $first: '$timetable_departure' }
+                timetable_schedule: { $first: '$timetable_departure' },
+                //
+                locality: { $first: { $objectToArray: '$id_locality' } }
             }},
+            //Get locality info
+            { $unwind: '$locality' },
+            { $match: { 'locality.k': { $eq: '$id'} } },
+            { $set: { locality: { $toObjectId: '$locality.v' } } },
+            { $lookup:
+            {
+                from: 'localities',
+                localField: 'locality',
+                foreignField: '_id',
+                as: 'locality'
+            }},
+            { $unwind: '$locality' },
             { $unwind: '$rooms' },
             //Где есть свободные места
             { $match: { 'rooms.number_of.rooms.available': { $gte: 1 } } },
@@ -85,6 +115,8 @@ handler.get(async (req, res) => {
                 services: { $first: '$services' },
                 rooms: { $push: '$rooms'},
                 // timetable_schedule: { $push: '$timetable_schedule' }
+                //
+                locality: { $first: '$locality' }
             }},
         ];
     }
@@ -103,8 +135,22 @@ handler.get(async (req, res) => {
                 // min_price: { $min: '$rooms.prices.usual' },
                 services: { $first: '$services.available' },
                 rooms: { $first: '$rooms'},
-                timetable_schedule: { $first: '$timetable_departure' }
+                timetable_schedule: { $first: '$timetable_departure' },
+                //
+                locality: { $first: { $objectToArray: '$id_locality' } }
             }},
+            //Get locality info
+            { $unwind: '$locality' },
+            { $match: { 'locality.k': { $eq: '$id'} } },
+            { $set: { locality: { $toObjectId: '$locality.v' } } },
+            { $lookup:
+            {
+                from: 'localities',
+                localField: 'locality',
+                foreignField: '_id',
+                as: 'locality'
+            }},
+            { $unwind: '$locality' },
             //Получение кол-ва незанятых комнат 
             { $unwind: '$rooms' },
             { $match: { 'rooms.number_of.rooms.available': { $gte: 1 } } },
@@ -126,6 +172,8 @@ handler.get(async (req, res) => {
                 services: { $first: '$services' },
                 rooms: { $push: '$rooms'},
                 timetable_schedule: { $addToSet: '$timetable_schedule' },
+                //
+                locality: { $first: '$locality' }
             }},
         ]
     }

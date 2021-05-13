@@ -13,6 +13,9 @@ handler.get(async (req, res) => {
     const id = req.query.id;
     const operator = req.query.operator || '$set';
     const prop = JSON.parse(req.query.prop);
+    console.log(prop);
+    console.log(id);
+    console.log(operator);
     //
     const collection = req.db.collection(type);
     //Update сложного объекта
@@ -74,6 +77,19 @@ handler.get(async (req, res) => {
                 console.log(prop);
                 Update(id, prop, '$pull');
                 break;
+            case '$replace':
+                collection.updateOne(
+                    { _id: ObjectId(id) }, 
+                    prop, 
+                    (err, result) => 
+                    {
+                        if(err)
+                            res.json(err);
+                        else
+                            res.json(result);
+                    }
+                );
+                break;
             default:
                 return console.log('THIS OPERATOR GROPU DON`T EXISTS');
         }
@@ -92,7 +108,8 @@ handler.get(async (req, res) => {
                     res.json(err);
                 else
                     res.json(result);
-            });
+            }
+        );
     }
 });
 
