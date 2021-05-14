@@ -2,16 +2,19 @@
     "AdminAuthorization": [
         {
             "type": "string",
-            "prop": "login"
+            "prop": "login",
+            "translate": "Логин"
         },
         {
             "type": "string",
             "prop": "password",
+            "translate": "Пароль",
             "secret": true
         },
         {
             "type": "combobox",
             "prop": "role",
+            "translate": "Должность",
             "items": [ "Менеджер", "Администратор" ]
         }
     ],

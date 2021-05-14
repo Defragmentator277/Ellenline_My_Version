@@ -1,4 +1,4 @@
-import React, {useState} from 'react'; 
+import React, {useEffect, useState} from 'react'; 
 import Head from 'next/head';
 import { useCookies } from 'react-cookie';
 //
@@ -14,7 +14,50 @@ import classes from './ClientLayout.module.scss';
 import Context from './ClientLayoutContext.js';
 
 const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
-    const [cookies, setCookie] = useCookies('account');
+    const [notification, setNotification] = useState();
+    // notification: { preset: ..., text }
+    const [cookies, setCookie, removeCookie] = useCookies('account');
+
+    function SetStateNotification() {
+        const account = cookies.account;
+        //
+        const authorization = { preset: 'ClientAuthorization', text: 'Добро пожаловать! Вы здесь впервые? Создайте аккаунт и войдите, под вашими учетными данными Это необходимо для заказа!' };
+
+        if(!account)
+            setNotification(authorization);
+        else if(account.role == 'users')
+        {
+            //Запрос во избежании несоотвествия данных
+            //...
+            fetch(`${Global.url}/api/authentication?login=${account.login}&password=${account.password}&type_of_users=${'users'}`, { method: 'POST' })
+            .then((res) => {
+                console.log('Успех!');
+                return res.json();
+            })
+            .then((res) => {
+                res = res[0];
+                if(!res)
+                    throw new Error();
+                setCookie('account', { ...res, role: 'users'});
+                //
+                setNotification({ preset: 'ClientPersonalAccount', text: `Добро пожаловать! ${res.name + ' ' + res.surname + ' ' + res.middle_name}`});
+            })
+            .catch((err) => {
+                console.log('Ошибка!');
+                return err.json();
+            })
+            .catch((err) => {
+                console.log(err);
+                removeCookie('account');
+                //
+                setNotification(authorization);
+            })
+        }
+    }
+
+    useEffect(() => {
+        SetStateNotification();
+    }, []);
 
     function GenerateContent() {
         return <>
@@ -25,31 +68,14 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
             <AsideHeader className={classes.header}/>
             <main className={classes.main}>
                 {children}
+                {/*  */}
                 <Footer/>
             </main>
         </>
     }
 
     function GenerateNotification() {
-        const account = cookies.account;
-
-        if(!account)
-            return <Notification preset='ClientAuthorization'>
-                Добро пожаловать! 
-                Вы здесь впервые? 
-                Создайте аккаунт и войдите, 
-                под вашими учетными данными 
-                Это необходимо для заказа!
-            </Notification>
-        else if(account.role == 'users')
-        {
-            //Запрос во избежании несоотвествия данных
-            //...
-            return <Notification preset='ClientPersonalAccount'>
-                Добро пожаловать!
-                {account.name + ' ' + account.surname + ' ' + account.middle_name}
-            </Notification>;
-        }
+        return notification ? <Notification {...notification}>{notification.text}</Notification>: '';
     }
 
     return(

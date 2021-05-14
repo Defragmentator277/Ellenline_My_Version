@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import Head from 'next/head';
 //
@@ -12,21 +12,10 @@ import Context from './AdminLayoutContext.js';
 
 const AdminLayout = (props) => {
     const title = props.title || 'Эллинлайн';
+    const [window, setWindow] = useState();
     const [cookies, setCookie, removeCookie] = useCookies('account');
 
-    function GenerateContent() {
-        return <>
-           <Head>
-               <title>{title}</title>
-           </Head>
-           <AdminHeader/>
-           <main className={classes.main}>
-               {props.children}
-           </main>
-       </>;
-    }
-
-    function GenerateAuthentication() {
+    function SetStateModalWindow() {
 
         function OnCloseModalWindow(e, value) {
             const login = value.login;
@@ -66,16 +55,65 @@ const AdminLayout = (props) => {
                 console.log(err);
             });
         }
+        //
+        const account = cookies.account;
+        //
+        if(!account || 
+            (account.role != 'admins' && account.role != 'managers'))
+            setWindow({ 
+                title:'Авторизируйтесь',
+                preset:'AdminAuthorization',
+                buttons: { close: false },
+                modal_overlay: classes.modal_overlay,
+                onClose: OnCloseModalWindow
+            });
+        else
+        {
+            //Запрос во избежании несоотвествия данных
+            //...
+            fetch(`${Global.url}/api/authentication?login=${account.login}&password=${account.password}&type_of_users=${account.role}`, { method: 'POST' })
+            .then((res) => {
+                console.log('Успех!');
+                return res.json();
+            })
+            .then((res) => {
+                res = res[0];
+                if(!res)
+                    throw new Error();
+                //
+                setCookie('account', { ...res, role: account.role});
+            })
+            .catch((err) => {
+                console.log('Ошибка!');
+                return err.json();
+            })
+            .catch((err) => {
+                console.log(err);
+                removeCookie('account');
+                //
+                location.reload();
+            })
+        }
+    }
 
-        console.log(cookies.account);
+    function GenerateContent() {
+        return <>
+           <Head>
+               <title>{title}</title>
+           </Head>
+           <AdminHeader/>
+           <main className={classes.main}>
+               {props.children}
+           </main>
+       </>;
+    }
 
-        if(!cookies.account || cookies.account.role != 'admins')
-            return <ModalWindow 
-            title='Авторизируйтесь'
-            preset='AdminAuthorization' 
-            buttons={{ close: false }}
-            modal_overlay={classes.modal_overlay}
-            onClose={OnCloseModalWindow}/>;
+    useEffect(() => {
+        SetStateModalWindow();
+    }, []);
+
+    function GenerateAuthentication() {
+        return window ? <ModalWindow {...window}/> : '';
     }
 
     return (

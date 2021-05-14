@@ -1,9 +1,16 @@
 @import './../styles/index.scss';
 
+.main
+{
+    margin: 0 50px;
+    box-shadow: none ;
+}
+
 @media screen and (max-width: 1024px)
 {
     .main
     {
         margin-left: 44px;
+
     }
 }

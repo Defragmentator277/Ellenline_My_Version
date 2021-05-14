@@ -21,20 +21,20 @@ const Account = (props) => {
     function OnChainge(e, value, prop) {
         user[prop] = value;
         setUser({...user});
-        // setUser
     }
 
     function OnClick(e) {
+        const id = user._id;
+        delete user._id;
         //
-        fetch(`${Global.url}/api/db/users/update?prop=${JSON.stringify(user)}&id=${user._id}&operator=${'$replace'}`)
+        fetch(`${Global.url}/api/db/users/update?prop=${JSON.stringify(user)}&id=${id}&operator=${'$replace'}`)
         .then((res) => {
             console.log('Успех!');
-            console.log(res);
             return res.json();
         })
         .then((res) => {
-            console.log(res);
-            
+            alert('Вы успешно изменили информацию о себе');
+            setCookie('account', {...user, role: 'users' });
         })
         .catch((err) => {
             console.log('Ошибка!');
@@ -42,61 +42,78 @@ const Account = (props) => {
         })
         .catch((err) => {
             console.log(err);
+            alert('Произошла непредвиденная ошибка');
         })
+        .finally(() => {
+            location.reload();
+        });
     }   
 
     function GenerateContent() {
-        
-        return <div className={classes.account}>
-            <div className={classes.greetings}>
-                <h1>Информация о вас</h1>
-            </div>
-            {/*  */}
-            <InputText title='Логин'
-            value={user.login}
-            className={classes.input + ' ' + classes.login}
-            onChainge={(e, value) => OnChainge(e, value, 'login')}/>
-            {/*  */}
-            <InputText title='Пароль'
-            value={user.password}
-            isPassword='true'
-            className={classes.input + ' ' + classes.password}
-            onChainge={(e, value) => OnChainge(e, value, 'password')}/>
-            {/*  */}
-            <InputText title='Имя'
-            value={user.name}
-            className={classes.input + ' ' + classes.name}
-            onChainge={(e, value) => OnChainge(e, value, 'name')}/>
-            {/*  */}
-            <InputText title='Фамилия'
-            value={user.surname}
-            className={classes.input + ' ' + classes.surname}
-            onChainge={(e, value) => OnChainge(e, value, 'surname')}/>
-            {/*  */}
-            <InputText title='Отчество'
-            value={user.middle_name}
-            className={classes.input + ' ' + classes.middle_name}
-            onChainge={(e, value) => OnChainge(e, value, 'middle_name')}/>
-            {/*  */}
-            <InputText title='Телефон'
-            value={user.telephone}
-            className={classes.input + ' ' + classes.telephone}
-            onChainge={(e, value) => OnChainge(e, value, 'telephone')}/>
-            {/*  */}
-            <SelectOption title='Пол'
-            values={[ 'Мужской', 'Женский' ]}
-            className={classes.input + ' ' + classes.gender}
-            onChainge={(e, value) => OnChainge(e, value, 'gender')}/>
-            {/*  */}
-            <button className={classes.button} onClick={OnClick}>
-                Принять изменения
-            </button>
-        </div>
+        const account = cookies.account;
+        //
+        if(account && account.role == 'users' && 
+           account.login == user.login && 
+           account.password == user.password)
+        {
+            // function Generate
+
+
+            return <div className={classes.account}>
+                <div className={classes.greetings}>
+                    <h1>Информация о вас</h1>
+                </div>
+                {/*  */}
+                <InputText title='Логин'
+                value={user.login}
+                className={classes.input + ' ' + classes.login}
+                onChainge={(e, value) => OnChainge(e, value, 'login')}/>
+                {/*  */}
+                <InputText title='Пароль'
+                value={user.password}
+                isPassword='true'
+                className={classes.input + ' ' + classes.password}
+                onChainge={(e, value) => OnChainge(e, value, 'password')}/>
+                {/*  */}
+                <InputText title='Имя'
+                value={user.name}
+                className={classes.input + ' ' + classes.name}
+                onChainge={(e, value) => OnChainge(e, value, 'name')}/>
+                {/*  */}
+                <InputText title='Фамилия'
+                value={user.surname}
+                className={classes.input + ' ' + classes.surname}
+                onChainge={(e, value) => OnChainge(e, value, 'surname')}/>
+                {/*  */}
+                <InputText title='Отчество'
+                value={user.middle_name}
+                className={classes.input + ' ' + classes.middle_name}
+                onChainge={(e, value) => OnChainge(e, value, 'middle_name')}/>
+                {/*  */}
+                <InputText title='Телефон'
+                value={user.telephone}
+                className={classes.input + ' ' + classes.telephone}
+                onChainge={(e, value) => OnChainge(e, value, 'telephone')}/>
+                {/*  */}
+                <SelectOption title='Пол'
+                values={[ 'Мужской', 'Женский' ]}
+                className={classes.input + ' ' + classes.gender}
+                onChainge={(e, value) => OnChainge(e, value, 'gender')}/>
+                {/*  */}
+                <button className={classes.button} onClick={OnClick}>
+                    Принять изменения
+                </button>
+            </div>;
+        }
+        else
+            return;
     }
 
     return (
         <ClientLayout title='Личный кабинет'>
-            {GenerateContent()}
+            <div className={classes.wrapper}>
+                {GenerateContent()}
+            </div>
         </ClientLayout>
     )
 }
@@ -108,7 +125,6 @@ export async function getStaticPaths() {
     const users = await res.json();
     //
     users.forEach((element) => paths.push({ params: { id: element._id } }));
-    console.log(paths);
     return {
         paths: paths,
         fallback: false
@@ -118,9 +134,8 @@ export async function getStaticPaths() {
 export async function getStaticProps(router) {
     const id_user = router.params.id;
     //
-    const res = await fetch(`${Global.url}/api/getUser?id_user=${id_user}`);
+    const res = await fetch(`${Global.url}/api/getUser?id_user=${id_user}&get_relaxes=${true}`);
     const user = await res.json();
-    console.log(user);
     //
     return {
         props: {

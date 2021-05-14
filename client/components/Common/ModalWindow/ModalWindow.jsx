@@ -187,28 +187,28 @@ const ModalWindow = (props) => {
                 {
                     case 'string':
                         return <InputText 
-                        {...GenerateProperties(field.prop)}
+                        {...GenerateProperties(field.translate || field.prop)}
                         placeholder='Введите текст'
                         isPassword={field.secret}/>;
                     case 'number':
                         return <InputNumber 
-                        {...GenerateProperties(field.prop)}
+                        {...GenerateProperties(field.translate || field.prop)}
                         placeholder='Введите число'/>;
                     case 'boolean':
                         //Нужно задать начальное состояние
                         SetValueOfPropertie(false);
                         return <InputBoolean 
-                        {...GenerateProperties(field.prop)}
+                        {...GenerateProperties(field.translate || field.prop)}
                         placeholder='Введите'/>;
                     case 'date':
                         return <InputDate
-                        {...GenerateProperties(field.prop)}/>;
+                        {...GenerateProperties(field.translate || field.prop)}/>;
                     case 'time':
                         return <InputTime
-                        {...GenerateProperties(field.prop)}/>;
+                        {...GenerateProperties(field.translate || field.prop)}/>;
                     case 'combobox':
                         return <SelectOption
-                        {...GenerateProperties(field.prop)}
+                        {...GenerateProperties(field.translate || field.prop)}
                         placeholder='Выберите значение'
                         classSelect={classes.input + ' ' + classes.select}
                         values={field.items}/>;
@@ -341,7 +341,7 @@ const ModalWindow = (props) => {
                         //Доработать
                         if(!element.min || element.min == 0)
                             object[element.title] = [];
-                        alert('Заполните массив ' + element.title + ' хотя бы одним значением!');
+                        alert('Заполните массив ' + (element.translate || element.title) + ' хотя бы одним значением!');
                         return true;
                     }
                 }   
@@ -353,7 +353,7 @@ const ModalWindow = (props) => {
                 else if(!object[element.prop] 
                 && element.type != 'boolean')
                 {
-                    alert('Поле ' + element.prop + ' не заполнено!');
+                    alert('Поле ' + (element.translate || element.prop) + ' не заполнено!');
                     return true;
                 }
             }

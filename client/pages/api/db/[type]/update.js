@@ -78,7 +78,7 @@ handler.get(async (req, res) => {
                 Update(id, prop, '$pull');
                 break;
             case '$replace':
-                collection.updateOne(
+                collection.update(
                     { _id: ObjectId(id) }, 
                     prop, 
                     (err, result) => 
