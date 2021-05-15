@@ -2,6 +2,7 @@ import { ObjectId } from 'bson';
 import nextConnect from 'next-connect';
 //
 import middleware from '../../../../../../middleware/database.js';
+import Global from '../../../../../global.js';
 
 const handler = nextConnect();
 
@@ -34,7 +35,8 @@ handler.get(async (req, res) => {
                 images: { $first: '$images.src' },
                 locality: { $first: { $objectToArray: '$id_locality' } },
                 timetable: { $push: '$timetable' },
-                timetable_schedule: { $first: '$timetable_departure'}
+                timetable_schedule: { $first: '$timetable_departure'},
+                comments: { $first: '$comments' }
             }},
             //Get locality info
             { $unwind: '$locality' },
@@ -78,7 +80,8 @@ handler.get(async (req, res) => {
                 images: { $first: '$images' },
                 locality: { $first: '$locality' },
                 timetable: { $first: '$timetable' },
-                timetable_schedule: { $first: '$timetable_schedule'}
+                timetable_schedule: { $first: '$timetable_schedule'},
+                comments: { $first: '$comments' }
             }},
             { $set: 
             {
@@ -104,10 +107,30 @@ handler.get(async (req, res) => {
                 images: { $first: '$images' },
                 locality: { $first: '$locality' },
                 timetable: { $first: '$timetable' },
-                timetable_schedule: { $push: '$timetable_schedule' }
+                timetable_schedule: { $push: '$timetable_schedule' },
+                comments: { $first: '$comments' }
             }},
-            //Получение туров которые еще не начились
-        ];
+            //
+        ].concat(
+        Global.GetLookupPipeline('comments', 'id_user', 'users', 'user'),
+        
+            { $group: 
+            {
+                _id: '$_id',
+                name: { $first: '$name' },
+                adress: { $first: '$adress' },
+                description: { $first: '$description' },
+                price: { $first: '$price' },
+                points: { $first: '$points'},
+                info: { $first: '$info' },
+                services: { $first: '$services' },
+                images: { $first: '$images' },
+                locality: { $first: '$locality' },
+                timetable: { $first: '$timetable' },
+                timetable_schedule: { $first: '$timetable_schedule' },
+                comments: { $push: '$comments' }
+            }}
+        );
     }
     else if(type === 'relax')
     {
@@ -130,7 +153,8 @@ handler.get(async (req, res) => {
                 price: { $min: '$rooms.prices.usual' },
                 points: { $first: '$points' },
                 rooms: { $push: '$rooms' },
-                locality: { $first: { $objectToArray: '$id_locality' } }
+                locality: { $first: { $objectToArray: '$id_locality' } },
+                comments: { $first: '$comments' }
             }},
             //Get locality info
             { $unwind: '$locality' },
@@ -143,7 +167,24 @@ handler.get(async (req, res) => {
                 foreignField: '_id',
                 as: 'locality'
             }},
-        ];
+        ].concat(
+        Global.GetLookupPipeline('comments', 'id_user', 'users', 'user'),
+        { $group: 
+        {
+            _id: '$_id',
+            name: { $first: '$name' },
+            adress: { $first: '$adress' },
+            description: { $first: '$description' },
+            stars: { $first: '$stars'},
+            images: { $first: '$images' },
+            services: { $first: '$services' },
+            //
+            price: { $first: '$price' },
+            points: { $first: '$points' },
+            rooms: { $first: '$rooms' },
+            locality: { $first: '$locality' },
+            comments: { $push: '$comments' }
+        }});;
     }
     else
     {
@@ -176,7 +217,8 @@ handler.get(async (req, res) => {
                 timetable: { $first: '$timetable' },
                 timetable_schedule: { $addToSet: '$timetable_departure'},
                 motorship: { $first: { $objectToArray: '$id_motorship' } },
-                locality: { $first: { $objectToArray: '$id_locality' } }
+                locality: { $first: { $objectToArray: '$id_locality' } },
+                comments: { $first: '$comments' }
             }},
             //Get locality info
             { $unwind: '$locality' },
@@ -202,11 +244,45 @@ handler.get(async (req, res) => {
                 as: 'info'
             }},
             { $unwind: '$info' },
-        ];
+            //Get motorship info
+            { $unwind: '$motorship' },
+            { $match: { 'motorship.k': { $eq: '$id'} } },
+            { $set: { 'motorship': { $toObjectId: '$motorship.v' } } },
+            { $lookup:
+            {
+                from: 'motorships',
+                localField: 'motorship',
+                foreignField: '_id',
+                as: 'info'
+            }},
+            { $unwind: '$info' }
+        ].concat(
+        Global.GetLookupPipeline('comments', 'id_user', 'users', 'user'),
+        { $group: 
+        {
+            _id: '$_id',
+            name: { $first: '$name' },
+            adress: { $first: '$adress' },
+            description: { $first: '$description' },
+            stars: { $first: '$stars'},
+            images: { $first: '$images' },
+            services: { $first: '$services' },
+            //
+            price: { $first: '$price' },
+            points: { $first: '$points' },
+            rooms: { $first: '$rooms' },
+            timetable: { $first: '$timetable' },
+            timetable_schedule: { $first: '$timetable_departure'},
+            motorship: { $first: '$motorship' },
+            locality: { $first: '$locality' },
+            //
+            comments: { $push: '$comments' }
+        }});
     }
     req.db.collection(type).aggregate(pipeline).toArray(
     (err, result) => {
         console.log("ON SERVER");
+        console.log(err);
         console.log(result);
         if(err)
             res.json(err);

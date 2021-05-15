@@ -2,39 +2,541 @@
 
 .account
 {
+    display: grid;
+    padding: 20px 10px;
+    row-gap: 25px;
+    
+    .info, .greetings
+    {
+        @extend %font;
+    }
+
+    .greetings
+    {
+        grid-column-start: 1;
+        // grid-column-end: 3;
+
+        & > h1
+        {
+            margin: 5px 0;
+            font-size: 1.7em;
+        }
+    }
+
     .info
     {
         display: grid;
-        @extend %font;
-        padding: 20px 10px;
-        // padding-right: 500px;
-        grid-template-columns: repeat(1, 1fr);
+        grid-template-columns: 1.25fr 1fr;
+        grid-template-rows: auto auto;
+        column-gap: 5px;
         row-gap: 10px;
-        column-gap: 15px;
-    
-        .greetings
+
+        .image
         {
-            grid-column-start: 1;
-            // grid-column-end: 3;
-    
-            & > h1
+            grid-column: 1;
+
+            img
             {
-                margin: 5px 0;
-                font-size: 1.85em;
+                object-fit: cover;
+                height: 100%;
+                width: 100%;
             }
         }
-    
-        .input
+
+        .inputs
         {
-            font-size: 0.75em;
+            grid-column: 2;
+            grid-row: 1;
+
+            display: grid;
+            grid-template-columns: repeat(1, 1fr);
+            // grid-template-rows: repeat(1, 1fr);
+            row-gap: 10px;
+            column-gap: 15px;
+        
+            .input
+            {
+                font-size: 0.75em;
+            }
         }
-    
+        
         button
         {
             @extend %button;
-            margin-top: 30px;
+
+            grid-column-start: 1;
+            grid-column-end: 3;
+            grid-row: 2;
+
+            // margin-top: 30px;
+            width: 100%;
             padding: 10px 0;
+            font-size: 1em;
+        }
+    }
+    //
+    .orders,
+    .history_orders
+    {
+
+        .tours,
+        .relaxes,
+        .cruises
+        {
+            display: grid;
+            // padding: 10px 25px;
+
+            .title
+            {
+                @extend %font;
+                font-size: 2em;
+                margin-bottom: 5px;
+            }
+
+            .buttons
+            {
+                grid-column-start: 1;
+                grid-column-end: 3;
+
+                display: grid;
+                grid-template-rows: 1fr;
+                column-gap: 10px;
+
+                .button
+                {
+                    @extend %button;
+                    grid-row: 1;
+                    padding: 10px 15px;
+                    font-size: .8em;
+                }
+            }
+
+            img
+            {
+                object-fit: cover;
+                height: 100%;
+                width: 100%;
+            }
+
+            .tour,
+            .relax,
+            .cruise
+            {
+                @extend %border;
+                @extend %font;
+                display: grid;
+                padding: 10px;
+                column-gap: 10px;
+                row-gap: 15px;
+
+                h1, p
+                {
+                    display: block;
+                    margin: 0;
+                }
+
+                h1
+                {
+                    font-size: 1.25em;
+                }
+
+                p
+                {
+                    height: fit-content;
+                    align-self: flex-end;
+                    font-size: 1em;
+                }
+            }
+            //
+            .tour
+            {
+                grid-template-columns: 1.5fr 1fr;
+                grid-template-rows: auto auto;
+                margin-bottom: 25px;
+
+
+                .image
+                {
+                    grid-column: 1;
+                    grid-row-start: 1;
+                    grid-row-end: 3;
+
+                }
+
+                .tour_info,
+                .order_info
+                {
+                    display: grid;
+                    grid-auto-rows: fit-content;
+                    row-gap: 15px;
+
+                    & > div
+                    {
+                        height: fit-content;
+                    }
+
+                    h1
+                    {
+                        grid-row: 1;
+                    }
+
+                    p
+                    {
+                        grid-row: 2;
+                    }
+                }
+
+                .tour_info
+                {
+                    grid-column: 2;
+                    grid-row: 1;
+                }
+
+                .order_info
+                {
+                    grid-column: 2;
+                    grid-row: 2;
+                }
+
+            }
+            //
+            .relax,
+            .cruise
+            {
+                grid-template-columns: repeat(2, 1fr);
+
+                .title_relax,
+                .title_room,
+                //
+                .title_cruise,
+                .title_cabin
+                {
+                    font-size: 1.25em;
+                }
+
+                .title_relax,
+                .title_cruise
+                {
+                    grid-column: 1;
+                }
+
+                .title_room,
+                .title_cabin
+                {
+                    grid-column: 2;
+                }
+
+                .image_relax,
+                .image_cruise
+                {
+                    grid-column: 1;
+                    grid-row: 2;
+                }
+
+                .image_room,
+                .image_cabin
+                {
+                    grid-column: 2;
+                    grid-row: 2;
+                }
+
+                .relax_info,
+                .cruise_info
+                {
+                    grid-column: 1;
+                    grid-row: 3;
+                    //
+                    display: grid;
+                }
+
+                .order_info
+                {
+                    grid-column: 2;
+                    grid-row: 3;
+                    //
+                    display: grid;
+                }
+
+                .buttons
+                {
+                    grid-row: 4;
+                }
+
+            }
+        }
+    }
+}
+@media screen and (max-width: 1024px)
+{
+    .account
+    {
+        .info
+        {
+            grid-template-columns: 1fr;
+
+            .image
+            {
+                grid-row: 1;
+            }
+
+            .inputs
+            {
+                grid-column: 1;
+                grid-row: 2;
+            }
+
+            .button
+            {
+                grid-row: 3;
+            }
+        }
+
+        .orders,
+        .history_orders
+        {
+
+            .tours,
+            .relaxes,
+            .cruises
+            {
+
+                .tour,
+                .relax,
+                .cruise
+                {
+                    grid-template-columns: 1fr;
+                }
+
+                .tour
+                {
+                    // grid-template-rows: fit-content max-contentfr;
+
+                    .image
+                    {
+                        grid-row: 1;
+                    }
+
+                    .order_info,
+                    .tour_info
+                    {
+                        & > div
+                        {
+                            display: grid;
+                            grid-template-columns: repeat(2, 1fr);
+    
+                            h1
+                            {
+                                grid-column: 1;
+                            }
+        
+                            p
+                            {
+                                grid-column: 2;
+                                grid-row: unset;
+                            }
+                        }
+                    }
+
+                    .tour_info
+                    {
+                        grid-column: 1;
+                        grid-row: 2;
+                        //
+                        display: grid;
+                        grid-template-rows: 1fr;
+                    }
+
+                    .order_info
+                    {
+                        grid-column: 1;
+                        grid-row: 3;
+                    }
+                }
+
+                .relax,
+                .cruise
+                {
+    
+                    .title_relax,
+                    .title_cruise
+                    {
+                        grid-column: 1;
+                        grid-row: 1;
+                    }
+
+                    .image_relax,
+                    .image_cruise
+                    {
+                        grid-column: 1;
+                        grid-row: 2;
+                    }
+
+                    .relax_info,
+                    .cruise_info
+                    {
+                        grid-column: 1;
+                        grid-row: 3;
+                        //
+                        display: grid;
+                    }
+                    //
+                    .title_room,
+                    .title_cabin
+                    {
+                        grid-column: 1;
+                        grid-row: 4;
+                    }
+    
+                    .image_room,
+                    .image_cabin
+                    {
+                        grid-column: 1;
+                        grid-row: 5;
+                    }
+    
+                    .order_info
+                    {
+                        grid-column: 1;
+                        grid-row: 6;
+                        //
+                        display: grid;
+                    }
+                    //
+                    .buttons
+                    {
+                        grid-row: 7;
+                    }
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 768px)
+{
+    .account
+    {
+        .info
+        {
             font-size: 1.25em;
+        }
+        //
+        .orders,
+        .history_orders
+        {
+
+            .tours,
+            .relaxes,
+            .cruises
+            {
+                .tour,
+                .relax,
+                .cruise
+                {
+
+                    h1
+                    {
+                        font-size: 1em;
+                    }
+
+                    p
+                    {
+                        font-size: .8em;
+                    }
+
+                }
+
+                .tour
+                {
+                    row-gap: 15px;
+
+                    .tour_info,
+                    .order_info
+                    {
+                        & > div
+                        {
+                            grid-template-columns: 1fr;
+                            grid-template-rows: max-content fit-content;
+                            row-gap: 0;
+
+                            h1
+                            {
+                                grid-row: 1;
+                            }
+
+                            p
+                            {
+                                grid-row: 2;
+                                grid-column: 1;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@media screen and (max-width: 425px)
+{
+    .account
+    {
+
+        .info, .greetings
+        {
+            font-size: 1em;
+        }
+
+        .orders,
+        .history_orders
+        {
+
+            .tours,
+            .relaxes,
+            .cruises
+            {
+                .cruise,
+                .relax,
+                {
+
+                    .title_relax,
+                    .title_room,
+                    .title_cruise,
+                    .title_cabin
+                    {
+                        font-size: 1em;
+                    }
+                }
+
+                // padding: 5px 10px;
+                .title
+                {
+                    font-size: 1.5em;
+                }
+
+                h1
+                {
+                    font-size: .85em;
+                }
+
+                p
+                {
+                    font-size: .7em;
+                }
+
+                .tour
+                {
+                    
+                    .buttons
+                    {   
+                        row-gap: 10px;
+                        .button
+                        {
+                            grid-column: 1;
+                            grid-row: unset;
+                        }
+                    }
+                }
+            }
         }
     }
 }

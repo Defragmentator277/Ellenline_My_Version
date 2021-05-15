@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 //
+import ClientLayout from '../../../../../layouts/ClientLayout.jsx';
 import FormBooking from '../../../../../components/Common/FormBooking/FormBooking.jsx';
 import InfoSection from '../../../../../components/Common/InfoSection/InfoSection.jsx';
 import PresentationMap from '../../../../../components/Common/Map/PresentationMap.jsx';
 import Providers from '../../../../../components/Common/Providers/Providers.jsx';
 import Timetable from '../../../../../components/Common/Timetable/Timetable.jsx';
-import ClientLayout from '../../../../../layouts/ClientLayout.jsx';
+import Comments from '../../../../../components/Common/Comments/Comments.jsx';
 //
 import Global from '../../../../global.js';
 import classes from './index.module.scss';
@@ -13,7 +14,6 @@ import classes from './index.module.scss';
 const Resort = (props) => {
     console.log('ON CLIENT');
     console.log(props.items);
-    // return (<></>);
     //
     const type = props.type;
     const resort = props.resort;
@@ -26,6 +26,7 @@ const Resort = (props) => {
     const text= props.text;
     const adress = props.adress;
     const points = props.points;
+    const comments = props.comments;
     //tours, cruises
     const info = props.info;
     const timetable = props.timetable;
@@ -89,6 +90,9 @@ const Resort = (props) => {
 
                 {GenerateTimetable()}
 
+                <Comments
+                comments={comments}/>
+
                 {/* {GenerateMap()} */}
 
                 <FormBooking 
@@ -150,6 +154,7 @@ export async function getStaticProps(router) {
             text: item.description || null,
             adress: item.adress || null,
             points: item.points || null,
+            comments: item.comments || null,
             //NOT NULL UP
             //tours, cruises
             info: item.info || null,

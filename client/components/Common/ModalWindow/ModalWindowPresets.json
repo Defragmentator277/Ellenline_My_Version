@@ -107,8 +107,12 @@
         },
         {
             "type": "combobox",
-            "prop": "role",
+            "prop": "gender",
             "items": [ "Мужской", "Женский" ]
+        },
+        {
+            "type": "string",
+            "prop": "image"
         }
     ],
     "PaymentSelection": [
@@ -116,6 +120,20 @@
             "type": "combobox",
             "prop": "payment",
             "items": [ "Полная оплата по карте", "Оплата половины суммы", "Оплата по прибытию" ]
+        }
+    ],
+    "LeaveComment": [
+        {
+            "type": "string",
+            "prop": "text",
+            "translate": "Текст"
+        },
+        {
+            "type": "number",
+            "prop": "rating",
+            "translate": "Оценка от 0 до 5",
+            "min": 0,
+            "max": 5
         }
     ]
 }

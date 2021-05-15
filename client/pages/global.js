@@ -70,4 +70,29 @@ export default class Global {
             console.log(err);
         });
     }
+
+    static GetLookupPipeline(path_orders, id_field, from_collection, end_field)
+    {
+        return [
+            //Get tours_orders info
+            { $unwind: 
+            { 
+                path: '$' + path_orders,
+                preserveNullAndEmptyArrays: true
+            }},
+            { $set: { [path_orders]: { $ifNull: [ '$' + path_orders, [] ] } } },
+            { $set: { [path_orders + '.' + id_field]: { $arrayElemAt: [ { $objectToArray: '$' + path_orders + '.' + id_field }, 1 ] } } }, 
+            { $set: { [path_orders + '.' + id_field]: { $toObjectId: '$' + path_orders + '.' + id_field + '.v' } } } ,
+            //
+            { $lookup:
+            {
+                from: from_collection,
+                localField: path_orders + '.' + id_field,
+                foreignField: '_id',
+                as: path_orders + '.' + id_field
+            }},
+            { $set: { [path_orders + '.' + end_field]: { $arrayElemAt: [ '$' + path_orders + '.' + id_field, 0 ]} } },
+            { $unset: path_orders + '.' + id_field }
+        ]
+    }
 }

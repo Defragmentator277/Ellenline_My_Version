@@ -1,4 +1,14 @@
 @import '../../../styles/index.scss';
+
+.wrap
+{
+    .title
+    {
+        @extend %font;
+        font-size: 2.2em;
+    }
+}
+
 .enter
 {
     display: grid;
@@ -147,6 +157,11 @@
         right: 0;
         bottom: -1px;
         background: linear-gradient(0deg, white, transparent);
+    }
+
+    .title
+    {
+        font-size: 1.5em;
     }
 
     p

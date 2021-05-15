@@ -193,6 +193,8 @@ const ModalWindow = (props) => {
                     case 'number':
                         return <InputNumber 
                         {...GenerateProperties(field.translate || field.prop)}
+                        min={field.min}
+                        max={field.max}
                         placeholder='Введите число'/>;
                     case 'boolean':
                         //Нужно задать начальное состояние
@@ -325,24 +327,28 @@ const ModalWindow = (props) => {
             for(let i = 0; i < properties.length; i++)
             {
                 const element = properties[i];
-                if(element.type == 'number' 
-                && parseInt(object[element.prop]) == 0)
-                    continue;
-                // if(!object[element.prop]
-                // && element.type == 'combobox')
-                // {
-                //     alert('Поле ' + element.title + ' не заполнено!');
-                //     return true;
-                // }
+                if(element.type == 'number')
+                {
+                    const value = parseInt(object[element.prop]);
+                    if(value == 0)
+                        continue;
+                }
                 if(element.type == 'button')
                 {
                     if(object[element.title] == undefined)
                     {
+                        const min = element.min || 0;
+                        console.log(min);
                         //Доработать
-                        if(!element.min || element.min == 0)
-                            object[element.title] = [];
-                        alert('Заполните массив ' + (element.translate || element.title) + ' хотя бы одним значением!');
-                        return true;
+                        if(min == 0)
+                        {
+                            object[element.title] = object[element.title] || [];
+                        }
+                        else if((object[element.title]?.length || 0) < min)
+                        {
+                            alert('Заполните массив ' + (element.translate || element.title) + ' ' + min + (min == 1 ? '  значение' : ' значениями') + '!');
+                            return true;
+                        }
                     }
                 }   
                 else if(element.type == 'object')

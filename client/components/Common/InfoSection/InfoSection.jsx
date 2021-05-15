@@ -75,7 +75,8 @@ const InfoSection = (props) => {
 
     return (
         <div className={classes.wrap}>
-            <h1>{title}</h1>
+            <h1 className={classes.title}>{title}</h1>
+            {/*  */}
             <div className={classes.enter}>
                 <Slider className={classes.slider} images={images} index={index}/>
                 <div className={classes.info}>
@@ -93,11 +94,11 @@ const InfoSection = (props) => {
                     </p>
                 </div>
             </div>
-
+            {/*  */}
             <div className={classes.description}>
                 <div>
                     <div className={classes.back} style={{display: expand ? 'none' : 'block'}}/>
-                    <h1>Описание</h1>
+                    <h1 className={classes.title}>Описание</h1>
                     <p style={{height: expand ? 'auto' : '10px'}}>
                         {text}
                     </p>
