@@ -16,9 +16,13 @@ $side_color: #F7F7F7;
 %font
 {
     font-family: 'Mediator Serif';
-    font-size: 1.5em;
+    font-size: 0.9em;
 }
-
+%fontTitle
+{
+    font-family: 'Mediator Serif';
+    font-size: 1.2em;
+}
 %border 
 {
     border: 3px solid $primary_color;

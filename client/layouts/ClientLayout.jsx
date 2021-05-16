@@ -4,6 +4,7 @@ import { useCookies } from 'react-cookie';
 //
 import Header from '../components/Common/Header/Header';
 import Footer from '../components/Common/Footer/Footer';
+import Footer_v2 from '../components/Common/Footer_v2/Footer';
 import AsideHeader from '../components/Common/Header/AsideHeader';
 import ModalWindow from '../components/Common/ModalWindow/ModalWindow.jsx';
 import Notification from '../components/Common/Notification/Notification.jsx';
@@ -69,7 +70,7 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
             <main className={classes.main}>
                 {children}
                 {/*  */}
-                <Footer/>
+                <Footer_v2/>
             </main>
         </>
     }
