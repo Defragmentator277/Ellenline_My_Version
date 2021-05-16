@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'; 
 import Head from 'next/head';
-import { useCookies } from 'react-cookie';
+import { parseCookies, setCookie} from 'nookies';
 //
 import Header from '../components/Common/Header/Header';
 import Footer from '../components/Common/Footer/Footer';
@@ -11,25 +11,32 @@ import Notification from '../components/Common/Notification/Notification.jsx';
 import Global from '../pages/global.js';
 import classes from './ClientLayout.module.scss';
 //Контекст
-import Context from './ClientLayoutContext.js';
+import {AccountContextComponent} from './ClientLayoutContext.js';
 
 const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
     const [notification, setNotification] = useState();
     // notification: { preset: ..., text }
-    const [cookies, setCookie, removeCookie] = useCookies('account');
+    const [AccountContext, setAccountContext] = useState();
+    const cookies = parseCookies();
 
-    function SetStateNotification() {
-        const account = cookies.account;
+    console.log(AccountContext);
+    console.log(cookies);
+
+    function CheckAccount() {
         //
         const authorization = { preset: 'ClientAuthorization', text: 'Добро пожаловать! Вы здесь впервые? Создайте аккаунт и войдите, под вашими учетными данными Это необходимо для заказа!' };
+        const account_user = cookies.account_user != 'undefined' ? JSON.parse(cookies.account_user) : undefined;
 
-        if(!account)
+
+        if(!account_user)
             setNotification(authorization);
-        else if(account.role == 'users')
+        else
         {
+
+            console.log('DOp query');
             //Запрос во избежании несоотвествия данных
             //...
-            fetch(`${Global.url}/api/authentication?login=${account.login}&password=${account.password}&type_of_users=${'users'}`, { method: 'POST' })
+            fetch(`${Global.url}/api/authentication?login=${account_user.login}&password=${account_user.password}&type_of_users=${'users'}`, { method: 'POST' })
             .then((res) => {
                 console.log('Успех!');
                 return res.json();
@@ -38,7 +45,7 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
                 res = res[0];
                 if(!res)
                     throw new Error();
-                setCookie('account', { ...res, role: 'users'});
+                setAccountContext({...res});
                 //
                 setNotification({ preset: 'ClientPersonalAccount', text: `Добро пожаловать! ${res.name + ' ' + res.surname + ' ' + res.middle_name}`});
             })
@@ -48,19 +55,27 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
             })
             .catch((err) => {
                 console.log(err);
-                removeCookie('account');
+                setAccountContext();
                 //
                 setNotification(authorization);
             })
         }
     }
 
-    useEffect(() => {
-        SetStateNotification();
+    useEffect(() => 
+    {
+        CheckAccount()
     }, []);
+    //
+    useEffect(() => {
+        if(AccountContext)
+            setCookie(null, 'account_user', JSON.stringify({ login: AccountContext.login, password: AccountContext.password }));
+        else
+            setCookie(null, 'account_user', 'undefined');
+    }, [AccountContext]);
 
     function GenerateContent() {
-        return <>
+        return <> 
             <Head>
                 <title>{title}</title>
             </Head>
@@ -71,7 +86,7 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
                 {/*  */}
                 <Footer/>
             </main>
-        </>
+        </>;
     }
 
     function GenerateNotification() {
@@ -79,12 +94,22 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
     }
 
     return(
-        <>
+        <AccountContextComponent.Provider value={[AccountContext, setAccountContext]}>
             {GenerateContent()}
             {GenerateNotification()}
-        </>
+        </AccountContextComponent.Provider>
     )
-
 }
+
+
+// export function getServerSideProps({ req, res }) {
+//     console.log("GETSDFSDFDF");
+//     console.log(req.cookies);
+//     return {
+//         props: {
+            
+//         }
+//     };
+// }
 
 export default ClientLayout;

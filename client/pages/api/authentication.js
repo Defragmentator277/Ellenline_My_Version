@@ -10,14 +10,11 @@ handler.post(async (req, res) => {
     const login = req.query.login;
     const password = req.query.password;
     const type_of_users = req.query.type_of_users;
-    console.log('IN AUTHENGI');
     //
     req.db.collection(type_of_users).find(
         { login: login, password: password }, 
         //
         ).toArray((err, result) => {
-        console.log(err);
-        console.log(result);
         if(err)
             res.json(err);
         else

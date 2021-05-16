@@ -11,13 +11,15 @@ import InputEmail from '../../CustomElements/InputEmail.jsx';
 import ChooseRoom from '../ChooseRoom/ChooseRoom.jsx';
 import ModalWindow from '../ModalWindow/ModalWindow.jsx';
 //
+import {AccountContextComponent} from '../../../layouts/ClientLayoutContext.js';
+//
 import Global from '../../../pages/global.js';
 import classes from './FormBooking.module.scss';
 
 const FormBooking = (props) => {
     /////////////////ALL
     //#region Variables
-    const [cookies, setCookie] = useCookies('account');
+    const [AccountContext, setAccountContext] = useState(AccountContextComponent);
     const [window, setWindow] = useState();
     //
     const timetable = props.timetable;
@@ -334,8 +336,7 @@ const FormBooking = (props) => {
 
     function GenerateBookingForm() {
         function GenerateButtonOrText() {
-            const account = cookies.account;
-            if(account && account.role == 'users')
+            if(AccountContext)
             {
                 return <Button 
                 className={classes.button} 
@@ -383,7 +384,7 @@ const FormBooking = (props) => {
         })
         //Создание связи между автобусным туром и клиентом
         function CreateReservation() {
-            const id_user = cookies.account._id;
+            const id_user = AccountContext._id;
             let prop;
             switch(type)
             {

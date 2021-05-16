@@ -99,7 +99,8 @@ export async function getStaticProps(router) {
     //
     // const condition = router.params.condition;
     console.log('ON GET STATIC PROPS');
-    console.log(JSON.stringify(router, null, 2));
+    // console.log(items);
+    // console.log(JSON.stringify(router, null, 2));
     return {
         props: {
             type: type,

@@ -1,2 +1,4 @@
 import React from 'react';
-export default React.createContext();
+const AccountContextComponent = React.createContext(undefined);
+const SettingsContextComponent = React.createContext(undefined);
+export { AccountContextComponent, SettingsContextComponent };

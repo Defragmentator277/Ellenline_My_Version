@@ -8,15 +8,15 @@ import ModalWindow from '../components/Common/ModalWindow/ModalWindow.jsx';
 import Global from '../pages/global.js';
 import classes from './AdminLayout.module.scss';
 //Контекст
-import Context from './AdminLayoutContext.js';
+import { AccountContextComponent } from './AdminLayoutContext.js';
 
 const AdminLayout = (props) => {
     const title = props.title || 'Эллинлайн';
     const [window, setWindow] = useState();
-    const [cookies, setCookie, removeCookie] = useCookies('account');
+    const [AccountContext, setAccountContext] = useState();
+    // const [cookies, setCookie, removeCookie] = useCookies(['account']);
 
-    function SetStateModalWindow() {
-
+    function CheckAccount() {
         function OnCloseModalWindow(e, value) {
             const login = value.login;
             const password = value.password;
@@ -39,8 +39,8 @@ const AdminLayout = (props) => {
                 {
                     alert('Вы успешно авторизовались!');
                     res[0].role = role;
-                    setCookie('account', res[0]);
-                    location.reload();
+                    setAccountContext(res[0]);
+                    setWindow();
                 }
                 else
                     alert('Сотрудника с таким логином и паролем не существует!');
@@ -56,13 +56,12 @@ const AdminLayout = (props) => {
             });
         }
         //
-        const account = cookies.account;
-        //
-        if(!account || 
-            (account.role != 'admins' && account.role != 'managers'))
-            setWindow({ 
-                title:'Авторизируйтесь',
-                preset:'AdminAuthorization',
+        if(!AccountContext || 
+            (AccountContext.role != 'admins' && AccountContext.role != 'managers'))
+            setWindow(
+            {
+                title: 'Авторизируйтесь',
+                preset: 'AdminAuthorization',
                 buttons: { close: false },
                 modal_overlay: classes.modal_overlay,
                 onClose: OnCloseModalWindow
@@ -71,7 +70,7 @@ const AdminLayout = (props) => {
         {
             //Запрос во избежании несоотвествия данных
             //...
-            fetch(`${Global.url}/api/authentication?login=${account.login}&password=${account.password}&type_of_users=${account.role}`, { method: 'POST' })
+            fetch(`${Global.url}/api/authentication?login=${AccountContext.login}&password=${AccountContext.password}&type_of_users=${AccountContext.role}`, { method: 'POST' })
             .then((res) => {
                 console.log('Успех!');
                 return res.json();
@@ -81,7 +80,7 @@ const AdminLayout = (props) => {
                 if(!res)
                     throw new Error();
                 //
-                setCookie('account', { ...res, role: account.role});
+                setAccountContext({ ...res, role: AccountContext.role });
             })
             .catch((err) => {
                 console.log('Ошибка!');
@@ -89,37 +88,36 @@ const AdminLayout = (props) => {
             })
             .catch((err) => {
                 console.log(err);
-                removeCookie('account');
-                //
-                location.reload();
+                setAccountContext(undefined);
             })
         }
     }
 
+    useEffect(() => 
+    {
+        CheckAccount();
+    }, [])
+    
     function GenerateContent() {
-        return <>
-           <Head>
-               <title>{title}</title>
-           </Head>
-           <AdminHeader/>
-           <main className={classes.main}>
-               {props.children}
-           </main>
-       </>;
+        return AccountContext ? <AccountContextComponent.Provider value={[AccountContext, setAccountContext]}>
+            <Head>
+                <title>{title}</title>
+            </Head>
+            <AdminHeader/>
+            <main className={classes.main}>
+                {props.children}
+            </main>
+        </AccountContextComponent.Provider> : '';
     }
 
-    useEffect(() => {
-        SetStateModalWindow();
-    }, []);
-
-    function GenerateAuthentication() {
+    function GenerateModalWindow() {
         return window ? <ModalWindow {...window}/> : '';
     }
 
     return (
         <>
             {GenerateContent()}
-            {GenerateAuthentication()}
+            {GenerateModalWindow()}
         </>
     )
 }

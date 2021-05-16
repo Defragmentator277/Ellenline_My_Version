@@ -1,15 +1,18 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useCookies } from 'react-cookie';
 import { useRouter } from 'next/router';
 //
 import ModalWindow from '../ModalWindow/ModalWindow.jsx';
+//
+// import Context from '../../../layouts/ClientLayoutContext.js';
+import {AccountContextComponent} from '../../../layouts/ClientLayoutContext.js';
 //
 import Global from '../../../pages/global.js';
 import classes from './Notification.module.scss';
 
 const Notification = (props) => {
     const router = useRouter();
-    const [cookies, setCookie, removeCookie] = useCookies('account');
+    const [AccountContext, setAccountContext] = useContext(AccountContextComponent);
     //
     const children = props.children;
     const preset = props.preset;
@@ -47,12 +50,14 @@ const Notification = (props) => {
                                             if(res[0])
                                             {
                                                 alert('Вы успешно авторизовались!');
-                                                res[0].role = 'users';
-                                                setCookie('account', res[0]);
+                                                // res[0].role = 'users';
+                                                const new_user = res[0];
+                                                // console.log(new_user);
+                                                setAccountContext({...new_user});
                                                 location.reload();
                                             }
                                             else
-                                                alert('Сотрудника с таким логином и паролем не существует!');
+                                                alert('Пользователя с таким логином и паролем не существует!');
                                         })
                                         .catch((err) => 
                                         {
@@ -76,7 +81,8 @@ const Notification = (props) => {
                                     preset: 'ClientRegistration',
                                     modal_overlay: classes.modal_overlay,
                                     onChainge: (e, value) => {
-                                        const user = { ...value, tours_orders: [], relax_orders: [], cruises_orders: [] };                                        
+                                        const user = { ...value, tours_orders: [], relax_orders: [], cruises_orders: [], 
+                                            history_tours_orders: [], history_relax_orders: [], history_cruises_orders: [] };                                        
                                         //
                                         if(user.password != user.repeat_password)
                                         {
@@ -108,12 +114,10 @@ const Notification = (props) => {
                                             else
                                             {
                                                 alert('Вы успешно зарегистрировались');
-                                                user.role = 'users';
+                                                // user.role = 'users';
                                                 user._id =  res.insertedId; 
-                                                delete user.tours_orders;
-                                                delete user.relax_orders;
-                                                delete user.cruises_orders;
-                                                setCookie('account', user);
+                                                setAccountContext(user);
+                                                // setCookie('account', user, '/');
                                                 location.reload();
                                             }
                                         })
@@ -139,13 +143,14 @@ const Notification = (props) => {
                                 //     pathname: '/post/[pid]',
                                 //     query: { pid: post.id },
                                 // })
-                                router.push(`/account/${cookies.account._id}`);//{ login: cookies.account.login, password: cookies.account.password });
+                                router.push(`/account/${AccountContext._id}`);//{ login: cookies.account.login, password: cookies.account.password });
                             }
                         },
                         {
                             "text": "Выйти",
                             OnClick: (e) => {
-                                removeCookie('account');
+                                setAccountContext();
+                                // removeCookie('account', { path: '/' });
                                 location.reload();
                             }
                         },

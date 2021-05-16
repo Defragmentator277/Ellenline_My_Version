@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 import { useCookies } from 'react-cookie';
 //
@@ -9,13 +9,19 @@ import Comment from '../../../components/Common/Comments/Comment.jsx';
 import InputText from '../../../components/CustomElements/InputText.jsx';
 import SelectOption from '../../../components/CustomElements/SelectOption.jsx';
 //
+import { AccountContextComponent, AccountContextHOF } from '../../../layouts/ClientLayoutContext.js';
+//
 import Global from '../../global.js';
 import classes from './index.module.scss';
 
 const Account = (props) => {
     const router = useRouter();
-    const [cookies, setCookie] = useCookies('account');
+    // console.log(useContext(AccountContextComponent));
+    const [AccountContext, setAccountContext] = useState(props.AccountContext);
     const [window, setWindow] = useState();
+
+    // const AccountContext = {};
+    console.log(AccountContext);
     //
     const [user, setUser] = useState(props.user);
 
@@ -27,21 +33,24 @@ const Account = (props) => {
     }
 
     function OnClick(e) {
-        const id = user._id;
-        delete user._id;
+        const copy_user = JSON.parse(JSON.stringify(user));
+        delete copy_user._id;
         //
-        fetch(`${Global.url}/api/db/users/update?prop=${JSON.stringify(user)}&id=${id}&operator=${'$replace'}`)
+        fetch(`${Global.url}/api/db/users/update?prop=${JSON.stringify(copy_user)}&id=${user._id}&operator=${'$replace'}`)
         .then((res) => {
             console.log('Успех!');
+            console.log(res);
             return res.json();
         })
         .then((res) => {
             console.log(res);
             alert('Вы успешно изменили информацию о себе');
-            setCookie('account', {...user, role: 'users' });
+            setAccountContext({...user});
+            // setCookie('account', {...user, role: 'users' }, { path: '/' });
         })
         .catch((err) => {
             console.log('Ошибка!');
+            console.log(err);
             return err.json();
         })
         .catch((err) => {
@@ -49,16 +58,15 @@ const Account = (props) => {
             alert('Произошла непредвиденная ошибка');
         })
         .finally(() => {
-            location.reload();
+            // location.reload();
         });
     }   
 
     function GenerateContent() {
-        const account = cookies.account;
         //
-        if(account && account.role == 'users' && 
-           account.login == user.login && 
-           account.password == user.password)
+        if(AccountContext && 
+           AccountContext.login == user.login && 
+           AccountContext.password == user.password)
         {
             function GenerateOrders() {
                 // function Generate
@@ -512,8 +520,8 @@ const Account = (props) => {
                 <div className={classes.wrapper}>
                     {GenerateContent()}
                 </div>
-            </ClientLayout>
             {GenerateModalWindow()}
+            </ClientLayout>
         </>
     )
 }
@@ -532,6 +540,8 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps(router) {
+    console.log(router);
+    console.log(JSON.stringify(null, 2, router));
     const id_user = router.params.id;
     //
     const res = await fetch(`${Global.url}/api/getUser?id_user=${id_user}&get_relaxes=${true}`);
@@ -544,4 +554,7 @@ export async function getStaticProps(router) {
     };
 }
 
-export default Account;
+export default AccountContextHOF(Account);
+// export default <AccountContextComponent.Consumer>
+//     {AccountContext => <Account AccountContext={AccountContext}/>}
+// </AccountContextComponent.Consumer>;
