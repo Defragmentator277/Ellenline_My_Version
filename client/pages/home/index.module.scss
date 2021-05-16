@@ -1,12 +1,18 @@
 @import '../../styles/index.scss';
 
+$titlecolor: #866711;
+$textcolor: #be9421;
+$linkcolor: #a04419;
+$fontSizeText: 1.0em;
+$fontSizeTitle: 1.2em;
+$fontSizeTitleSection: 3em;
+
 %title
 {
-    font-size: 3em;
+    font-size: 2em;
     font-family: "Kazimir";
     transform: skewY(-1.5deg);
     background-color: $primary_color;
-
     p
     {
         text-align: center;
@@ -15,6 +21,26 @@
         transform: skewY(1.5deg);
         color: $sub_color;
     }
+}
+
+%fontTitleSection
+{
+    color: $titlecolor;
+    font-size: $fontSizeTitleSection;
+    font-weight: bold;
+}
+%fontTitleNews
+{
+    font-size: $fontSizeTitle;
+    color: $linkcolor;
+    font-weight: bold;
+    text-decoration: underline;
+    cursor: pointer;
+}
+%fontContentText
+{
+    font-size: $fontSizeText;
+    color: $textcolor;
 }
 @media screen and (max-width: 425px)
 {

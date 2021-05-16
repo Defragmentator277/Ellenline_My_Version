@@ -1,0 +1,62 @@
+$textcolor: #be9421;
+$titlecolor: #866711;
+$fontSizeDescr: 0.9em;
+@import './index.module.scss';
+
+.spec
+{
+    padding: 50px 80px;
+    h2
+    {
+        text-align: center;
+        @extend %fontTitleSection;
+    }
+    &__wrapper{
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        margin: 0 auto;
+        &__item
+        {
+            width: 300px;
+            margin-right: 30px;
+            margin-top: 20px; 
+            &__image
+            {
+                position: relative;
+                img
+                {
+                    width: 300px;
+                }
+                h3
+                {
+                    font-weight: bold;
+                    color: white;
+                    text-align: center;
+                    padding: 10px;
+                    font-size: 14px;
+                    position: absolute;
+                    top: 150px;
+                    left: 0;
+                    width: 300px;
+                    background-color: #2929299c;
+                    text-decoration: underline;
+                }
+            }
+            &__descr
+            {
+                margin-top: 10px;
+                color: $textcolor;
+                font-size: $fontSizeDescr;
+            }
+            &__price
+            {
+                margin-top: 5px;
+                color: $titlecolor;   
+                font-size: 18px;
+                font-weight: bold;
+            }
+            
+        }
+    }
+}

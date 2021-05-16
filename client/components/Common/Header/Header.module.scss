@@ -6,55 +6,113 @@
     display: grid;
     grid-template-rows: fit-content fit-content;
     row-gap: 25px;
-    padding: 25px 0;
-    margin: 10px 125px;
+    padding: 10px 100px;
     border-bottom: 2px solid $primary_color;
-
-    .logo
+    .top
     {
-        display: grid;
-        grid-template-columns: min-content max-content;
-        column-gap: 10px;
-        margin-left: 7.5px;
-
-        img
+        display: flex;
+        justify-content: flex-end;
+        color: #be9421; 
+        .sub
         {
-            @extend %grid_center;
-            grid-column: 1;
-        }
-
-        .text
-        {
-            font-size: 1em;
-            grid-column: 2;
-
-            h1, p
+            margin-right: 40px;
+            i
             {
-                margin: 0px;
+                margin-right: 5px;
+            }
+        }
+        .person
+        {
+            i
+            {
+                margin-right: 5px;
             }
         }
     }
-
+    .wrapper
+    {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr;
+        .logo
+        {
+            align-self: center;
+            display: grid;
+            grid-template-columns: min-content max-content;
+            column-gap: 10px;
+            margin-left: 7.5px;
+            img
+            {
+                @extend %grid_center;
+                grid-column: 1;
+            }
+            
+            .text
+            {
+                font-size: 1em;
+                grid-column: 2;
+                
+                h1, p
+                {
+                    width: 250px;
+                    margin: 0px;
+                }
+            }
+        }
+        .btn
+        {
+            align-self: center;
+            button
+            {
+                margin-bottom: 6px;
+                background-color: #800008;
+                padding: 10px;
+                color: white;
+                border-radius: 5px;
+                border: 2px solid #e7ae0f;
+                width: 160px
+            }
+        }
+        .contact
+        {
+            align-self: center;
+            div
+            {
+                font-size: 18px;
+                i
+                {
+                    color: #0062FF;
+                }
+            }
+        }
+    }
+    
     .menu
     {
         display: grid;
+        border-radius: 10px;
         // grid-template-columns: repeat(6, 1fr);
         grid-auto-columns: auto;
         grid-template-rows: 1fr;
         column-gap: 15px;
-
-
+        background-color: #e7ae0f;
+        /* display: flex;
+        justify-content: space-between; */
         .item
         {
+            margin: 0 auto;
             @extend %button;
             grid-row: 1;
-            border-top: none;
-            border-bottom: none;
-            padding: 5px 10px;
-
+            border: none;
+            padding: 10px 0;
             a
             {
-                font-size: 1em;
+                color: white;
+                padding: 10px 30px;
+                font-size: 1.3em;
+                &:hover
+                {
+                    background-color:#c5a13d
+                }
             }
         }
     }

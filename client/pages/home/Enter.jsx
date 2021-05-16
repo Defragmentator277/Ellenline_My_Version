@@ -4,8 +4,10 @@ import Services from './Services.jsx';
 import Advantages from './Advantages.jsx';
 import Reviews from './Reviews.jsx';
 import Clients from './Clients.jsx';
-import QRcode from './QRcode.jsx';
 import NemoTravel from './NemoTravel.jsx';
+import News from './News.jsx'
+import SpecOffers from './SpecOffers.jsx'
+
 //
 import classes from './Enter.module.scss';
 
@@ -18,8 +20,9 @@ const Home = () => {
             {/* <Services data={data.services}/>
             <Advantages data={data.advantages}/> */}
             <Reviews/>
-            <Clients/>
-            <QRcode/>
+            {/* <Clients/> */}
+            <SpecOffers />
+            <News />
         </div>
     )
 }

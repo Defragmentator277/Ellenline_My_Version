@@ -1,13 +1,17 @@
 {
-  "name": "ellenline",
-  "version": "0.1.0",
-  "private": true,
+  "name": "client",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
+  "author": "",
+  "license": "ISC",
   "dependencies": {
+<<<<<<< HEAD
     "cors": "^2.8.5",
     "js-cookie": "^2.2.1",
     "mongodb": "^3.6.4",
@@ -15,12 +19,17 @@
     "next-connect": "^0.10.0",
     "nookies": "^2.5.2",
     "react": "17.0.1",
+=======
+    "bson": "^4.3.0",
+    "mongodb": "^3.6.6",
+    "next": "^10.2.0",
+    "next-connect": "^0.10.1",
+    "react": "^17.0.2",
+>>>>>>> origin/Doler
     "react-cookie": "^4.0.3",
-    "react-dom": "17.0.1",
-    "react-hook-form": "^6.14.2",
-    "react-player": "^2.8.2",
+    "react-dom": "^17.0.2",
     "react-responsive": "^8.2.0",
     "react-yandex-maps": "^4.6.0",
-    "sass": "^1.32.8"
+    "sass": "^1.32.13"
   }
 }
