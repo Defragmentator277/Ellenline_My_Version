@@ -51,12 +51,12 @@ handler.get(async (req, res) => {
                     telephone: { $first: '$telephone' },
                     gender: { $first: '$gender' },
                     image: { $first: '$image'},
-                    tours_orders: { $push: '$tours_orders' },
-                    relax_orders: { $push: '$relax_orders' },
-                    cruises_orders: { $push: '$cruises_orders' },
-                    history_tours_orders: { $push: '$history_tours_orders' },
-                    history_relax_orders: { $push: '$history_relax_orders' },
-                    history_cruises_orders: { $push: '$history_cruises_orders' }
+                    tours_orders: { $addToSet: '$tours_orders' },
+                    relax_orders: { $addToSet: '$relax_orders' },
+                    cruises_orders: { $addToSet: '$cruises_orders' },
+                    history_tours_orders: { $addToSet: '$history_tours_orders' },
+                    history_relax_orders: { $addToSet: '$history_relax_orders' },
+                    history_cruises_orders: { $addToSet: '$history_cruises_orders' }
                 }}
                 //
             ])).toArray((err, result) => {
