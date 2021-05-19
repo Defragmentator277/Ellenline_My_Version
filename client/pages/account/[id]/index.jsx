@@ -17,10 +17,11 @@ import classes from './index.module.scss';
 const Account = (props) => {
     const router = useRouter();
     // console.log(useContext(AccountContextComponent));
-    const [AccountContext, setAccountContext] = useState(props.AccountContext);
+    const { AccountContext } = useContext(AccountContextComponent);
     const [window, setWindow] = useState();
 
     // const AccountContext = {};
+    console.log("THIS ACCOUNT CONTEXT");
     console.log(AccountContext);
     //
     const [user, setUser] = useState(props.user);

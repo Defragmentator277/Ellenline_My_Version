@@ -95,22 +95,11 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
     }
 
     return(
-        <AccountContextComponent.Provider value={[AccountContext, setAccountContext]}>
+        <AccountContextComponent.Provider value={AccountContext}>
             {GenerateContent()}
             {GenerateNotification()}
         </AccountContextComponent.Provider>
     )
 }
-
-
-// export function getServerSideProps({ req, res }) {
-//     console.log("GETSDFSDFDF");
-//     console.log(req.cookies);
-//     return {
-//         props: {
-            
-//         }
-//     };
-// }
 
 export default ClientLayout;
