@@ -11,21 +11,14 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-<<<<<<< HEAD
     "cors": "^2.8.5",
     "js-cookie": "^2.2.1",
-    "mongodb": "^3.6.4",
-    "next": "^10.0.5",
-    "next-connect": "^0.10.0",
     "nookies": "^2.5.2",
-    "react": "17.0.1",
-=======
     "bson": "^4.3.0",
     "mongodb": "^3.6.6",
     "next": "^10.2.0",
     "next-connect": "^0.10.1",
     "react": "^17.0.2",
->>>>>>> origin/Doler
     "react-cookie": "^4.0.3",
     "react-dom": "^17.0.2",
     "react-responsive": "^8.2.0",

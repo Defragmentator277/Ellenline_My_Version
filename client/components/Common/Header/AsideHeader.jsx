@@ -30,10 +30,10 @@ const AsideHeader = (props) => {
                             <p>Туры</p>
                         </Link>
                         <div className={classes.submenu}>
-                            <Link href='/resorts/tours/oneday'>
+                            <Link href='/resorts/tours/oneday?condition={"price":{"min":0}}'>
                                 <p>Однодневные</p>
                             </Link>
-                            <Link href='/resorts/tours/multiday'>
+                            <Link href='/resorts/tours/multiday?condition={"price":{"min":0}}'>
                                 <p>Многодневные</p>
                             </Link>
                         </div>
@@ -44,10 +44,10 @@ const AsideHeader = (props) => {
                             <p>Отдых</p>
                         </Link>
                         <div className={classes.submenu}>
-                            <Link href='/resorts/relax/sanatoriums'>
+                            <Link href='/resorts/relax/sanatoriums?condition={"price":{"min":0}}'>
                                 <p>Санатории</p>
                             </Link>
-                            <Link href='/resorts/relax/pensionats'>
+                            <Link href='/resorts/relax/pensionats?condition={"price":{"min":0}}'>
                                 <p>Пансионаты</p>
                             </Link>
                         </div>
@@ -58,10 +58,10 @@ const AsideHeader = (props) => {
                                 <p>Круизы</p>
                         </Link>
                         <div className={classes.submenu}>
-                            <Link href='/resorts/cruises/river'>
+                            <Link href='/resorts/cruises/river?condition={"price":{"min":0}}'>
                                 <p>Речные</p>
                             </Link>
-                            <Link href='/resorts/cruises/marine'>
+                            <Link href='/resorts/cruises/marine?condition={"price":{"min":0}}'>
                                 <p>Морские</p>
                             </Link>
                         </div>

@@ -1,4 +1,5 @@
 import React from 'react';
+import { parseCookies, setCookie } from 'nookies';
 //
 import DatabaseLayout from './DatabaseLayout.jsx';
 //
@@ -23,7 +24,6 @@ const Db = (props) => {
 export async function getStaticProps(router) {
     //Запрос к бд для получения коллекции из mongoDB
     const collections = await (await fetch(Global.url + '/api/db/')).json();
-    console.log(collections);
 
     return {
         props: {

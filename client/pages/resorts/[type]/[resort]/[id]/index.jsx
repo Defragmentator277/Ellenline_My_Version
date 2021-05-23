@@ -14,6 +14,7 @@ import classes from './index.module.scss';
 const Resort = (props) => {
     console.log('ON CLIENT');
     console.log(props.items);
+    // return <></>;
     //
     const type = props.type;
     const resort = props.resort;
@@ -138,6 +139,7 @@ export async function getStaticProps(router) {
     //
     const res = await fetch(Global.url + '/api/resorts/' + type + '/' + resort + '/' + id);
     const items = await res.json();
+
     const item = items[0];
     //
     return {

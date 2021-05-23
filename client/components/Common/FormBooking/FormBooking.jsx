@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
+import { parseCookies, setCookie } from 'nookies';
 //
 import SelectOption from '../../CustomElements/SelectOption.jsx';
 import InputText from '../../CustomElements/InputText.jsx';
@@ -19,7 +19,8 @@ import classes from './FormBooking.module.scss';
 const FormBooking = (props) => {
     /////////////////ALL
     //#region Variables
-    const [AccountContext, setAccountContext] = useState(AccountContextComponent);
+    const cookies = parseCookies();
+    const account_user = Global.getCookie(cookies, 'account_user');
     const [window, setWindow] = useState();
     //
     const timetable = props.timetable;
@@ -336,7 +337,7 @@ const FormBooking = (props) => {
 
     function GenerateBookingForm() {
         function GenerateButtonOrText() {
-            if(AccountContext)
+            if(account_user)
             {
                 return <Button 
                 className={classes.button} 
@@ -384,7 +385,7 @@ const FormBooking = (props) => {
         })
         //Создание связи между автобусным туром и клиентом
         function CreateReservation() {
-            const id_user = AccountContext._id;
+            const id_user = account_user._id;
             let prop;
             switch(type)
             {

@@ -1,0 +1,177 @@
+@import '../../../styles/index.scss';
+
+.users
+{
+    @extend %font;
+    //
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    row-gap: 15px;
+    column-gap: 10px;
+
+    h1, p
+    {
+        margin: 0;
+    }
+
+    h1
+    {
+        font-size: 1.25em;
+    }
+
+    p
+    {
+        font-size: 1em;
+    }
+
+    .greetings
+    {
+        font-size: 2em;
+        grid-column-start: 1;
+        grid-column-end: 3;
+    }
+
+    .user
+    {
+        @extend %border;
+        //
+        display: grid;
+        row-gap: 10px;
+        padding: 5px;
+
+        .greetings
+        {
+            font-size: 1.5em;
+            // grid-column-start: 1;
+            // grid-column-end: 3;
+        }
+
+        .info
+        {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-row: 2;
+            //
+            margin-left: 25px;
+            padding-left: 5px;
+            padding-bottom: 7.5px;
+            border-bottom: 3px solid $primary_color;
+            border-left: 3px solid $primary_color;
+
+            & > div
+            {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+
+                h1
+                {
+                    grid-column: 1;
+                }
+
+                p
+                {
+                    grid-column: 2;
+                    // align-self: flex-end;
+                    align-self: center;
+                }
+            }
+        }
+
+        .orders
+        {
+            grid-row: 4;
+            //
+            display: grid;
+            row-gap: 10px;
+            //
+            padding-left: 25px;
+
+            // h1, p
+            // {
+            //     font-size: 1em;
+            // }
+
+            .tours_orders,
+            .relax_orders,
+            .cruises_orders
+            {
+                //
+                padding: 7.5px;
+                border-bottom: 3px solid $primary_color;
+                border-left: 3px solid $primary_color;
+
+                .greetings
+                {
+                    display: grid;
+                    grid-template-columns: max-content min-content;
+                    //
+                    margin-bottom: 10px;
+
+                    h1
+                    {
+                        width: 100%;
+                        font-size: 1em;
+                    }
+
+                    i
+                    {
+
+                    }
+                }
+                
+                .tour,
+                .relax,
+                .cruise
+                {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 10px;
+
+                    .tour_info,
+                    .relax_info,
+                    .cruise_info
+                    {
+                        grid-column: 1;
+                    }
+                    
+                    .order_info
+                    {
+                        grid-column: 2;
+                    }
+                }
+            }
+
+            .buttons
+            {
+                grid-column-start: 1;
+                grid-column-end: 3;
+                //
+                display: grid;
+                grid-template-columns: repeat(2, 1fr);
+                column-gap: 10px;
+
+                .button
+                {
+                    @extend %button;
+                    grid-row: 1;
+                    //
+                    width: 100%;
+                    padding: 7.5px;
+                    font-size: 1em;
+                }
+            }
+        }
+    }
+}
+@media screen and (max-width: 1440px)
+{
+    .users
+    {
+        grid-template-columns: 1fr;
+
+        .greetings
+        {
+            grid-column-end: unset;
+        }
+    }
+}

@@ -1,5 +1,4 @@
 import React from 'react';
-import YouTubePlayer from 'react-player/youtube';
 //
 import PresentationMap from '../Map/PresentationMap';
 //

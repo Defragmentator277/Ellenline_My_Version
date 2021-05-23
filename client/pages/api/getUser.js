@@ -16,7 +16,8 @@ handler.get(async (req, res) => {
     {
 
         req.db.collection('users').aggregate(
-            [{ $match: { _id: ObjectId(id_user) } }].concat(
+            [{ $match: { _id: ObjectId(id_user) } }]
+            .concat(
             //Get tours_orders info
             Global.GetLookupPipeline('tours_orders', 'id_tour', 'tours', 'tour'), 
             //Get cruises_orders info
@@ -51,19 +52,27 @@ handler.get(async (req, res) => {
                     telephone: { $first: '$telephone' },
                     gender: { $first: '$gender' },
                     image: { $first: '$image'},
-                    tours_orders: { $push: '$tours_orders' },
-                    relax_orders: { $push: '$relax_orders' },
-                    cruises_orders: { $push: '$cruises_orders' },
-                    history_tours_orders: { $push: '$history_tours_orders' },
-                    history_relax_orders: { $push: '$history_relax_orders' },
-                    history_cruises_orders: { $push: '$history_cruises_orders' }
+                    //
+                    tours_orders: { $addToSet: '$tours_orders' },
+                    relax_orders: { $addToSet: '$relax_orders' },
+                    cruises_orders: { $addToSet: '$cruises_orders' },
+                    //
+                    history_tours_orders: { $addToSet: '$history_tours_orders' },
+                    history_relax_orders: { $addToSet: '$history_relax_orders' },
+                    history_cruises_orders: { $addToSet: '$history_cruises_orders' }
                 }}
                 //
-            ])).toArray((err, result) => {
+            ])
+            ).toArray((err, result) => {
                 if(err)
                     res.json(err);
                 else
+                {
+                    // console.log(result);
+                    result = Global.CorrectArraysOfOrders(result);
+                    //
                     res.json(result[0]);
+                }
             }
         );
     }

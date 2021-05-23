@@ -1,18 +1,18 @@
 import React, { useContext, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import { useRouter } from 'next/router';
+import { parseCookies, setCookie } from 'nookies';
 //
 import ModalWindow from '../ModalWindow/ModalWindow.jsx';
-//
-// import Context from '../../../layouts/ClientLayoutContext.js';
-import {AccountContextComponent} from '../../../layouts/ClientLayoutContext.js';
+
 //
 import Global from '../../../pages/global.js';
+
 import classes from './Notification.module.scss';
+import Cookies from 'universal-cookie';
 
 const Notification = (props) => {
     const router = useRouter();
-    const [AccountContext, setAccountContext] = useContext(AccountContextComponent);
+    const cookies = parseCookies();
     //
     const children = props.children;
     const preset = props.preset;
@@ -52,8 +52,9 @@ const Notification = (props) => {
                                                 alert('Вы успешно авторизовались!');
                                                 // res[0].role = 'users';
                                                 const new_user = res[0];
-                                                // console.log(new_user);
-                                                setAccountContext({...new_user});
+                                                // setAccountContext({...new_user});
+                                                // setCookie(null, 'account_user', { _id: new_user._id, login: new_user.login, password: new_user.password }, { path: '/' });
+                                                Global.setCookie(setCookie, 'account_user', new_user, { path: '/' });
                                                 location.reload();
                                             }
                                             else
@@ -89,6 +90,16 @@ const Notification = (props) => {
                                             alert('Пароли не совпадают!');
                                             return true;
                                         }
+                                        if(!/^([a-z0-9_-]+\.)*[a-z0-9_-]+@[a-z0-9_-]+(\.[a-z0-9_-]+)*\.[a-z]{2,6}$/.test(user.email))
+                                        {
+                                            alert('Электронная почта в неверном формате');
+                                            return true;
+                                        }
+                                        if(!/^(\+7|8)\d{10}$/.test(user.telephone))
+                                        {
+                                            alert('Номер телефона должен быть в формать +7(8)0000000000!');
+                                            return true;
+                                        }
                                         delete user.repeat_password;
                                         //
                                         fetch(`${Global.url}/api/db/users/insert?object=${JSON.stringify(user)}`)
@@ -116,8 +127,9 @@ const Notification = (props) => {
                                                 alert('Вы успешно зарегистрировались');
                                                 // user.role = 'users';
                                                 user._id =  res.insertedId; 
-                                                setAccountContext(user);
-                                                // setCookie('account', user, '/');
+                                                // setAccountContext(user);
+                                                // setCookie(null, 'account_user', JSON.stringify({ _id: user._id, login: user.login, password: user.password }), { path: '/' });
+                                                Global.setCookie(setCookie, 'account_user', user, { path: '/' });
                                                 location.reload();
                                             }
                                         })
@@ -138,22 +150,28 @@ const Notification = (props) => {
                         {
                             "text": "Войти в личный кабинет",
                             OnClick: (e) => {
-                                
-                                // router.push({
-                                //     pathname: '/post/[pid]',
-                                //     query: { pid: post.id },
-                                // })
-                                router.push(`/account/${AccountContext._id}`);//{ login: cookies.account.login, password: cookies.account.password });
+                                const account_user = Global.getCookie(cookies, 'account_user');
+                                router.push(`/account/${account_user._id}`);//{ login: cookies.account.login, password: cookies.account.password });
                             }
                         },
                         {
                             "text": "Выйти",
                             OnClick: (e) => {
-                                setAccountContext();
-                                // removeCookie('account', { path: '/' });
+                                // setAccountContext();
+                                // setCookie(null, 'account_user', 'undefined', { path: '/' });
+                                Global.setCookie(setCookie, 'account_user', 'undefined', { path: '/' });
                                 location.reload();
                             }
                         },
+                    ],
+                    "AdminPersonalAccount": [
+                        {
+                            "text": "Выйти",
+                            OnClick: (e) => {
+                                Global.setCookie(setCookie, 'account_worker', 'undefined', { path: '/' });
+                                location.reload();
+                            } 
+                        }
                     ]
                 }
                 const buttons = presets[preset];

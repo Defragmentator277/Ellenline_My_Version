@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useCookies } from 'react-cookie';
+import { parseCookies, setCookie } from 'nookies';
 //
 import ClientLayout from '../../../layouts/ClientLayout.jsx';
 import ModalWindow from '../../../components/Common/ModalWindow/ModalWindow.jsx';
@@ -9,22 +9,17 @@ import Comment from '../../../components/Common/Comments/Comment.jsx';
 import InputText from '../../../components/CustomElements/InputText.jsx';
 import SelectOption from '../../../components/CustomElements/SelectOption.jsx';
 //
-import { AccountContextComponent, AccountContextHOF } from '../../../layouts/ClientLayoutContext.js';
-//
 import Global from '../../global.js';
 import classes from './index.module.scss';
 
 const Account = (props) => {
     const router = useRouter();
-    // console.log(useContext(AccountContextComponent));
-    const { AccountContext } = useContext(AccountContextComponent);
     const [window, setWindow] = useState();
-
-    // const AccountContext = {};
-    console.log("THIS ACCOUNT CONTEXT");
-    console.log(AccountContext);
+    const cookies = parseCookies();
     //
     const [user, setUser] = useState(props.user);
+    const [login, setLogin] = useState(props.login);
+    const [password, setPassword] = useState(props.password);
 
     console.log(user);
 
@@ -46,8 +41,7 @@ const Account = (props) => {
         .then((res) => {
             console.log(res);
             alert('Вы успешно изменили информацию о себе');
-            setAccountContext({...user});
-            // setCookie('account', {...user, role: 'users' }, { path: '/' });
+            Global.setCookie(setCookie, 'account_user', user, { path: '/' });
         })
         .catch((err) => {
             console.log('Ошибка!');
@@ -59,15 +53,16 @@ const Account = (props) => {
             alert('Произошла непредвиденная ошибка');
         })
         .finally(() => {
-            // location.reload();
+            location.reload();
         });
     }   
 
     function GenerateContent() {
+        const account_user = Global.getCookie(cookies, 'account_user');
         //
-        if(AccountContext && 
-           AccountContext.login == user.login && 
-           AccountContext.password == user.password)
+        if(account_user && 
+           account_user.login == login && 
+           account_user.password == password)
         {
             function GenerateOrders() {
                 // function Generate
@@ -89,7 +84,7 @@ const Account = (props) => {
                                         date: comment.date,
                                         rating: comment.rating
                                     }};
-                                    //s
+                                    //
                                     return <div className={classes.comment}>
                                         <h1>Ваш комментарий</h1>
                                         <Comment {...new_comment}/>
@@ -115,6 +110,8 @@ const Account = (props) => {
                                         })
                                         .then((res) => {
                                             console.log(res);
+                                            if(res)
+                                                location.reload();
                                         })
                                         .catch((err) => {
                                             console.log('Ошибка!');
@@ -132,11 +129,77 @@ const Account = (props) => {
                             </button>;
                         }     
                         //
+                        function GeneratePayInAdditioon() {
+                            if(order.status == 'Заказ оплачен')
+                                return;
+                            //
+                            function OnClickPayInAddition() {
+                                //
+                                function UpdatePayment(prop) {
+                                    fetch(`${Global.url}/api/db/users/update?id=${account_user._id}&prop=${JSON.stringify(prop)}`)
+                                    .then((res) => {
+                                        console.log('Успех!');
+                                        console.log(res);
+                                        return res.json();
+                                    })
+                                    .then((res) => {
+                                        console.log(res);
+                                        location.reload();
+                                    })
+                                    .catch((err) => {
+                                        console.log('Ошибка!');
+                                        console.log(err);
+                                        return err.json();
+                                    })
+                                    .catch((err) => {
+                                        console.log(err);
+                                    });
+                                }
+                                //
+                                const prop = {
+                                    key: 'status',
+                                    path: type_order,
+                                    id: order.id,
+                                    new_value: ''
+                                }
+                                //
+                                if(order.status == 'Не оплаченно')
+                                {
+                                    setWindow(
+                                    {
+                                        title: 'Доплата',
+                                        preset: 'PayInAdditionSelection',
+                                        onChainge: (e, value) => {
+                                            if(value.payment == 'Оплата половины суммы')
+                                                prop.new_value = 'Оплаченно половины суммы';
+                                            else if(value.payment == 'Полная оплата по карте')
+                                                prop.new_value = 'Заказ оплачен';
+                                            UpdatePayment(prop);
+                                        }
+                                    });
+                                }
+                                else
+                                {
+                                    prop.new_value = 'Заказ оплачен';
+                                    UpdatePayment(prop);
+                                }
+                            }
+                            //
+                            return <button className={classes.button} onClick={OnClickPayInAddition}>
+                                Доплатить
+                            </button>
+                        }
+                        //
                         switch(type_order)
                         {
                             case 'tours_orders':
                             case 'history_tours_orders':
                                 const tour = order.tour;
+                                //
+                                if(!tour)
+                                    return <div className={classes.dont_exists}>
+                                        <h1>Данный тур больше не существует!</h1>
+                                    </div>;
                                 //
                                 function OnClickTour(e) {
                                     router.push(`/resorts/tours/${tour.timetable.length > 1 ? 'multiday' : 'oneday' }/${tour._id}`);
@@ -201,7 +264,7 @@ const Account = (props) => {
                                         <button className={classes.button} onClick={OnClickTour}>
                                             Перейти на страницу
                                         </button>
-                                        {isHistory ? GenerateLeaveCommentButton(tour, 'tours') : ''}
+                                        {isHistory ? GenerateLeaveCommentButton(tour, 'tours') : GeneratePayInAdditioon()}
                                     </div>
                                 </div>;
                             case 'relax_orders':
@@ -209,13 +272,18 @@ const Account = (props) => {
                                 const relax = order.relax;
                                 const room = order.room;
                                 //
+                                if(!relax || !room)
+                                    return <div className={classes.dont_exists}>
+                                        <h1>Данное место отдыха больше не существует!</h1>
+                                    </div>;
+                                //
                                 function OnClickRelax(e) {
                                     router.push(`/resorts/relax/${relax.type == 'Санаторий' ? 'sanatoriums' : 'pensionats' }/${relax._id}`);
                                 }
                                 //
                                 return <div className={classes.relax}>
                                     <div className={classes.title_relax}>
-                                        Фото место отдыха
+                                        Фото c места отдыха
                                     </div>
                                     <div className={classes.title_room}>
                                         Фото комнаты
@@ -293,13 +361,17 @@ const Account = (props) => {
                                         <button className={classes.button} onClick={OnClickRelax}>
                                             Перейти на страницу
                                         </button>
-                                        {isHistory ? GenerateLeaveCommentButton(relax, 'relax') : ''}
+                                        {isHistory ? GenerateLeaveCommentButton(relax, 'relax') : GeneratePayInAdditioon()}
                                     </div>
                                 </div>;
                             case 'cruises_orders':
                             case 'history_cruises_orders':
                                 const cruise = order.cruise;
                                 const cabin = order.room;
+                                if(!cruise || !cabin)
+                                    return <div className={classes.dont_exists}>
+                                        <h1>Данный круиз больше не существует!</h1>
+                                    </div>;
                                 //
                                 function OnClickCruise(e) {
                                     router.push(`/resorts/cruise/${cruise.type == 'Речной' ? 'river' : 'marine' }/${cruise._id}`);
@@ -307,7 +379,7 @@ const Account = (props) => {
                                 //
                                 return <div className={classes.cruise}>
                                     <div className={classes.title_cruise}>
-                                        Фото c место отдыха
+                                        Фото c места отдыха
                                     </div>
                                     <div className={classes.title_cabin}>
                                         Фото каюты
@@ -360,7 +432,7 @@ const Account = (props) => {
                                         <div className={classes.number_of_seats}>
                                             <h1>Кол-во занятых вами мест:</h1>
                                             <p>Взрослых: {cabin.number_of.seats.adult} из {order.number_of.adult}<br/>
-                                               {order.number_of.child ? `Детских: ${room.number_of.seats.child} из ${order.number_of.child}` : ''}
+                                               {order.number_of.child ? `Детских: ${cabin.number_of.seats.child} из ${order.number_of.child}` : ''}
                                             </p>
                                         </div>
                                         <div className={classes.type_food}>
@@ -377,7 +449,7 @@ const Account = (props) => {
                                         <button className={classes.button} onClick={OnClickCruise}>
                                             Перейти на страницу
                                         </button>
-                                        {isHistory ? GenerateLeaveCommentButton(cruise, 'cruises') : ''}
+                                        {isHistory ? GenerateLeaveCommentButton(cruise, 'cruises') : GeneratePayInAdditioon()}
                                     </div>
                                 </div>;
                         }
@@ -386,8 +458,7 @@ const Account = (props) => {
                     const elements = [];
                     const orders = user[type_order];
                     //tours
-                    if(orders && 
-                       Object.keys(orders[0]).length != 0)
+                    if(orders)
                     {
                         for(let i = 0; i < orders.length; i++)
                         {
@@ -541,8 +612,6 @@ export async function getStaticPaths() {
 }
 
 export async function getStaticProps(router) {
-    console.log(router);
-    console.log(JSON.stringify(null, 2, router));
     const id_user = router.params.id;
     //
     const res = await fetch(`${Global.url}/api/getUser?id_user=${id_user}&get_relaxes=${true}`);
@@ -550,12 +619,14 @@ export async function getStaticProps(router) {
     //
     return {
         props: {
-            user: user
+            user: user,
+            login: user.login,
+            password: user.password
         }
     };
 }
 
-export default AccountContextHOF(Account);
+export default Account;
 // export default <AccountContextComponent.Consumer>
 //     {AccountContext => <Account AccountContext={AccountContext}/>}
 // </AccountContextComponent.Consumer>;

@@ -20,7 +20,7 @@ const ModalWindow = (props) => {
     const [contextMenu, setContextMenu] = useState();
     const up_value = props.up_value;
     //all
-    const title = props.title;
+    const title = props.title;  
 
     //Преднастройка имеет самый высокий приоритет
     const preset = props.preset;
@@ -28,7 +28,7 @@ const ModalWindow = (props) => {
     const fields = preset ? Presets[preset] : props.fields;
     //originally if type not undefined
     const onChainge = props.onChainge;
-    //from the beginning
+    //Variables from the beginning
     const children = props.children;
     const onClose = props.onClose;
     const buttons = props.buttons || { close: true };
@@ -60,49 +60,9 @@ const ModalWindow = (props) => {
                         function OnClickButton(e) {
                             //item.props.window = { title: ..., fields: ..., onChainge: (e, value) => { ... } }
                             const str = item.props.window.toGetInnerIds;
-                            //Конвертирование элемента для модального окна
-                            function ConvertToFieldsAddButtonMassive(element) {
-                                switch(element.type)
-                                {
-                                    case 'massive':
-                                        //В случаи если это массив значит нужно добавить кнопку
-                                        //element.prop = [ ... ]
-                                        // console.log(element.prop);
-                                        return {
-                                            type: 'button',
-                                            prop: 
-                                            {
-                                                title: 'Добавить',
-                                                fields: element.prop.map((element) => ConvertToFieldsAddButtonMassive(element))
-                                            },
-                                            title: element.title
-                                        };
-                                    //В случаи массива или объекта
-                                    case 'object':
-                                        let prop = element.prop;
-                                        if(Array.isArray(prop))
-                                            return {
-                                                type: 'object',
-                                                prop: prop.map((element) => ConvertToFieldsAddButtonMassive(element)),
-                                                title: element.title
-                                            };
-                                        else
-                                            //В случаи если это объект рекурсивно добираемся до свойств
-                                            return ConvertToFieldsAddButtonMassive(prop);
-                                    case 'OtherId':
-                                        element.getValues = (setValues) => Global.GetIds(setValues, element.ref); 
-                                        return element;
-                                    case 'InnerId':
-                                        // const str
-                                        console.log(str);
-                                        element.getValues = (setValues) => Global.GetIds(setValues, str + `&key=${element.ref}`, 'id');
-                                        return element;
-                                    default:
-                                        return element;
-                                }
-                            }
-
-                            item.props.window.fields = item.props.window.fields.map((element) => ConvertToFieldsAddButtonMassive(element));
+                            //
+                            item.props.window.fields = item.props.window.fields.map((element) => Global.ConvertToFieldsAddButtonMassive(element));
+                            //
                             setWindow(item.props.window);
                         }
                         //
@@ -227,7 +187,7 @@ const ModalWindow = (props) => {
                         getValues={(values) => field.getValues(values)}/>;
                     case 'OtherId':
                         return <SelectOption
-                        title={field.prop}
+                        title={field.translate || field.prop}
                         placeholder='Выберите айди'
                         classSelect={classes.input + ' ' + classes.select}
                         onChainge={(e, value) => SetValueOfPropertie(Global.ConvertToDBRef(field.ref, value))}
@@ -271,7 +231,7 @@ const ModalWindow = (props) => {
                         }
                         // SetValueOfPropertie([], field.title);
                         return <div className={classes.massive}>
-                            <h1 className={classes.title}>{field.title}</h1>
+                            <h1 className={classes.title}>{field.translate || field.title}</h1>
                             <button className={classes.button} onClick={(e) => OnClickAddButton(e, OnChainge)}>
                                 Добавить
                             </button>
@@ -282,10 +242,11 @@ const ModalWindow = (props) => {
                         field.prop.forEach(element => {
                             array.push(GenerateField(element, path.concat(field.title)));
                         });
+                        console.log(field);
                         //
                         return <div className={classes.object}>
                             <p className={classes.title}>
-                                {field.title}
+                                {field.translate || field.title}
                             </p>
                             {array}
                         </div>;
@@ -299,8 +260,6 @@ const ModalWindow = (props) => {
             for(let i = 0; i < fields.length; i++)
             {
                 let field = fields[i];
-                //Настроить конвертацию
-                //field: { type: ... , prop: ..., [...title] }
                 elements.push(GenerateField(field));
             } 
             return elements;

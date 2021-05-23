@@ -1,3 +1,5 @@
+
+
 //Функция для создания поля
 function GetField(type_of, prop, title, ref, items) {
     //field: { type: ..., prop: ..., title: ..., ref: ..., items: ..., min: ... }
@@ -371,8 +373,8 @@ db.structure.insertOne(
             type: 'OtherId',
             prop: 'id_locality',
             ref: 'localities',
-            translate: 'Айди населенного пункта',
-            hint: 'Айди ближаего от отдха населенного пункта'
+            translate: 'Айди города',
+            hint: 'Айди ближаего от отдыха города'
         },
         {
             type: 'OtherId',
@@ -505,7 +507,7 @@ db.structure.insertOne(
                 {
                     type: 'string',
                     prop: 'corpus',
-                    translate: 'Корпус'
+                    translate: 'Палуба'
                 },
                 {
                     type: 'object',
@@ -819,129 +821,266 @@ db.structure.insertOne(
             translate: 'Расписание туров',
             min: 1
         },
-        ////WHERE I END
-        GetField('OtherId', 'id_locality', undefined, 'localities'),
-        GetField('object', 
-        [
-            GetField('number', 'x'),
-            GetField('number', 'y')
-        ], 'points'),
+        {
+            type: 'OtherId',
+            prop: 'id_locality',
+            ref: 'localities',
+            translate: 'Айди города'
+        },
+        {
+            type: 'object',
+            prop: 
+            [
+                {
+                    type: 'number',
+                    prop: 'x',
+                    translate: 'Координата Х'
+                },
+                {
+                    type: 'number',
+                    prop: 'y',
+                    translate: 'Координата Y'
+                }
+            ],
+            title: 'points',
+            translate: 'Точки на карте'
+        },
         //
         {
             type: 'massive',
             prop: 
             [
-                GetField('number', 'day'),
-                GetField('object',
-                [
-                    GetField('time', 'start'),
-                    GetField('time', 'end')
-                ], 'time'),
-                GetField('string', 'description')
+                {
+                    type: 'number',
+                    prop: 'day',
+                    translate: 'Номер дня'
+                },
+                {
+                    type: 'object',
+                    prop: 
+                    [
+                        {
+                            type: 'time',
+                            prop: 'start',
+                            translate: 'Начала'
+                        },
+                        {
+                            type: 'time',
+                            prop: 'start',
+                            translate: 'Конца'
+                        }
+                    ],
+                    title: 'time',
+                    translate: 'Время'
+                },
+                {
+                    type: 'string',
+                    prop: 'description',
+                    translate: 'Описание'
+                }
             ],
             title: 'timetable',
+            translate: 'Расписание по дням',
             min: 1
         },
-        GetField('object',
-        [
-            //
-            {
-                type: 'massive',
-                prop: 
-                [
-                    GetField('string', 'language')
-                ],
-                title: 'languages',
-                min: 1
-            },
-            //
-            {
-                type: 'massive',
-                prop: 
-                [
-                    GetField('OtherId', 'id_country', undefined, 'countries')
-                ],
-                title: 'countries',
-                min: 1
-            },
-            //
-            {
-                type: 'massive',
-                prop: 
-                [
-                    GetField('string', 'route')
-                ],
-                title: 'routes',
-                min: 1
-            }
-        ], 'info'),
-        GetField('object',
-        [
-            //
-            {
-                type: 'massive',
-                prop: 
-                [ 
-                    GetField('string', 'icon'),
-                    GetField('string', 'text')
-                ],
-                title: 'included',
-                min:1
-            },
-            //
-            {
-                type: 'massive',
-                prop: 
-                [ 
-                    GetField('string', 'icon'),
-                    GetField('string', 'text')
-                ],
-                title: 'payable',
-                min:1
-            }
-        ], 'services'),
+        {
+            type: 'object',
+            prop: 
+            [
+                //
+                {
+                    type: 'massive',
+                    prop: 
+                    [
+                        {
+                            type: 'string',
+                            prop: 'language',
+                            translate: 'Язык'
+                        }
+                    ],
+                    title: 'languages',
+                    translate: 'Языках',
+                    min: 1
+                },
+                //
+                {
+                    type: 'massive',
+                    prop: 
+                    [
+                        {
+                            type: 'OtherId',
+                            prop: 'id_country',
+                            ref: 'countries',
+                            translate: 'Страна'
+                        }
+                    ],
+                    title: 'countries',
+                    translate: 'Странах',
+                    min: 1
+                },
+                //
+                {
+                    type: 'massive',
+                    prop: 
+                    [
+                        GetField('string', 'route')
+                    ],
+                    title: 'routes',
+                    translate: 'Машрутах',
+                    min: 1
+                }
+            ],
+            title: 'info',
+            translate: 'Информаци о'
+
+        },
+        {
+            type: 'object',
+            prop: 
+            [
+                //
+                {
+                    type: 'massive',
+                    prop: 
+                    [ 
+                        {
+                            type: 'string',
+                            prop: 'icon',
+                            translate: 'Иконка'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'text',
+                            translate: 'Текст иконки'
+                        }
+                    ],
+                    title: 'included',
+                    translate: 'Включенные в стоимость',
+                    min:1
+                },
+                //
+                {
+                    type: 'massive',
+                    prop: 
+                    [ 
+                        {
+                            type: 'string',
+                            prop: 'icon',
+                            translate: 'Иконка'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'text',
+                            translate: 'Текст иконки'
+                        }
+                    ],
+                    title: 'payable',
+                    translate: 'Платные',
+                    min:1
+                }
+            ],
+            title: 'services',
+            translate: 'Сервисы'
+        },
         //
         {
             type: 'massive',
             prop: 
             [ 
-                GetField('string', 'src')
+                {
+                    type: 'string',
+                    prop: 'src',
+                    translate: 'Ссылка на изображение',
+                    hint: 'Вставте ссылку на картинку из интеренета'
+                }
             ],
             title: 'images',
+            translate: 'Изображения',
             min:1
         },
         {
             type: 'massive',
             prop: 
             [
-                GetField('OtherId', 'id_user', undefined, 'users'),
-                GetField('string', 'text'),
-                GetField('date', 'date'),
+                {
+                    type: 'OtherId',
+                    prop: 'id_user',
+                    ref: 'users',
+                    translate: 'Айди пользователя'
+                },
+                {
+                    type: 'string',
+                    prop: 'text',
+                    translate: 'Текст комментария'
+                },
+                {
+                    type: 'date',
+                    prop: 'date',
+                    translate: 'Дата'
+                },
                 {
                     type: 'number',
                     prop: 'rating',
+                    translate: 'Оценка от 0 до 5',
                     min: 0,
                     max: 5
                 }
             ],
-            title: 'comments'
+            title: 'comments',
+            translate: 'Комментарии'
         }
     ],
     //
     'localities': [
-        GetField('ObjectId', '_id'),
-        GetField('string', 'name'),
-        GetField('string', 'description'),
-        GetField('OtherId', 'id_country', undefined, 'countries')
+        {
+            type: 'ObjectId',
+            prop: '_id',
+            translate: 'Айди',
+            hint: 'Идентификатор объекта'
+        },
+        {
+            type: 'string',
+            prop: 'name',
+            translate: 'Имя'
+        },
+        {
+            type: 'string',
+            prop: 'description',
+            translate: 'Описание'
+        },
+        {
+            type: 'OtherId',
+            prop: 'id_country',
+            ref: 'countries',
+            translate: 'Айди страны'
+        }
     ],
     'countries': [
-        GetField('ObjectId', '_id'),
-        GetField('string', 'name'),
-        GetField('string', 'description')
+        {
+            type: 'ObjectId',
+            prop: '_id',
+            translate: 'Айди',
+            hint: 'Идентификатор объекта'
+        },
+        {
+            type: 'string',
+            prop: 'name',
+            translate: 'Имя'
+        },
+        {
+            type: 'string',
+            prop: 'description',
+            translate: 'Описание'
+        }
     ],
     //
     'admins': [
-        GetField('ObjectId', '_id'),
+        {
+            type: 'ObjectId',
+            prop: '_id',
+            translate: 'Айди',
+            hint: 'Идентификатор объекта'
+        },
         //Authorization
         {
             type: 'string',
@@ -954,367 +1093,964 @@ db.structure.insertOne(
             secret: true
         },
         //
-        GetField('string', 'name'),
-        GetField('string', 'surname'),
-        GetField('string', 'middle_name'),
-        GetField('string', 'email'),
-        GetField('string', 'telephone'),
+        {
+            type: 'string',
+            prop: 'name',
+            translate: 'Имя'
+        },
+        {
+            type: 'string',
+            prop: 'surname',
+            translate: 'Фамилия'
+        },
+        {
+            type: 'string',
+            prop: 'middle_name',
+            translate: 'Отчество'
+        },
+        {
+            type: 'string',
+            prop: 'email',
+            translate: 'Электронная почта'
+        },
+        {
+            type: 'string',
+            prop: 'telephone',
+            translate: 'Телефон'
+        },
         {
             type: 'combobox',
             prop: 'gender',
+            translate: 'Пол',
             items: [ 'Мужской', 'Женский' ]
         }
     ],
     'users': [
-        GetField('ObjectId', '_id'),
+        {
+            type: 'ObjectId',
+            prop: '_id',
+            translate: 'Айди',
+            hint: 'Идентификатор объекта'
+        },
         //Authorization
         {
             type: 'string',
             prop: 'login',
+            translate: 'Логин',
             secret: true
         },
         {
             type: 'string',
             prop: 'password',
+            translate: 'Пароль',
             secret: true
         },
-        //
-        GetField('string', 'name'),
-        GetField('string', 'surname'),
-        GetField('string', 'middle_name'),
-        GetField('string', 'email'),
-        GetField('string', 'telephone'),
-        GetField('string', 'image'),
+        {
+            type: 'string',
+            prop: 'name',
+            translate: 'Имя'
+        },
+        {
+            type: 'string',
+            prop: 'surname',
+            translate: 'Фамилия'
+        },
+        {
+            type: 'string',
+            prop: 'middle_name',
+            translate: 'Отчество'
+        },
+        {
+            type: 'string',
+            prop: 'email',
+            translate: 'Электронная почта'
+        },
+        {
+            type: 'string',
+            prop: 'telephone',
+            translate: 'Телефон'
+        },
+        {
+            type: 'string',
+            prop: 'image',
+            translate: 'Аватарка'
+        },
         {
             type: 'combobox',
             prop: 'gender',
+            translate: 'Пол',
             items: [ 'Мужской', 'Женский' ]
         },
         {
             type: 'massive',
             prop:
             [
-                GetField('OtherId', 'id_tour', undefined, 'tours'),
-                //Copy object instead of create reference, this method increase speed, but add unnecesseary data
-                //object timetable_departure
-                GetField('object',
-                [
-                    GetField('date', 'date'),
-                    GetField('time', 'time'),
-                ], 'timetable_departure'),
-                //
-                GetField('number', 'tickets'),
-                GetField('number', 'price'),
+                {
+                    type: 'OtherId',
+                    prop: 'id_tour',
+                    ref: 'tours',
+                    translate: 'Айди тура'
+                },
+                {
+                    type: 'object',
+                    prop: 
+                    [
+                        {
+                            type: 'date',
+                            prop: 'date',
+                            translate: 'Дата'
+                        },
+                        {
+                            type: 'time',
+                            prop: 'time',
+                            translate: 'Время'
+                        }
+                    ],
+                    title: 'timetable_departure',
+                    translate: 'Начало тура'
+                },
+                {
+                    type: 'number',
+                    prop: 'tickets',
+                    translate: 'Кол-во билетов'
+                },
+                {
+                    type: 'number',
+                    prop: 'price',
+                    translate: 'Цена'
+                },
                 {
                     type: 'combobox',
                     prop: 'status',
+                    translate: 'Статус заказа',
                     items: [ 'Не оплаченно', 'Оплаченно половины суммы', 'Заказ оплачен' ]
                 }
             ],
-            title: 'tours_orders'
+            title: 'tours_orders',
+            translate: 'Заказы туров'
         },
         {
             type: 'massive',
             prop:
             [
-                GetField('OtherId', 'id_tour', undefined, 'tours'),
-                GetField('OtherId', 'id_manager', undefined, 'managers'),
-                GetField('object',
-                [
-                    GetField('date', 'date'),
-                    GetField('time', 'time'),
-                ], 'timetable_departure'),
-                //
-                GetField('number', 'tickets'),
-                GetField('number', 'price')
-            ],
-            title: 'history_tours_orders'
-        },
-        {
-            type: 'massive',
-            prop:
-            [
-                GetField('OtherId', 'id_relax', undefined, 'relax'),
-                //Copy object instead of create reference, this method increase speed, but add unnecesseary data
-                //object rooms
-                GetField('object',
-                [
-                    GetField('string', 'category'),
-                    GetField('object', 
+                {
+                    type: 'OtherId',
+                    prop: 'id_tour',
+                    ref: 'tours',
+                    translate: 'Айди тура'
+                },
+                {
+                    type: 'OtherId',
+                    prop: 'id_manager',
+                    ref: 'managers',
+                    translate: 'Айди менеджера'
+                },
+                {
+                    type: 'object',
+                    prop: 
                     [
-                        GetField('object',
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'seats'),
-                    ], 'number_of'),
-                    GetField('string', 'corpus'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'usual'),
-                        GetField('number', 'on_weekends'),
-                        GetField('object', 
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'extra')
-                    ], 'prices'),
-                    GetField('boolean', 'pets'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'bb'),
-                        GetField('number', 'hb'),
-                        GetField('number', 'fb'),
+                        {
+                            type: 'date',
+                            prop: 'date',
+                            translate: 'Дата'
+                        },
+                        {
+                            type: 'time',
+                            prop: 'time',
+                            translate: 'Время'
+                        }
                     ],
-                    'prices_of_food'),
-                    GetField('string', 'image'),
-                ], 'room'),
-                //
-                GetField('object',
-                [
-                    GetField('number', 'adult'),
-                    GetField('number', 'child'),
-                    GetField('object', 
+                    title: 'timetable_departure',
+                    translate: 'Начало тура'
+                },
+                {
+                    type: 'number',
+                    prop: 'tickets',
+                    translate: 'Кол-во билетов'
+                },
+                {
+                    type: 'number',
+                    prop: 'price',
+                    translate: 'Цена'
+                }
+            ],
+            title: 'history_tours_orders',
+            translate: 'История заказов туров'
+        },
+        {
+            type: 'massive',
+            prop:
+            [
+                {
+                    type: 'OtherId',
+                    prop: 'id_relax',
+                    ref: 'relax',
+                    translate: 'Айди отдыха'
+                },
+                {
+                    type: 'object',
+                    prop:
                     [
-                        GetField('boolean', 'adult'),
-                        GetField('boolean', 'child')
-                    ], 'extra')
-                ], 'number_of'),
+                        {
+                            type: 'string',
+                            prop: 'category',
+                            translate: 'Тип комнаты'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Для взрослых'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Для детей'
+                                        }
+                                    ],
+                                    title: 'seats',
+                                    translate: 'Мест в комнате'
+                                }
+                            ],
+                            title: 'number_of',
+                            translate: 'Кол-во'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'corpus',
+                            translate: 'Корпус'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'number',
+                                    prop: 'usual',
+                                    translate: 'По будням'
+                                },
+                                {
+                                    type: 'number',
+                                    prop: 'on_weekends',
+                                    translate: 'По выходным'
+                                },
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Взрослому'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Ребенку'
+                                        }
+                                    ],
+                                    title: 'extra',
+                                    translate: 'За дополнительное место'
+                                },
+                            ],
+                            title: 'prices',
+                            translate: 'Цены'
+                        },
+                        {
+                            type: 'boolean',
+                            prop: 'pets',
+                            translate: 'Разрешены домашние питомцы'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                GetField('number', 'bb'),
+                                GetField('number', 'hb'),
+                                GetField('number', 'fb'),
+                            ],
+                            title: 'prices_of_food',
+                            translate: 'Цена за питание'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'image',
+                            translate: 'Изображение'
+                        }
+                    ],
+                    title: 'room',
+                    translate: 'Номер'
+                },
+                {
+                    type: 'object',
+                    prop: 
+                    [
+                        {
+                            type: 'number',
+                            prop: 'adult',
+                            translate: 'Взрослых'
+                        },
+                        {
+                            type: 'number',
+                            prop: 'child',
+                            translate: 'Детей'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'boolean',
+                                    prop: 'adult',
+                                    translate: 'Для взрослого'
+                                },
+                                {
+                                    type: 'boolean',
+                                    prop: 'child',
+                                    translate: 'Для ребенка'
+                                }
+                            ],
+                            title: 'extra',
+                            translate: 'Дополнительное место'
+                        },
+                    ],
+                    title: 'number_of',
+                    translate: 'Кол-во'
+                },
                 {
                     type: 'combobox',
                     prop: 'type_of_food',
+                    translate: 'Тип питания',
                     items: [ 'bb', 'hb', 'fb']
                 },
-                GetField('date', 'date_arrival'),
-                GetField('date', 'date_leave'),
-                GetField('number', 'price'),
+                {
+                    type: 'date',
+                    prop: 'date_arrival',
+                    translate: 'Дата заезда'
+                },
+                {
+                    type: 'date',
+                    prop: 'date_leave',
+                    translate: 'Дата выезда'
+                },
+                {
+                    type: 'number',
+                    prop: 'price',
+                    translate: 'Цена'
+                },
                 {
                     type: 'combobox',
                     prop: 'status',
+                    translate: 'Статус заказа',
                     items: [ 'Не оплаченно', 'Оплаченно половины суммы', 'Заказ оплачен' ]
                 }
             ],
-            title: 'relax_orders'
+            title: 'relax_orders',
+            translate: 'Заказы санаториев и пансионатов'
         },
         {
             type: 'massive',
             prop:
             [
-                GetField('OtherId', 'id_relax', undefined, 'relax'),
-                GetField('OtherId', 'id_manager', undefined, 'managers'),
-                //Copy object instead of create reference, this method increase speed, but add unnecesseary data
-                //object rooms
-                GetField('object',
-                [
-                    GetField('string', 'category'),
-                    GetField('object', 
+                ////////////////////////
+                {
+                    type: 'OtherId',
+                    prop: 'id_relax',
+                    ref: 'relax',
+                    translate: 'Айди отдыха'
+                },
+                {
+                    type: 'OtherId',
+                    prop: 'id_manager',
+                    ref: 'relax',
+                    translate: 'Айди менеджера'
+                },
+                {
+                    type: 'object',
+                    prop:
                     [
-                        GetField('object',
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'seats'),
-                    ], 'number_of'),
-                    GetField('string', 'corpus'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'usual'),
-                        GetField('number', 'on_weekends'),
-                        GetField('object', 
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'extra')
-                    ], 'prices'),
-                    GetField('boolean', 'pets'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'bb'),
-                        GetField('number', 'hb'),
-                        GetField('number', 'fb'),
+                        {
+                            type: 'string',
+                            prop: 'category',
+                            translate: 'Тип комнаты'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Для взрослых'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Для детей'
+                                        }
+                                    ],
+                                    title: 'seats',
+                                    translate: 'Мест в комнате'
+                                }
+                            ],
+                            title: 'number_of',
+                            translate: 'Кол-во'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'corpus',
+                            translate: 'Корпус'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'number',
+                                    prop: 'usual',
+                                    translate: 'По будням'
+                                },
+                                {
+                                    type: 'number',
+                                    prop: 'on_weekends',
+                                    translate: 'По выходным'
+                                },
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Взрослому'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Ребенку'
+                                        }
+                                    ],
+                                    title: 'extra',
+                                    translate: 'За дополнительное место'
+                                },
+                            ],
+                            title: 'prices',
+                            translate: 'Цены'
+                        },
+                        {
+                            type: 'boolean',
+                            prop: 'pets',
+                            translate: 'Разрешены домашние питомцы'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                GetField('number', 'bb'),
+                                GetField('number', 'hb'),
+                                GetField('number', 'fb'),
+                            ],
+                            title: 'prices_of_food',
+                            translate: 'Цена за питание'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'image',
+                            translate: 'Изображение'
+                        }
                     ],
-                    'prices_of_food'),
-                    GetField('string', 'image'),
-                ], 'room'),
-                //
-                GetField('object',
-                [
-                    GetField('number', 'adult'),
-                    GetField('number', 'child'),
-                    GetField('object', 
+                    title: 'room',
+                    translate: 'Номер'
+                },
+                {
+                    type: 'object',
+                    prop: 
                     [
-                        GetField('boolean', 'adult'),
-                        GetField('boolean', 'child')
-                    ], 'extra')
-                ], 'number_of'),
+                        {
+                            type: 'number',
+                            prop: 'adult',
+                            translate: 'Для взрослых'
+                        },
+                        {
+                            type: 'number',
+                            prop: 'child',
+                            translate: 'Для детей'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'boolean',
+                                    prop: 'adult',
+                                    translate: 'Для взрослого'
+                                },
+                                {
+                                    type: 'boolean',
+                                    prop: 'child',
+                                    translate: 'Для ребенка'
+                                }
+                            ],
+                            title: 'extra',
+                            translate: 'Есть ли дополнительные'
+                        },
+                    ],
+                    title: 'number_of',
+                    translate: 'Кол-во мест'
+                },
                 {
                     type: 'combobox',
                     prop: 'type_of_food',
+                    translate: 'Тип питания',
                     items: [ 'bb', 'hb', 'fb']
                 },
-                GetField('date', 'date_arrival'),
-                GetField('date', 'date_leave'),
-                GetField('number', 'price')
+                {
+                    type: 'date',
+                    prop: 'date_arrival',
+                    translate: 'Дата заезда'
+                },
+                {
+                    type: 'date',
+                    prop: 'date_leave',
+                    translate: 'Дата выезда'
+                },
+                {
+                    type: 'number',
+                    prop: 'price',
+                    translate: 'Цена'
+                }
             ],
-            title: 'history_relax_orders'
+            title: 'history_relax_orders',
+            translate: 'История заказов санаторие и пансионатов'
         },
         {
             type: 'massive',
             prop:
             [
-                GetField('OtherId', 'id_cruise', undefined, 'cruises'),
                 //Copy object instead of create reference, this method increase speed, but add unnecesseary data
-                //object room
-                GetField('object',
-                [
-                    GetField('string', 'category'),
-                    GetField('object', 
+                //////////////////////////
+                {
+                    type: 'OtherId',
+                    prop: 'id_cruise',
+                    ref: 'cruises',
+                    translate: 'Айди круиза'
+                },
+                {
+                    type: 'object',
+                    prop:
                     [
-                        GetField('object',
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'seats')
-                    ], 'number_of'),
-                    GetField('string', 'corpus'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'usual'),
-                        GetField('object', 
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'extra')
-                    ], 'prices'),
-                    GetField('boolean', 'pets'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'bb'),
-                        GetField('number', 'hb'),
-                        GetField('number', 'fb'),
+                        {
+                            type: 'string',
+                            prop: 'category',
+                            translate: 'Тип каюты'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Для взрослых'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Для детей'
+                                        }
+                                    ],
+                                    title: 'seats',
+                                    translate: 'Мест в каюте'
+                                }
+                            ],
+                            title: 'number_of',
+                            translate: 'Кол-во'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'corpus',
+                            translate: 'Палуба'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'number',
+                                    prop: 'usual',
+                                    translate: 'Стандартная'
+                                },
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Взрослому'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Ребенку'
+                                        }
+                                    ],
+                                    title: 'extra',
+                                    translate: 'За дополнительное место'
+                                },
+                            ],
+                            title: 'prices',
+                            translate: 'Цены'
+                        },
+                        {
+                            type: 'boolean',
+                            prop: 'pets',
+                            translate: 'Разрешены домашние питомцы'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                GetField('number', 'bb'),
+                                GetField('number', 'hb'),
+                                GetField('number', 'fb'),
+                            ],
+                            title: 'prices_of_food',
+                            translate: 'Цена за питание'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'image',
+                            translate: 'Изображение'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'date',
+                                    prop: 'date',
+                                    translate: 'Дата'
+                                },
+                                {
+                                    type: 'time',
+                                    prop: 'time',
+                                    translate: 'Время'
+                                }
+                            ],
+                            title: 'timetable_departure',
+                            translate: 'Начало круиза'
+                        }
                     ],
-                    'prices_of_food'),
-                    GetField('string', 'image'),
-                    //Instead of InnerId copy object
-                    GetField('object',
+                    title: 'room',
+                    translate: 'Каюта'
+                },
+                {
+                    type: 'object',
+                    prop: 
                     [
-                        GetField('date', 'date'),
-                        GetField('time', 'time'),
-                    ], 'timetable_departure'),
-                ], 'room'),
-                //
-                GetField('object',
-                [
-                    GetField('number', 'adult'),
-                    GetField('number', 'child'),
-                    GetField('object', 
-                    [
-                        GetField('boolean', 'adult'),
-                        GetField('boolean', 'child')
-                    ], 'extra')
-                ], 'number_of'),
+                        {
+                            type: 'number',
+                            prop: 'adult',
+                            translate: 'Для взрослых'
+                        },
+                        {
+                            type: 'number',
+                            prop: 'child',
+                            translate: 'Для детей'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'boolean',
+                                    prop: 'adult',
+                                    translate: 'Для взрослого'
+                                },
+                                {
+                                    type: 'boolean',
+                                    prop: 'child',
+                                    translate: 'Для ребенка'
+                                }
+                            ],
+                            title: 'extra',
+                            translate: 'Есть ли дополнительные'
+                        },
+                    ],
+                    title: 'number_of',
+                    translate: 'Кол-во мест'
+                },
                 {
                     type: 'combobox',
                     prop: 'type_of_food',
+                    translate: 'Тип питания',
                     items: [ 'bb', 'hb', 'fb']
                 },
-                GetField('number', 'price'),
+                {
+                    type: 'number',
+                    prop: 'price',
+                    translate: 'Цена'
+                },
                 {
                     type: 'combobox',
                     prop: 'status',
-                    items: [ 'Полная оплата по карте', 'Оплата половины суммы', 'Оплата по прибытию' ]
+                    translate: 'Статус заказа',
+                    items: [ 'Не оплаченно', 'Оплаченно половины суммы', 'Заказ оплачен' ]
                 }
             ],
-            title: 'cruises_orders'
+            title: 'cruises_orders',
+            translate: 'Заказ круизов'
         },
         {
             type: 'massive',
             prop:
             [
-                GetField('OtherId', 'id_cruise', undefined, 'cruises'),
-                GetField('OtherId', 'id_manager', undefined, 'managers'),
                 //Copy object instead of create reference, this method increase speed, but add unnecesseary data
-                //object room
-                GetField('object',
-                [
-                    GetField('string', 'category'),
-                    GetField('object', 
+                //////////////////////////
+                {
+                    type: 'OtherId',
+                    prop: 'id_cruise',
+                    ref: 'cruises',
+                    translate: 'Айди круиза'
+                },
+                {
+                    type: 'OtherId',
+                    prop: 'id_manager',
+                    ref: 'managers',
+                    translate: 'Айди менеджера'
+                },
+                {
+                    type: 'object',
+                    prop:
                     [
-                        GetField('object',
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'seats')
-                    ], 'number_of'),
-                    GetField('string', 'corpus'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'usual'),
-                        GetField('object', 
-                        [
-                            GetField('number', 'adult'),
-                            GetField('number', 'child')
-                        ], 'extra')
-                    ], 'prices'),
-                    GetField('boolean', 'pets'),
-                    GetField('object', 
-                    [
-                        GetField('number', 'bb'),
-                        GetField('number', 'hb'),
-                        GetField('number', 'fb'),
+                        {
+                            type: 'string',
+                            prop: 'category',
+                            translate: 'Тип каюты'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Для взрослых'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Для детей'
+                                        }
+                                    ],
+                                    title: 'seats',
+                                    translate: 'Мест в каюте'
+                                }
+                            ],
+                            title: 'number_of',
+                            translate: 'Кол-во'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'corpus',
+                            translate: 'Палуба'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'number',
+                                    prop: 'usual',
+                                    translate: 'Стандартная'
+                                },
+                                {
+                                    type: 'object',
+                                    prop: 
+                                    [
+                                        {
+                                            type: 'number',
+                                            prop: 'adult',
+                                            translate: 'Взрослому'
+                                        },
+                                        {
+                                            type: 'number',
+                                            prop: 'child',
+                                            translate: 'Ребенку'
+                                        }
+                                    ],
+                                    title: 'extra',
+                                    translate: 'За дополнительное место'
+                                },
+                            ],
+                            title: 'prices',
+                            translate: 'Цены'
+                        },
+                        {
+                            type: 'boolean',
+                            prop: 'pets',
+                            translate: 'Разрешены домашние питомцы'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                GetField('number', 'bb'),
+                                GetField('number', 'hb'),
+                                GetField('number', 'fb'),
+                            ],
+                            title: 'prices_of_food',
+                            translate: 'Цена за питание'
+                        },
+                        {
+                            type: 'string',
+                            prop: 'image',
+                            translate: 'Изображение'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'date',
+                                    prop: 'date',
+                                    translate: 'Дата'
+                                },
+                                {
+                                    type: 'time',
+                                    prop: 'time',
+                                    translate: 'Время'
+                                }
+                            ],
+                            title: 'timetable_departure',
+                            translate: 'Начало круиза'
+                        }
                     ],
-                    'prices_of_food'),
-                    GetField('string', 'image'),
-                    //Instead of InnerId copy object
-                    GetField('object',
+                    title: 'room',
+                    translate: 'Каюта'
+                },
+                {
+                    type: 'object',
+                    prop: 
                     [
-                        GetField('date', 'date'),
-                        GetField('time', 'time'),
-                    ], 'timetable_departure'),
-                ], 'room'),
-                //
-                GetField('object',
-                [
-                    GetField('number', 'adult'),
-                    GetField('number', 'child'),
-                    GetField('object', 
-                    [
-                        GetField('boolean', 'adult'),
-                        GetField('boolean', 'child')
-                    ], 'extra')
-                ], 'number_of'),
+                        {
+                            type: 'number',
+                            prop: 'adult',
+                            translate: 'Для взрослых'
+                        },
+                        {
+                            type: 'number',
+                            prop: 'child',
+                            translate: 'Для детей'
+                        },
+                        {
+                            type: 'object',
+                            prop: 
+                            [
+                                {
+                                    type: 'boolean',
+                                    prop: 'adult',
+                                    translate: 'Для взрослого'
+                                },
+                                {
+                                    type: 'boolean',
+                                    prop: 'child',
+                                    translate: 'Для ребенка'
+                                }
+                            ],
+                            title: 'extra',
+                            translate: 'Есть ли дополнительные'
+                        },
+                    ],
+                    title: 'number_of',
+                    translate: 'Кол-во мест'
+                },
                 {
                     type: 'combobox',
                     prop: 'type_of_food',
+                    translate: 'Тип питания',
                     items: [ 'bb', 'hb', 'fb']
                 },
-                GetField('number', 'price')
+                {
+                    type: 'number',
+                    prop: 'price',
+                    translate: 'Цена'
+                }
             ],
-            title: 'history_cruises_orders'
+            title: 'history_cruises_orders',
+            translate: 'История заказов круизов'
         },
     ],
     'managers': [
-        GetField('ObjectId', '_id'),
+        {
+            type: 'ObjectId',
+            prop: '_id',
+            translate: 'Айди',
+            hint: 'Идентификатор объекта'
+        },
         //Authorization
         {
             type: 'string',
             prop: 'login',
+            translate: 'Логин',
             secret: true
         },
         {
             type: 'string',
             prop: 'password',
+            translate: 'Пароль',
             secret: true
         },
         //
-        GetField('string', 'name'),
-        GetField('string', 'surname'),
-        GetField('string', 'middle_name'),
-        GetField('string', 'email'),
-        GetField('string', 'telephone'),
+        {
+            type: 'string',
+            prop: 'name',
+            translate: 'Имя'
+        },
+        {
+            type: 'string',
+            prop: 'surname',
+            translate: 'Фамилия'
+        },
+        {
+            type: 'string',
+            prop: 'middle_name',
+            translate: 'Отчество'
+        },
+        {
+            type: 'string',
+            prop: 'email',
+            translate: 'Электронная почта'
+        },
+        {
+            type: 'string',
+            prop: 'telephone',
+            translate: 'Телефон'
+        },
         {
             type: 'combobox',
             prop: 'gender',
+            translate: 'Пол',
             items: [ 'Мужской', 'Женский' ]
         }
     ]
@@ -1377,5 +2113,101 @@ db.managers.insertOne(
     gender: 'Мужской'
 });
 //
-db.countries.insertOne({ name: 'Россия', description: 'Описание великой и ужасной' });
-// db.localities.insertOne({ name: 'Санкт-Петебург', description: 'Самый красивый город нашей страный' });
+// db.countries.insertOne({ name: 'Россия', description: 'Описание великой и ужасной' });
+// //
+// const country = db.countries.findOne();
+// db.localities.insertOne(
+// {
+//     name: 'Санкт-Петербург',
+//     description: 'Наш замечательный город',
+//     id_country: new DBRef('countries', ObjectId(country._id))
+// });
+// const locality = db.localities.findOne();
+// const user = db.user.findOne();
+// const manager = db.user.findOne();
+// //
+// db.relax.insertOne(
+// {
+//     name: 'Белые ночи',
+//     description: 'Санаторий предлагает своим пациентам не только комплексную медицинскую помощь, комфортное размещение, индивидуальный подход и качественное обслуживание, но и разнообразное, вкусное и полезное питание, разработанное специалистами отделения диетологии санатория.',
+//     id_locality: new DBRef('localities', ObjectId(locality._id)),
+//     type: 'Санаторий',
+//     services:
+//     {
+//         available: [
+//             {
+//                 id: 0,
+//                 icon: 'glass',
+//                 text: 'Алкоголь'
+//             }
+//         ],
+//         common: [
+//             {
+//                 id: 0,
+//                 icon: 'glass',
+//                 text: 'Алкоголь'
+//             }
+//         ],
+//         rooms: [
+//             {
+//                 id: 0,
+//                 icon: 'glass',
+//                 text: 'Алкоголь'
+//             }
+//         ]
+//     },
+//     stars: 4,
+//     images: [
+//         {
+//             src: 'http://rusnka.ru/wp-content/uploads/2018/06/22.jpg',
+//             id: 0
+//         }
+//     ],
+//     rooms: [
+//         {
+//             id: 0,
+//             category: 'Комфорт',
+//             number_of: 
+//             {
+//                 seats:
+//                 {
+//                     adult: 2,
+//                     child: 1
+//                 },
+//                 rooms: 
+//                 {
+//                     available: 50,
+//                     occupied: 0
+//                 }
+//             },
+//             corpus: 'Главный',
+//             prices: 
+//             {
+//                 usual: 15000,
+//                 on_weekends: 17500,
+//                 extra: 
+//                 {
+//                     adult: 1000,
+//                     child: 1500
+//                 }
+//             },
+//             pets: false,
+//             prices_of_food:
+//             {
+//                 bb: 0,
+//                 hb: 100,
+//                 fb: 150
+//             },
+//             image: 'https://www.spa-kluchi.ru/upload/iblock/945/9459b379fa4860d2dfeeabc4c57a3c4d.jpg'
+//         }
+//     ],
+//     adress: 'Народная 46',
+//     points: 
+//     {
+//         x: 59,
+//         y: 49
+//     },
+//     comments: []
+// });
+
+

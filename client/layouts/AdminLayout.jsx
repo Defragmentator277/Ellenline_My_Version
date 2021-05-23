@@ -1,23 +1,25 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { useCookies } from 'react-cookie';
 import Head from 'next/head';
+import { parseCookies, setCookie } from 'nookies';
 //
 import AdminHeader from '../components/CommonAdmin/Header/AdminHeader.jsx';
+import Notification from '../components/Common/Notification/Notification.jsx';
 import ModalWindow from '../components/Common/ModalWindow/ModalWindow.jsx';
 //
 import Global from '../pages/global.js';
 import classes from './AdminLayout.module.scss';
-//Контекст
-import { AccountContextComponent } from './AdminLayoutContext.js';
 
 const AdminLayout = (props) => {
     const title = props.title || 'Эллинлайн';
     const [window, setWindow] = useState();
-    const [AccountContext, setAccountContext] = useState();
-    // const [cookies, setCookie, removeCookie] = useCookies(['account']);
+    const [notification, setNotification] = useState();
+    const cookies = parseCookies();
+    //
+    const account_worker = Global.getCookie(cookies, 'account_worker');
+    console.log(account_worker);
 
     function CheckAccount() {
-        function OnCloseModalWindow(e, value) {
+        function OnChaingeModalWindow(e, value) {
             const login = value.login;
             const password = value.password;
             if(value.role == 'Менеджер')
@@ -39,11 +41,15 @@ const AdminLayout = (props) => {
                 {
                     alert('Вы успешно авторизовались!');
                     res[0].role = role;
-                    setAccountContext(res[0]);
-                    setWindow();
+                    res = res[0];
+                    Global.setCookie(setCookie, 'account_worker', res, { path: '/' });
+                    setNotification({ preset: 'AdminPersonalAccount', text: `Добро пожаловать! ${res.name + ' ' + res.surname + ' ' + res.middle_name}` });
                 }
                 else
+                {
                     alert('Сотрудника с таким логином и паролем не существует!');
+                    location.reload();
+                }
             })
             .catch((err) => 
             {
@@ -56,31 +62,33 @@ const AdminLayout = (props) => {
             });
         }
         //
-        if(!AccountContext || 
-            (AccountContext.role != 'admins' && AccountContext.role != 'managers'))
+        if(!account_worker)
             setWindow(
             {
                 title: 'Авторизируйтесь',
                 preset: 'AdminAuthorization',
                 buttons: { close: false },
                 modal_overlay: classes.modal_overlay,
-                onClose: OnCloseModalWindow
+                onChainge: OnChaingeModalWindow
             });
         else
         {
             //Запрос во избежании несоотвествия данных
             //...
-            fetch(`${Global.url}/api/authentication?login=${AccountContext.login}&password=${AccountContext.password}&type_of_users=${AccountContext.role}`, { method: 'POST' })
+            fetch(`${Global.url}/api/authentication?login=${account_worker.login}&password=${account_worker.password}&type_of_users=${account_worker.role}`, { method: 'POST' })
             .then((res) => {
                 console.log('Успех!');
                 return res.json();
             })
             .then((res) => {
                 res = res[0];
-                if(!res)
-                    throw new Error();
+                if(res)
+                {
+                    Global.setCookie(setCookie, 'account_worker', { ...res, role: account_worker.role }, { path: '/' });
+                    setNotification({ preset: 'AdminPersonalAccount', text: `Добро пожаловать! ${res.name + ' ' + res.surname + ' ' + res.middle_name}` });
+                }
                 //
-                setAccountContext({ ...res, role: AccountContext.role });
+                // setAccountContext({ ...res, role: AccountContext.role });
             })
             .catch((err) => {
                 console.log('Ошибка!');
@@ -88,7 +96,8 @@ const AdminLayout = (props) => {
             })
             .catch((err) => {
                 console.log(err);
-                setAccountContext(undefined);
+                // setAccountContext(undefined);
+                Global.setCookie(setCookie, 'account_worker', 'undefined', { path: '/' });
             })
         }
     }
@@ -99,7 +108,11 @@ const AdminLayout = (props) => {
     }, [])
     
     function GenerateContent() {
-        return AccountContext ? <AccountContextComponent.Provider value={[AccountContext, setAccountContext]}>
+        function GenerateNotification() {
+            return notification ? <Notification {...notification}>{notification.text}</Notification> : '';
+        }
+
+        return account_worker ? <>
             <Head>
                 <title>{title}</title>
             </Head>
@@ -107,11 +120,12 @@ const AdminLayout = (props) => {
             <main className={classes.main}>
                 {props.children}
             </main>
-        </AccountContextComponent.Provider> : '';
+            {GenerateNotification()}
+        </> : '';
     }
 
     function GenerateModalWindow() {
-        return window ? <ModalWindow {...window}/> : '';
+        return window ? <ModalWindow {...window} onClose={() => setWindow()}/> : '';
     }
 
     return (

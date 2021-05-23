@@ -31,7 +31,9 @@ const Type = (props) => {
 
         //Из ключей создается массив колоннок
         const columns = struct.map((element) => {
-            if(element.title)// && (element.type == 'object' || element.type == 'massive'))
+            if(element.translate)
+                return element.translate
+            else if(element.title)
                 return element.title;
             else
                 return element.prop;
@@ -41,6 +43,7 @@ const Type = (props) => {
         function GenerateRows() {
             //По клику на клетку запоминает последний айди
             let last_id;
+            //GLOBAl
             //Конвертирование элемента для модального окна
             function ConvertToFieldsAddButton(element) {
                 switch(element.type)
@@ -56,7 +59,9 @@ const Type = (props) => {
                                 title: 'Добавить',
                                 fields: element.prop.map((element) => ConvertToFieldsAddButton(element))
                             },
-                            title: element.title
+                            title: element.title,
+                            translate: element.translate,
+                            min: element.min
                         };
                     //В случаи массива или объекта
                     case 'object':
@@ -65,7 +70,9 @@ const Type = (props) => {
                             return {
                                 type: 'object',
                                 prop: prop.map((element) => ConvertToFieldsAddButton(element)),
-                                title: element.title
+                                title: element.title,
+                                translate: element.translate,
+                                min: element.min
                             };
                         else
                             //В случаи если это объект рекурсивно добираемся до свойств
@@ -427,9 +434,14 @@ const Type = (props) => {
                             const array_path = path.concat(elem_struct.title).join('.');
                             //
                             array.forEach((element, index) => {
-    
+                                
                                 function OnClickRemoveButton(e) {
                                     e.preventDefault();
+                                    if(array.length == 1)
+                                    {
+                                        alert('Запрещено удалять первый элемент массива!');
+                                        return;
+                                    }
                                     const object = { key: array_path, new_value: element.id };
                                     fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`)
                                     .then((res) => 
@@ -456,11 +468,8 @@ const Type = (props) => {
                                 function ConvertElementOfArray() {
                                     return ConvertVariable(
                                         { [elem_struct.title]: element }, 
-                                        { 
-                                            type: 'object', 
-                                            prop: elem_struct.prop, 
-                                            title: elem_struct.title
-                                        }, path.concat(element.id));
+                                        { ...elem_struct, type: 'object', }, 
+                                        path.concat(element.id));
                                 }
                                 //
                                 content.push(<div className={classes.item}>
@@ -497,7 +506,6 @@ const Type = (props) => {
                                 {
                                     console.log(err);
                                 });
-                                return;
                             }
                             const new_id = this_id;
                             //
@@ -518,15 +526,17 @@ const Type = (props) => {
                             const new_object = object[elem_struct.title];
                             //
                             elem_struct.prop.forEach((element) => {
-                                let title;
-                                if(element.title)
-                                    title = element.title;
-                                else
-                                    title = element.prop;
+                                // let title = ;
+                                // if(element.translate)
+                                //     title = elem
+                                // if(element.title)
+                                //     title = element.title;
+                                // else
+                                //     title = element.prop;
                                 //
                                 content.push(<>
                                     <div className={classes.text}>
-                                        {Global.FirstLetter(title)}:
+                                        {Global.FirstLetter(element.translate || element.title || element.prop)}:
                                     </div>
                                     <div className={classes.content}>
                                         {ConvertVariable(new_object, element, path.concat(elem_struct.title))}
@@ -550,7 +560,7 @@ const Type = (props) => {
                             });
                         }
                         //
-                        return <button onClick={(e) => OpenModalButton(e, content, elem_struct.title)}>
+                        return <button onClick={(e) => OpenModalButton(e, content, elem_struct.translate || elem_struct.title)}>
                             Открыть
                         </button>;
                     }

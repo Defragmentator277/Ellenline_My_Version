@@ -21,88 +21,106 @@
     "AdminRegistration": [
         {
             "type": "string",
-            "prop": "login"
+            "prop": "login",
+            "translate": "Логин"
         },
         {
             "type": "string",
             "prop": "password",
+            "translate": "Пароль",
             "secret": true
         },
         {
             "type": "string",
             "prop": "repeat_password",
+            "translate": "Повторите пароль",
             "secret": true
         },
         {
             "type": "string",
+            "translate": "Имя",
             "prop": "name"
         },
         {
             "type": "string",
+            "translate": "Фамилия",
             "prop": "surname"
         },
         {
             "type": "string",
+            "translate": "Отчетсво",
             "prop": "middle_name"
         },
         {
             "type": "string",
+            "translate": "Электронная почта",
             "prop": "email"
         },
         {
             "type": "string",
+            "translate": "Телефон",
             "prop": "telephone"
         },
         {
             "type": "combobox",
-            "prop": "role",
+            "prop": "gender",
             "items": [ "Мужской", "Женский" ]
         }
     ],
     "ClientAuthorization": [
         {
             "type": "string",
-            "prop": "login"
+            "prop": "login",
+            "translate": "Логин"
         },
         {
             "type": "string",
             "prop": "password",
+            "translate": "Пароль",
             "secret": true
         }
     ],
     "ClientRegistration": [
         {
             "type": "string",
-            "prop": "login"
+            "prop": "login",
+            "translate": "Логин"
         },
         {
             "type": "string",
             "prop": "password",
+            "translate": "Пароль",
             "secret": true
         },
         {
             "type": "string",
             "prop": "repeat_password",
+            "translate": "Повторите пароль",
             "secret": true
         },
         {
             "type": "string",
+            "translate": "Имя",
             "prop": "name"
         },
         {
             "type": "string",
+            "translate": "Фамилия",
             "prop": "surname"
         },
         {
             "type": "string",
+            "translate": "Отчетсво",
             "prop": "middle_name"
         },
         {
             "type": "string",
+            "translate": "Электронная почта",
             "prop": "email"
         },
         {
             "type": "string",
+            "translate": "Телефон",
             "prop": "telephone"
         },
         {
@@ -112,6 +130,7 @@
         },
         {
             "type": "string",
+            "translate": "Аватарка",
             "prop": "image"
         }
     ],
@@ -119,7 +138,16 @@
         {
             "type": "combobox",
             "prop": "payment",
-            "items": [ "Полная оплата по карте", "Оплата половины суммы", "Оплата по прибытию" ]
+            "translate": "Оплата",
+            "items": [ "Не оплаченно", "Оплаченно половины суммы", "Заказ оплачен" ]
+        }
+    ],
+    "PayInAdditionSelection": [
+        {
+            "type": "combobox",
+            "prop": "payment",
+            "translate": "Оплата",
+            "items": [ "Полная оплата по карте", "Оплата половины суммы" ]
         }
     ],
     "LeaveComment": [

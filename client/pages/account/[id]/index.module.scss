@@ -4,7 +4,7 @@
 {
     display: grid;
     padding: 20px 10px;
-    row-gap: 25px;
+    row-gap: 15px;
     
     .info, .greetings
     {
@@ -14,7 +14,6 @@
     .greetings
     {
         grid-column-start: 1;
-        // grid-column-end: 3;
 
         & > h1
         {
@@ -26,7 +25,7 @@
     .info
     {
         display: grid;
-        grid-template-columns: 1.25fr 1fr;
+        grid-template-columns: 1fr 1.5fr;
         grid-template-rows: auto auto;  
         column-gap: 5px;
         row-gap: 10px;
@@ -100,6 +99,8 @@
                 grid-column-end: 3;
 
                 display: grid;
+                grid-auto-columns: 1fr;
+                // grid-template-columns: repeat(2, 1fr);
                 grid-template-rows: 1fr;
                 column-gap: 10px;
 
@@ -129,6 +130,8 @@
                 padding: 10px;
                 column-gap: 10px;
                 row-gap: 15px;
+                //
+                margin-bottom: 25px;
 
                 h1, p
                 {
@@ -153,7 +156,6 @@
             {
                 grid-template-columns: 1.5fr 1fr;
                 grid-template-rows: auto auto;
-                margin-bottom: 25px;
 
 
                 .image

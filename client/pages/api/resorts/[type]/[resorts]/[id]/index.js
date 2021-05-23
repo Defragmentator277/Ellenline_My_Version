@@ -114,7 +114,7 @@ handler.get(async (req, res) => {
         ].concat(
         Global.GetLookupPipeline('comments', 'id_user', 'users', 'user'),
         
-            { $group: 
+            [{ $group: 
             {
                 _id: '$_id',
                 name: { $first: '$name' },
@@ -129,7 +129,7 @@ handler.get(async (req, res) => {
                 timetable: { $first: '$timetable' },
                 timetable_schedule: { $first: '$timetable_schedule' },
                 comments: { $push: '$comments' }
-            }}
+            }}]
         );
     }
     else if(type === 'relax')
@@ -169,7 +169,7 @@ handler.get(async (req, res) => {
             }},
         ].concat(
         Global.GetLookupPipeline('comments', 'id_user', 'users', 'user'),
-        { $group: 
+        [{ $group: 
         {
             _id: '$_id',
             name: { $first: '$name' },
@@ -183,13 +183,14 @@ handler.get(async (req, res) => {
             points: { $first: '$points' },
             rooms: { $first: '$rooms' },
             locality: { $first: '$locality' },
+            //
             comments: { $push: '$comments' }
-        }});;
+        }}]);
     }
     else
     {
         pipeline = [
-            { $match: { _id: ObjectId(id) } },
+            { $match: { _id: ObjectId(id) } }, 
             { $unwind: '$rooms'},
             //Где есть свободные места
             { $match: { 'rooms.number_of.rooms.available': { $gte: 1 } } },
@@ -207,7 +208,6 @@ handler.get(async (req, res) => {
                 name: { $first: '$name' },
                 adress: { $first: '$adress' },
                 description: { $first: '$description' },
-                stars: { $first: '$stars'},
                 images: { $first: '$images.src' },
                 services: { $first: '$services' },
                 //
@@ -244,27 +244,15 @@ handler.get(async (req, res) => {
                 as: 'info'
             }},
             { $unwind: '$info' },
-            //Get motorship info
-            { $unwind: '$motorship' },
-            { $match: { 'motorship.k': { $eq: '$id'} } },
-            { $set: { 'motorship': { $toObjectId: '$motorship.v' } } },
-            { $lookup:
-            {
-                from: 'motorships',
-                localField: 'motorship',
-                foreignField: '_id',
-                as: 'info'
-            }},
-            { $unwind: '$info' }
-        ].concat(
+        ]
+        .concat(
         Global.GetLookupPipeline('comments', 'id_user', 'users', 'user'),
-        { $group: 
+        [{ $group: 
         {
             _id: '$_id',
             name: { $first: '$name' },
             adress: { $first: '$adress' },
             description: { $first: '$description' },
-            stars: { $first: '$stars'},
             images: { $first: '$images' },
             services: { $first: '$services' },
             //
@@ -272,18 +260,25 @@ handler.get(async (req, res) => {
             points: { $first: '$points' },
             rooms: { $first: '$rooms' },
             timetable: { $first: '$timetable' },
-            timetable_schedule: { $first: '$timetable_departure'},
+            timetable_schedule: { $first: '$timetable_schedule'},
             motorship: { $first: '$motorship' },
             locality: { $first: '$locality' },
+            info: { $first: '$info' },
             //
             comments: { $push: '$comments' }
-        }});
+        }}]);
     }
     req.db.collection(type).aggregate(pipeline).toArray(
     (err, result) => {
+        result.forEach((element) => {
+            if(Object.keys(element.comments[0]).length == 0)  
+                element.comments = [];
+        });
+        //
         console.log("ON SERVER");
         console.log(err);
         console.log(result);
+        //
         if(err)
             res.json(err);
         else

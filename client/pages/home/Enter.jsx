@@ -1,30 +1,38 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 //
-import Services from './Services.jsx';
-import Advantages from './Advantages.jsx';
 import Reviews from './Reviews.jsx';
-import Clients from './Clients.jsx';
 import NemoTravel from './NemoTravel.jsx';
-import News from './News.jsx'
-import SpecOffers from './SpecOffers.jsx'
-
+import Comments from '../../components/Common/Comments/Comments.jsx';
 //
+import Global from '../global.js';
 import classes from './Enter.module.scss';
 
 // Стоит выделить Home в отдельный компонент в папку Home, вместе со стилями
-const Home = () => {
+const Home = (props) => {
+    const comments = props.comments;
+    //
+    console.log('COMMENTS');
+    console.log(comments);
 
     return (
         <div className={classes.home}>
             <NemoTravel/>
-            {/* <Services data={data.services}/>
-            <Advantages data={data.advantages}/> */}
-            <Reviews/>
-            {/* <Clients/> */}
-            <SpecOffers />
-            <News />
+
+            {/* <Reviews/> */}
+            {/* <SpecOffers />
+            <News /> */}
         </div>
     )
+}
+
+export async function getStaticProps(router) {
+    const comments = await(await fetch(`${Global.url}/api/getRandomComments`)).json();
+
+    return {
+        props: {
+            comments: comments
+        }
+    }
 }
 
 export default Home;

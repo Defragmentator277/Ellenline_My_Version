@@ -74,12 +74,14 @@ $start_width: 45px;
     i, p
     {
         color: $sub_color;
+        cursor: pointer;
     }
 
     & > i
     {
         z-index: inherit;
         position: absolute;
+        cursor: pointer;
         top: 50%;
         right: 0;
         padding: 0 $start_width / 8;
