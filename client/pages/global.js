@@ -144,7 +144,7 @@ export default class Global {
 
     static getCookie(name, json = true) {
         let matches;
-        if(typeof document !== undefined)
+        if(process.browser)
             matches = document.cookie.match(new RegExp(
             "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
             ));
@@ -189,7 +189,7 @@ export default class Global {
             }
         }
         //
-        if(typeof document !== undefined)
+        if(process.browser)
             document.cookie = updatedCookie;
         console.log(updatedCookie);
     }
