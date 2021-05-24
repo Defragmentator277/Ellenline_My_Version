@@ -3,9 +3,7 @@ import { AccountContextComponent } from '../layouts/ClientLayoutContext.js';
 import { CookiesProvider } from 'react-cookie';
 
 function MyApp({ Component, pageProps }) {
-  return <AccountContextComponent.Provider>
-    <Component {...pageProps} />
-  </AccountContextComponent.Provider>
+  return <Component {...pageProps} />;
 }
 
 export default MyApp

@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
-import { parseCookies, setCookie } from 'nookies';
 //
 import ClientLayout from '../../../layouts/ClientLayout.jsx';
 import ModalWindow from '../../../components/Common/ModalWindow/ModalWindow.jsx';
@@ -15,13 +14,10 @@ import classes from './index.module.scss';
 const Account = (props) => {
     const router = useRouter();
     const [window, setWindow] = useState();
-    const cookies = parseCookies();
     //
     const [user, setUser] = useState(props.user);
-    const [login, setLogin] = useState(props.login);
-    const [password, setPassword] = useState(props.password);
-
-    console.log(user);
+    const login = props.login;
+    const password = props.password;
 
     function OnChainge(e, value, prop) {
         user[prop] = value;
@@ -41,7 +37,7 @@ const Account = (props) => {
         .then((res) => {
             console.log(res);
             alert('Вы успешно изменили информацию о себе');
-            Global.setCookie(setCookie, 'account_user', user, { path: '/' });
+            Global.setCookie('account_user', { _id: user._id, login: user.login, password: user.password });
         })
         .catch((err) => {
             console.log('Ошибка!');
@@ -58,7 +54,7 @@ const Account = (props) => {
     }   
 
     function GenerateContent() {
-        const account_user = Global.getCookie(cookies, 'account_user');
+        const account_user = Global.getCookie('account_user');
         //
         if(account_user && 
            account_user.login == login && 

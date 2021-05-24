@@ -1,7 +1,12 @@
 @import './index.module.scss';
 
-.title
+.nemo_travel
 {
-    @extend %title;
-    margin: 25px auto;
+    padding: 10px 0;
+
+    .title
+    {
+        @extend %title;
+        margin: 25px auto;
+    }
 }

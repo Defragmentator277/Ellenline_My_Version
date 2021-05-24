@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react'; 
 import Head from 'next/head';
-import { parseCookies, setCookie } from 'nookies';
 //
 import Header from '../components/Common/Header/Header';
 import Footer from '../components/Common/Footer/Footer';
@@ -11,17 +10,13 @@ import Notification from '../components/Common/Notification/Notification.jsx';
 //
 import Global from '../pages/global.js';
 import classes from './ClientLayout.module.scss';
-//Контекст
-import {AccountContextComponent} from './ClientLayoutContext.js';
 
 const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
-    const cookies = parseCookies();
     const [notification, setNotification] = useState();
     // notification: { preset: ..., text }
-    const account_user = Global.getCookie(cookies, 'account_user');
+    const account_user = Global.getCookie('account_user');
 
-    console.log(notification);
-    console.log(cookies);
+    console.log(account_user);
 
     function CheckAccount() {
         //
@@ -43,11 +38,10 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
                 res = res[0];
                 if(res)
                 {
-                    Global.setCookie(setCookie, 'account_user', res, { path: '/' });
+                    Global.setCookie('account_user', { _id: res._id, login: res.login, password: res.password });
                     // setCookie(null, 'account_user', JSON.stringify({ _id: res.id, login: res.login, password: res.password }), { path: '/' });
                     // setAccountContext({...res});
                     //
-                    console.log('SETTTT');
                     setNotification({ preset: 'ClientPersonalAccount', text: `Добро пожаловать! ${res.name + ' ' + res.surname + ' ' + res.middle_name}`});
                 }
             })
@@ -57,7 +51,7 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
             })
             .catch((err) => {
                 console.log(err);
-                Global.setCookie(setCookie, 'account_user', 'undefined', { path: '/' });
+                Global.setCookie('account_user', 'undefined');
                 // setCookie(null, 'account_user', 'undefined', { path: '/' });
                 // setAccountContext();
                 //

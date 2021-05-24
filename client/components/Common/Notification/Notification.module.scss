@@ -8,6 +8,7 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
 .notification
 {
     @extend %border;
+    z-index: 1001;
     position: fixed;
     display: grid;
     grid-template-columns: min-content min-content;

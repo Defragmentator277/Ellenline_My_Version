@@ -19,7 +19,7 @@ handler.post(async (req, res) => {
             res.json(err);
         else
             res.json(result);
-    })
+    });
 
 });
 

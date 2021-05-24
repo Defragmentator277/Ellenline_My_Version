@@ -19,8 +19,6 @@ import classes from './index.module.scss';
 const Relax = (props) => {
     const type = props.type;
     const searchInfo = props.searchInfo;
-    // const [filters, setFilters] = useState({});
-    // let filters = {};
     //{ name:... , stars:... , country:... , locality:... , price: { min: ..., max:... } }
     //
     const convert = Global.GetConvert(type);

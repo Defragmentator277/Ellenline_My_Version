@@ -85,7 +85,10 @@ const InfoSection = (props) => {
                         <h2>от {price} руб.</h2>
                         <span>за человека</span>
                     </div>
-                    <Button value='Забронировать' className={classes.booking_btn} />
+                    <a className={classes.booking_btn} href='#form_booking'>
+                        Забронировать
+                    </a>
+                    {/* <Button value='Забронировать' onClick/> */}
                 </div>
                 <div className={classes.wallet}>
                     <i class="fa fa-credit-card" aria-hidden="true"></i>

@@ -1,6 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Head from 'next/head';
-import { parseCookies, setCookie } from 'nookies';
 //
 import AdminHeader from '../components/CommonAdmin/Header/AdminHeader.jsx';
 import Notification from '../components/Common/Notification/Notification.jsx';
@@ -13,9 +12,8 @@ const AdminLayout = (props) => {
     const title = props.title || 'Эллинлайн';
     const [window, setWindow] = useState();
     const [notification, setNotification] = useState();
-    const cookies = parseCookies();
     //
-    const account_worker = Global.getCookie(cookies, 'account_worker');
+    const account_worker = Global.getCookie('account_worker');
     console.log(account_worker);
 
     function CheckAccount() {
@@ -40,9 +38,9 @@ const AdminLayout = (props) => {
                 if(res[0])
                 {
                     alert('Вы успешно авторизовались!');
-                    res[0].role = role;
+                    // res[0].role = role;
                     res = res[0];
-                    Global.setCookie(setCookie, 'account_worker', res, { path: '/' });
+                    Global.setCookie('account_worker', { _id: res._id, login: res.login, password: res.password, role: role });
                     setNotification({ preset: 'AdminPersonalAccount', text: `Добро пожаловать! ${res.name + ' ' + res.surname + ' ' + res.middle_name}` });
                 }
                 else
@@ -84,10 +82,10 @@ const AdminLayout = (props) => {
                 res = res[0];
                 if(res)
                 {
-                    Global.setCookie(setCookie, 'account_worker', { ...res, role: account_worker.role }, { path: '/' });
+                    Global.setCookie('account_worker', { _id: res._id, login: res.login, password: res.password, role: account_worker.role });
                     setNotification({ preset: 'AdminPersonalAccount', text: `Добро пожаловать! ${res.name + ' ' + res.surname + ' ' + res.middle_name}` });
                 }
-                //
+                    
                 // setAccountContext({ ...res, role: AccountContext.role });
             })
             .catch((err) => {
@@ -97,7 +95,7 @@ const AdminLayout = (props) => {
             .catch((err) => {
                 console.log(err);
                 // setAccountContext(undefined);
-                Global.setCookie(setCookie, 'account_worker', 'undefined', { path: '/' });
+                Global.setCookie('account_worker', 'undefined');
             })
         }
     }
@@ -121,7 +119,9 @@ const AdminLayout = (props) => {
                 {props.children}
             </main>
             {GenerateNotification()}
-        </> : '';
+        </> : <Head>
+            <title>Авторизация</title>
+        </Head>;
     }
 
     function GenerateModalWindow() {

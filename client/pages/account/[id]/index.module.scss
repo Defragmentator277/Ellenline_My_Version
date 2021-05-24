@@ -18,7 +18,7 @@
         & > h1
         {
             margin: 5px 0;
-            font-size: 1.7em;
+            font-size: 2em;
         }
     }
 
@@ -56,7 +56,7 @@
         
             .input
             {
-                font-size: 0.75em;
+                font-size: 1em;
             }
         }
         
@@ -414,13 +414,26 @@
         }
     }
 }
-@media screen and (max-width: 768px)
+@media screen and (max-width: 600px)
 {
     .account
     {
         .info
         {
-            font-size: 1.25em;
+            .greetings
+            {
+                // & > h1
+                // {
+                //     font-size: 1.5em;
+                // }
+            }
+            .inputs
+            {
+                .input
+                {
+                    font-size: 1em;
+                }
+            }
         }
         //
         .orders,
@@ -436,15 +449,15 @@
                 .cruise
                 {
 
-                    h1
-                    {
-                        font-size: 1em;
-                    }
+                    // h1
+                    // {
+                    //     font-size: 1em;
+                    // }
 
-                    p
-                    {
-                        font-size: .8em;
-                    }
+                    // p
+                    // {
+                    //     font-size: .8em;
+                    // }
 
                 }
 
@@ -484,10 +497,10 @@
     .account
     {
 
-        .info, .greetings
-        {
-            font-size: 1em;
-        }
+        // .info, .greetings
+        // {
+        //     font-size: 1em;
+        // }
 
         .orders,
         .history_orders
@@ -497,8 +510,15 @@
             .relaxes,
             .cruises
             {
+                .tour,
                 .cruise,
-                .relax,
+                .relax
+                {
+                    column-gap: 0;
+                }
+
+                .cruise,
+                .relax
                 {
 
                     .title_relax,

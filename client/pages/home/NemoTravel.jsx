@@ -11,7 +11,7 @@ const NemoTravel = () => {
         });
     });
 
-    return <div>
+    return <div className={classes.nemo_travel}>
         <div className={classes.title}>
             <p>Поиск</p>
         </div>

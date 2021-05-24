@@ -12,8 +12,6 @@ import Global from '../../../../global.js';
 import classes from './index.module.scss';
 
 const Resort = (props) => {
-    console.log('ON CLIENT');
-    console.log(props.items);
     // return <></>;
     //
     const type = props.type;
@@ -92,6 +90,9 @@ const Resort = (props) => {
                 {GenerateTimetable()}
 
                 <Comments
+                classTitle={classes.title}
+                className={classes.comments}
+                max={4}
                 comments={comments}/>
 
                 {/* {GenerateMap()} */}

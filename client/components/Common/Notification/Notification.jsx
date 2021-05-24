@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react';
 import { useRouter } from 'next/router';
-import { parseCookies, setCookie } from 'nookies';
 //
 import ModalWindow from '../ModalWindow/ModalWindow.jsx';
 
@@ -8,11 +7,9 @@ import ModalWindow from '../ModalWindow/ModalWindow.jsx';
 import Global from '../../../pages/global.js';
 
 import classes from './Notification.module.scss';
-import Cookies from 'universal-cookie';
 
 const Notification = (props) => {
     const router = useRouter();
-    const cookies = parseCookies();
     //
     const children = props.children;
     const preset = props.preset;
@@ -52,9 +49,9 @@ const Notification = (props) => {
                                                 alert('Вы успешно авторизовались!');
                                                 // res[0].role = 'users';
                                                 const new_user = res[0];
+                                                Global.setCookie('account_user', { _id: new_user._id, login: new_user.login, password: new_user.password }, { path: '/' });
                                                 // setAccountContext({...new_user});
                                                 // setCookie(null, 'account_user', { _id: new_user._id, login: new_user.login, password: new_user.password }, { path: '/' });
-                                                Global.setCookie(setCookie, 'account_user', new_user, { path: '/' });
                                                 location.reload();
                                             }
                                             else
@@ -67,6 +64,7 @@ const Notification = (props) => {
                                         })
                                         .catch((err) => 
                                         {
+                                            alert('Ошибка! Авторизоваться не получилось!');
                                             console.log(err);
                                         });
                                     }
@@ -127,9 +125,9 @@ const Notification = (props) => {
                                                 alert('Вы успешно зарегистрировались');
                                                 // user.role = 'users';
                                                 user._id =  res.insertedId; 
+                                                Global.setCookie('account_user', { _id: user._id, login: user.login, password: user.password });
                                                 // setAccountContext(user);
                                                 // setCookie(null, 'account_user', JSON.stringify({ _id: user._id, login: user.login, password: user.password }), { path: '/' });
-                                                Global.setCookie(setCookie, 'account_user', user, { path: '/' });
                                                 location.reload();
                                             }
                                         })
@@ -150,16 +148,16 @@ const Notification = (props) => {
                         {
                             "text": "Войти в личный кабинет",
                             OnClick: (e) => {
-                                const account_user = Global.getCookie(cookies, 'account_user');
+                                const account_user = Global.getCookie('account_user');
                                 router.push(`/account/${account_user._id}`);//{ login: cookies.account.login, password: cookies.account.password });
                             }
                         },
                         {
                             "text": "Выйти",
                             OnClick: (e) => {
+                                Global.setCookie('account_user', 'undefined');
                                 // setAccountContext();
                                 // setCookie(null, 'account_user', 'undefined', { path: '/' });
-                                Global.setCookie(setCookie, 'account_user', 'undefined', { path: '/' });
                                 location.reload();
                             }
                         },
@@ -168,7 +166,7 @@ const Notification = (props) => {
                         {
                             "text": "Выйти",
                             OnClick: (e) => {
-                                Global.setCookie(setCookie, 'account_worker', 'undefined', { path: '/' });
+                                Global.setCookie('account_worker', 'undefined');
                                 location.reload();
                             } 
                         }

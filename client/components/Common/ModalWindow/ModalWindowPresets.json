@@ -126,6 +126,7 @@
         {
             "type": "combobox",
             "prop": "gender",
+            "translate": "Пол",
             "items": [ "Мужской", "Женский" ]
         },
         {

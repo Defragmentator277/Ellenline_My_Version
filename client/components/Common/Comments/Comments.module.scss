@@ -1,0 +1,12 @@
+@import '../../../styles/index.scss';
+
+.comments
+{
+    // padding: 5px 25px;
+
+    .content
+    {
+        display: grid;
+        row-gap: 10px;
+    }
+}

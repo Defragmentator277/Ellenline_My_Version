@@ -21,8 +21,8 @@ $start_width: 45px;
 
 .aside
 {
+    @extend %font;
     display: none;
-    // position: sticky;
     top: 10px;
     left: 0;
     bottom: 0;
@@ -30,6 +30,7 @@ $start_width: 45px;
     padding-left: 5px;
     width: $start_width;
     // background-color: $primary_color;
+    
     //
     transition: width $show_time $easing;
 

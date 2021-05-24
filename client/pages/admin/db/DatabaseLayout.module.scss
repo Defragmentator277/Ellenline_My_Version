@@ -3,9 +3,9 @@
 .main
 {
     display: grid;
-    height: 100%;
+    min-height: inherit;
     grid-template-columns: fit-content(0px) auto;
-    grid-template-rows: 1fr;
+    // grid-template-rows: 1fr;
     column-gap: 5px;
 
     .aside

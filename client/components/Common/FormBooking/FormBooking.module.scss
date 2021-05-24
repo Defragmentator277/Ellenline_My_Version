@@ -96,8 +96,10 @@
         .button
         {
             @extend %button;
+            @extend %font;
             padding: 5px;
             margin: 10px 0;
+            font-size: 1em;
         }
 
         .text

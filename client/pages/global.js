@@ -1,7 +1,9 @@
 import { DBRef, ObjectID } from 'bson';
+//
+import { getCookie, setCookie, deleteCookie } from 'cookielib';
 
 export default class Global {
-    static url = 'http://localhost:3000';
+    static url = 'http://192.168.1.34:3000';
 
     static resorts = {
         'relax': [ 'pensionats', 'sanatoriums' ],
@@ -142,42 +144,101 @@ export default class Global {
         }
     }
 
-    static getCookie(cookies, name) {
+    static getCookie(name, json = true) {
+        console.log('getCookie');
+        let matches = document.cookie.match(new RegExp(
+          "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+        ));
+        console.log(matches);
+        let res = matches ? decodeURIComponent(matches[1]) : undefined;
         try
         {
-            let res = JSON.parse(cookies[name]);
-            return Object.keys(res) == 0 ? undefined : res;
+            if(json)
+                return JSON.parse(res);
+            return res;
         }
         catch
         {
             return undefined;
         }
     }
+      
+    static setCookie(name, value, options = {}) {
+        console.log('setCookie');
+        //
+        if(typeof value === 'object')
+            value = JSON.stringify(value);
+        //
+        options = {
+            path: '/',
+            // add other defaults here if necessary
+            ...options
+        };
+        //
+        if (options.expires instanceof Date) {
+            options.expires = options.expires.toUTCString();
+        }
+        //
+        let updatedCookie = encodeURIComponent(name) + "=" + encodeURIComponent(value);
+        //
+        for (let optionKey in options) 
+        {
+            updatedCookie += "; " + optionKey;
+            let optionValue = options[optionKey];
+            if (optionValue !== true) 
+            {
+                updatedCookie += "=" + optionValue;
+            }
+        }
+        //
+        document.cookie = updatedCookie;
+        console.log(updatedCookie);
+    }
+      
+      
+    static deleteCookie(name) {
+        setCookie(name, "", {
+            'max-age': -1
+        })
+    }
 
-    static setCookie(setCookieThis, name, value, options = { path: '/' })
-    {
-        if(name == 'account_user')
-            setCookieThis(null, name, JSON.stringify({ _id: value._id, login: value.login, password: value.password }), options);
-        else if(name = 'account_worker')
-            setCookieThis(null, name, JSON.stringify({ _id: value._id, login: value.login, password: value.password, role: value.role}, options));
-        else
-            setCookieThis(null, name, value, options);
+    // static getCookie(cookies, name) {
+    //     console.log('getCookie');
+    //     let res = getCookie(name);
+    //     console.log(res);
+    //     return !res || Object.keys(res) == 0 ? undefined : res;
+    // }
+
+    // static setCookie(setCookieThis, name, value, options = { path: '/' })
+    // {
+    //     console.log('setCookie');
+    //     if(name == 'account_user')
+    //         setCookie(name, { _id: value._id, login: value.login, password: value.password }, options);
+    //         // setCookieThis(null, name, JSON.stringify({ _id: value._id, login: value.login, password: value.password }), options);
+    //     else if(name = 'account_worker')
+    //         setCookie(name, { _id: value._id, login: value.login, password: value.password, role: value.role }, options);
+    //         // setCookieThis(null, name, JSON.stringify({ _id: value._id, login: value.login, password: value.password, role: value.role}, options));
+    //     else
+    //         setCookie(name, value, options);
+    //         // setCookieThis(null, name, value, options);
+    //     console.log(getCookie(name, true));
+    // }
+
+    static CorrectArray(element, order) {
+        if(Object.keys(element[order][0]).length == 0)
+            element[order] = [];
     }
     
     static CorrectArraysOfOrders(array)
     {
-        function CorrectArray(element, order) {
-            if(Object.keys(element[order][0]).length == 0)
-                element[order] = [];
-        }
         //
         return array.map((element) => {
-            CorrectArray(element, 'tours_orders');
-            CorrectArray(element, 'relax_orders');
-            CorrectArray(element, 'cruises_orders');
-            CorrectArray(element, 'history_tours_orders');
-            CorrectArray(element, 'history_relax_orders');
-            CorrectArray(element, 'history_cruises_orders');
+            Global.CorrectArray(element, 'tours_orders');
+            Global.CorrectArray(element, 'relax_orders');
+            Global.CorrectArray(element, 'cruises_orders');
+            Global.CorrectArray(element, 'history_tours_orders');
+            Global.CorrectArray(element, 'history_relax_orders');
+            Global.CorrectArray(element, 'history_cruises_orders');
             //
             return element;
         });

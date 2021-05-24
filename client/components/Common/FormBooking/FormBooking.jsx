@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { parseCookies, setCookie } from 'nookies';
 //
 import SelectOption from '../../CustomElements/SelectOption.jsx';
 import InputText from '../../CustomElements/InputText.jsx';
@@ -11,16 +10,13 @@ import InputEmail from '../../CustomElements/InputEmail.jsx';
 import ChooseRoom from '../ChooseRoom/ChooseRoom.jsx';
 import ModalWindow from '../ModalWindow/ModalWindow.jsx';
 //
-import {AccountContextComponent} from '../../../layouts/ClientLayoutContext.js';
-//
 import Global from '../../../pages/global.js';
 import classes from './FormBooking.module.scss';
 
 const FormBooking = (props) => {
     /////////////////ALL
     //#region Variables
-    const cookies = parseCookies();
-    const account_user = Global.getCookie(cookies, 'account_user');
+    const account_user = Global.getCookie('account_user');
     const [window, setWindow] = useState();
     //
     const timetable = props.timetable;
@@ -339,10 +335,11 @@ const FormBooking = (props) => {
         function GenerateButtonOrText() {
             if(account_user)
             {
-                return <Button 
+                return <button 
                 className={classes.button} 
-                type='submit' 
-                value='Забронировать'/>;
+                type='submit'>
+                    Забронировать
+                </button>;
             }
             else
             {
@@ -501,7 +498,7 @@ const FormBooking = (props) => {
     }
 
     return(<>
-        <form className={classes.booking + ' ' + props.className} onSubmit={SubmitOnClick}>
+        <form id='form_booking' className={classes.booking + ' ' + props.className} onSubmit={SubmitOnClick}>
             {/* SEPARATOR */}
             {GenerateInfoGoing()}
             {/* SEPARATOR */}

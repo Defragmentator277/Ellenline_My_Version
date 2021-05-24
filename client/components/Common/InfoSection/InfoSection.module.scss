@@ -62,9 +62,13 @@
     
         .booking_btn
         {
+            @extend %font;
+            @extend %button;
             justify-self: center;
             height: fit-content;
             padding: 5px 15px;
+            font-size: 1.25em;
+            text-decoration: none;
         }
     
         h1, h2, button
@@ -161,19 +165,21 @@
 
     .title
     {
-        font-size: 1.5em;
+        font-size: 2em;
     }
 
     p
     {
         height: 15px;
+        font-size: 1em;
         overflow: hidden;
     }
 
     i
     {
         float: right;
-        font-size: 2em;
+        font-size: 2.5em;
+        margin: 5px;
         transition: transform .25s linear;
         &:hover
         {

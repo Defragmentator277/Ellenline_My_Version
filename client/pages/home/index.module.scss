@@ -49,3 +49,23 @@ $fontSizeTitleSection: 3em;
         font-size: 2em;
     }
 }
+
+
+.home
+{
+
+    .comments
+    {
+        // padding: 25px;
+
+        .title
+        {
+            @extend %title;
+        }
+
+        .content
+        {
+            padding: 25px;
+        }
+    }
+}

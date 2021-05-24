@@ -1,6 +1,5 @@
 import React from 'react';
 import { useRouter } from 'next/router';
-import { parseCookies, setCookie } from 'nookies';
 //
 import AdminLayout from '../../../layouts/AdminLayout.jsx';
 import ModalWindow from '../../../components/Common/ModalWindow/ModalWindow.jsx';
@@ -12,13 +11,12 @@ import classes from './index.module.scss';
 const Orders = (props) => {
     const payments = [ 'Не оплаченно', 'Оплаченно половины суммы', 'Заказ оплачен' ];
     const router = useRouter();
-    const cookies = parseCookies();
     //
     const orders = props.orders;
     console.log(orders);
     //
     function GenerateContent() {
-        const account_worker = Global.getCookie(cookies, 'account_worker');
+        const account_worker = Global.getCookie('account_worker');
         //
         function GenerateUser(user) {
 

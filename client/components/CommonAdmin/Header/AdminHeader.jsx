@@ -7,15 +7,13 @@ import Global from '../../../pages/global.js';
 import classes from './AdminHeader.module.scss';
 
 const AdminHeader = (props) => {
-    const cookies = parseCookies();
-    const account_worker = Global.getCookie(cookies, 'account_worker');
-
-
+    const account_worker = Global.getCookie('account_worker');
+    //
     function GenerateContent() {
         if(!account_worker)
             return;
         //Кнопки находящиеся на каждой форме
-        const buttons = [ <div className={classes.item}><Link href='/admin/staff'>Сотрудники</Link></div> ]
+        const buttons = [];//[ <div className={classes.item}><Link href='/admin/staff'>Сотрудники</Link></div> ]
         switch(account_worker.role)
         {
             case 'managers':

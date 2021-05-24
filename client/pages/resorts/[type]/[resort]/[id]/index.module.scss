@@ -6,6 +6,20 @@
     grid-auto-rows: auto;
     padding: 5px 15px;
 
+    .comments
+    {
+
+        // font-size: 1em;
+        padding: 0;
+        
+        .title
+        {
+            @extend %font;
+            margin-top: 0;
+            font-size: 1.8em;
+        }
+    }
+
     i
     {
         color: $primary_color;

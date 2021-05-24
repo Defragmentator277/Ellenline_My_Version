@@ -5,6 +5,7 @@ import classes from './Comment.module.scss';
 const Comment = (props) => {
     const comment = props.comment;
     const user = comment.user;
+    //
     if(!user || !comment)
         return <></>;
     // comment: { user: ..., text: ..., date: ..., rating: 0-5 }
