@@ -143,11 +143,11 @@ export default class Global {
     }
 
     static getCookie(name, json = true) {
-        console.log('getCookie');
-        let matches = document.cookie.match(new RegExp(
-          "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
-        ));
-        console.log(matches);
+        let matches;
+        if(typeof document !== undefined)
+            matches = document.cookie.match(new RegExp(
+            "(?:^|; )" + name.replace(/([\.$?*|{}\(\)\[\]\\\/\+^])/g, '\\$1') + "=([^;]*)"
+            ));
         let res = matches ? decodeURIComponent(matches[1]) : undefined;
         try
         {
@@ -189,7 +189,8 @@ export default class Global {
             }
         }
         //
-        document.cookie = updatedCookie;
+        if(typeof document !== undefined)
+            document.cookie = updatedCookie;
         console.log(updatedCookie);
     }
       
