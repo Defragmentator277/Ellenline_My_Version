@@ -1,5 +1,4 @@
 import React from 'react';
-import { parseCookies, setCookie } from 'nookies';
 //
 import DatabaseLayout from './DatabaseLayout.jsx';
 //

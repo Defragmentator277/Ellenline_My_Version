@@ -11,10 +11,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "cors": "^2.8.5",
-    "js-cookie": "^2.2.1",
-    "nookies": "^2.5.2",
     "bson": "^4.3.0",
+    "cors": "^2.8.5",
     "mongodb": "^3.6.6",
     "next": "^10.2.0",
     "next-connect": "^0.10.1",
