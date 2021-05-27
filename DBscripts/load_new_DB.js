@@ -200,12 +200,12 @@ db.structure.insertOne(
                                 {
                                     type: 'number',
                                     prop: 'available',
-                                    title: 'Доступных'
+                                    translate: 'Доступных'
                                 },
                                 {
                                     type: 'number',
                                     prop: 'occupied',
-                                    title: 'Занятых'
+                                    translate: 'Занятых'
                                 }
                             ],
                             title: 'rooms',
@@ -489,12 +489,12 @@ db.structure.insertOne(
                                 {
                                     type: 'number',
                                     prop: 'available',
-                                    title: 'Доступных'
+                                    translate: 'Доступных'
                                 },
                                 {
                                     type: 'number',
                                     prop: 'occupied',
-                                    title: 'Занятых'
+                                    translate: 'Занятых'
                                 }
                             ],
                             title: 'rooms',
