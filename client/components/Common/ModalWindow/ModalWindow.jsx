@@ -346,7 +346,7 @@ const ModalWindow = (props) => {
         //Массив кнопок
         const new_buttons = [];
         //Опции генерации модульного окна
-        if(children && buttons.close)
+        if(children || buttons.close)
             new_buttons.push(
             <button onClick={(e) => onClose(e)}>
                 Закрыть

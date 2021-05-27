@@ -19,6 +19,8 @@ const Account = (props) => {
     const login = props.login;
     const password = props.password;
 
+    console.log(user);
+
     function OnChainge(e, value, prop) {
         user[prop] = value;
         setUser({...user});
@@ -26,7 +28,60 @@ const Account = (props) => {
 
     function OnClick(e) {
         const copy_user = JSON.parse(JSON.stringify(user));
+        //
+        function ConvertOrder(order)
+        {
+            switch(order)
+            {
+                case 'tours_orders':
+                case 'history_tours_orders':
+                    copy_user[order] = copy_user[order].map((element) => {
+                        element.id_tour = Global.ConvertToDBRef('tours', element.tour._id);
+                        if(order == 'history_tours_orders')
+                        {
+                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
+                            delete element.manager;
+                        }
+                        delete element.tour;
+                        return element;
+                    });
+                    break;
+                case 'relax_orders':
+                case 'history_relax_orders':
+                    copy_user[order] = copy_user[order].map((element) => {
+                        element.id_relax = Global.ConvertToDBRef('relax', element.relax._id);
+                        if(order == 'history_tours_orders')
+                        {
+                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
+                            delete element.manager;
+                        }
+                        delete element.manager;
+                        return element;
+                    });
+                    break;
+                case 'cruises_orders':
+                case 'history_cruises_orders':
+                    copy_user[order] = copy_user[order].map((element) => {
+                        element.id_cruise = Global.ConvertToDBRef('cruises', element.cruise._id);
+                        if(order == 'history_tours_orders')
+                        {
+                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
+                            delete element.manager;
+                        }
+                        delete element.manager;
+                        return element;
+                    });
+                    break;
+            }
+        }
+        //
         delete copy_user._id;
+        ConvertOrder('tours_orders');
+        ConvertOrder('history_tours_orders');
+        ConvertOrder('relax_orders');
+        ConvertOrder('history_relax_orders');
+        ConvertOrder('cruise_orders');
+        ConvertOrder('history_cruises_orders');
         //
         fetch(`${Global.url}/api/db/users/update?prop=${JSON.stringify(copy_user)}&id=${user._id}&operator=${'$replace'}`)
         .then((res) => {
