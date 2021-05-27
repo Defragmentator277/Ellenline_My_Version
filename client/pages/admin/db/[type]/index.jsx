@@ -358,8 +358,8 @@ const Type = (props) => {
                                                 })
                                                 .then((res) => 
                                                 {
-                                                    // field.innerHTML = value;k
                                                     console.log(res);
+                                                    location.reload();
                                                 })
                                                 //Ошибка
                                                 .catch((err) => 

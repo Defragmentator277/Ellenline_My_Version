@@ -24,7 +24,7 @@ const Resorts = (props) => {
 
     function InsertItems() {
         const elements = [];
-        if(condition && items && items.length != 0)
+        if(items && items.length != 0)
         {
             for(let i = 0; i < items.length; i++)
             {

@@ -66,6 +66,7 @@
             @extend %button;
             justify-self: center;
             height: fit-content;
+            width: fit-content !important;
             padding: 5px 15px;
             font-size: 1.25em;
             text-decoration: none;

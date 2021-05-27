@@ -369,13 +369,15 @@ const FormBooking = (props) => {
                 switch(type)
                 {
                     case 'tours':
-                        DecrementSeats({ id: trip.id, path: 'timetable_departure', key: 'number_of_seats.available', new_value: -1 * tickets }, DecrementSeats, 
-                               { prop: { id: trip.id, path: 'timetable_departure', key: 'number_of_seats.occupied', new_value: tickets }, next: CreateReservation });
+                        // DecrementSeats({ id: trip.id, path: 'timetable_departure', key: 'number_of_seats.available', new_value: -1 * tickets }, DecrementSeats, 
+                        //        { prop: { id: trip.id, path: 'timetable_departure', key: 'number_of_seats.occupied', new_value: tickets }, next: CreateReservation });
+                        DecrementSeats(trip.id, tickets);
                         break;
                     case 'relax':
                     case 'cruises':
-                        DecrementSeats({ id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.available', new_value: -1 }, DecrementSeats, 
-                               { prop: { id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.occupied', new_value: 1 }, next: CreateReservation });
+                        DecrementSeats(reservation.room.id, 1);
+                        // DecrementSeats({ id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.available', new_value: -1 }, DecrementSeats, 
+                        //        { prop: { id: reservation.room.id, path: 'rooms', key: 'number_of.rooms.occupied', new_value: 1 }, next: CreateReservation });
                         break;
                 }
             }
@@ -450,7 +452,7 @@ const FormBooking = (props) => {
             .then((res) => 
             {
                 console.log(res);
-                alert('Спасибо за вашу покупку, мы свяжемся с вами в ближайшее время!');
+                alert('Спасибо за вашу покупку, мы свяжемся с вами в ближайшее время, вы можете посмотреть ваш заказ в личном кабинете!');
             })
             .catch((err) => 
             {
@@ -460,28 +462,37 @@ const FormBooking = (props) => {
             .catch((err) => 
             {
                 console.log(err);
+            })
+            .finally(() => 
+            {
+                location.reload();
             });
         }
         //Уменьшение сидение в автобусе
-        function DecrementSeats(prop, next, prop_next) {
-            fetch(`${Global.url}/api/db/${type}/update?id=${id}&prop=${JSON.stringify(prop)}&operator=${'$inc'}`)
+        function DecrementSeats(arr_id, inc) {
+            fetch(`${Global.url}/api/db/${type}/decrement?id=${id}&arr_id=${arr_id}&inc=${inc}`)
             .then((res) => 
             {
-                console.log('Успех значение ' + prop.key + (prop.new_value >= 0 ? ' увеличенно' : ' уменьшенно') + '!');
+                console.log('Успех!');
+                console.log(res);
                 return res.json();
             })
             .then((res) => 
             {
                 console.log(res);
-                if(prop_next)
-                    // next(prop_next.key, prop_next.isPos, prop_next.next, prop_next.prop_next);
-                    next(prop_next.prop, prop_next.next, prop_next.prop_next)
+                if(res.modifiedCount != 0)
+                {
+                    CreateReservation();
+                }
                 else
-                    next();
+                {
+                    alert('Извините в данный момент бронирование недоступно!');
+                }
             })
             .catch((err) => 
             {
                 console.log('Ошибка');
+                console.log(err);
                 return err.json();
             })
             .catch((err) => 

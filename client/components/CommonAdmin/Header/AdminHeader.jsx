@@ -1,8 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
 //
-import { parseCookies, setCookie } from 'nookies';
-//
 import Global from '../../../pages/global.js';
 import classes from './AdminHeader.module.scss';
 

@@ -866,7 +866,7 @@ db.structure.insertOne(
                         },
                         {
                             type: 'time',
-                            prop: 'start',
+                            prop: 'end',
                             translate: 'Конца'
                         }
                     ],

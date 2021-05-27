@@ -9,15 +9,6 @@ const AsideMenu = (props) => {
 
     function GenerateItems() {
 
-        function GenerateItem(item) {
-            if(!item.items)
-                return;
-            return item.items.map((element) => 
-            <Link href={`/admin/${root}/${item.href}/${element.href}`}>
-                {element.title}
-            </Link>);
-        }
-
         const elements = [];
         if(items && items.length != 0)
         {
@@ -26,9 +17,6 @@ const AsideMenu = (props) => {
                 let item = items[i];
                 elements.push(<div className={classes.item}>
                     <Link href={`/admin/${root}/${item.href}`}>{item.title}</Link>
-                    <div className={classes.submenu}>
-                        {GenerateItem(item)}
-                    </div>
                 </div>);
             }
         }

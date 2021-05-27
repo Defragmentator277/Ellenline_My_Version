@@ -1,9 +1,18 @@
 import React from 'react';
 import Link from 'next/link';
 //
+import Global from '../../../pages/global.js';
 import classes from './Header.module.scss';
 
 const Header = (props) => {
+    const account_user = Global.getCookie('account_user');
+
+    function GenerateLogIn() {
+        return account_user ? 
+        <div className={classes.item}>
+            <Link href={'/account/' + account_user._id}>Войти в личный кабинет</Link>
+        </div> : '';
+    }
 
     return (
         <div className={classes.header}>
@@ -16,11 +25,9 @@ const Header = (props) => {
             </div>
             {/*  */}
             <div className={classes.menu}>
+                {GenerateLogIn()}
                 <div className={classes.item}>
-                    <Link href='/'>О нас</Link>
-                </div>
-                <div className={classes.item}>
-                    <Link href='/'>Санкт-Петербург</Link>
+                    <Link href='/home'>О нас</Link>
                 </div>
                 <div className={classes.item}>
                     <Link href='/resorts/tours'>Туры</Link>

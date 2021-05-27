@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 //
+import Global from '../../../pages/global.js';
 import classes from './AsideHeader.module.scss';
 
 const AsideHeader = (props) => {
+    const account_user = Global.getCookie('account_user');
+    //
     const [expand, setExpand] = useState(props.expand);
 
     function onClickExpandMenu(e) {
@@ -15,6 +18,7 @@ const AsideHeader = (props) => {
         arrow.closest('div').classList
         .toggle(classes.active);
     }
+    //
 
     return(
         <div className={classes.back + ' ' + props.className}>
@@ -30,10 +34,10 @@ const AsideHeader = (props) => {
                             <p>Туры</p>
                         </Link>
                         <div className={classes.submenu}>
-                            <Link href='/resorts/tours/oneday?condition={"price":{"min":0}}'>
+                            <Link href='/resorts/tours/oneday'>
                                 <p>Однодневные</p>
                             </Link>
-                            <Link href='/resorts/tours/multiday?condition={"price":{"min":0}}'>
+                            <Link href='/resorts/tours/multiday'>
                                 <p>Многодневные</p>
                             </Link>
                         </div>
@@ -44,10 +48,10 @@ const AsideHeader = (props) => {
                             <p>Отдых</p>
                         </Link>
                         <div className={classes.submenu}>
-                            <Link href='/resorts/relax/sanatoriums?condition={"price":{"min":0}}'>
+                            <Link href='/resorts/relax/sanatoriums'>
                                 <p>Санатории</p>
                             </Link>
-                            <Link href='/resorts/relax/pensionats?condition={"price":{"min":0}}'>
+                            <Link href='/resorts/relax/pensionats'>
                                 <p>Пансионаты</p>
                             </Link>
                         </div>
@@ -58,17 +62,14 @@ const AsideHeader = (props) => {
                                 <p>Круизы</p>
                         </Link>
                         <div className={classes.submenu}>
-                            <Link href='/resorts/cruises/river?condition={"price":{"min":0}}'>
+                            <Link href='/resorts/cruises/river'>
                                 <p>Речные</p>
                             </Link>
-                            <Link href='/resorts/cruises/marine?condition={"price":{"min":0}}'>
+                            <Link href='/resorts/cruises/marine'>
                                 <p>Морские</p>
                             </Link>
                         </div>
                     </div>
-                    <Link href='/spb'>
-                        <p className={classes.option}>Санкт-Петербург</p>
-                    </Link>
                 </div>
                 <i class="fa fa-arrow-right" onClick={onClickExpandMenu} aria-hidden="true"></i>
             </aside>
