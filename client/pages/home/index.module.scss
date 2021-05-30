@@ -13,6 +13,7 @@ $fontSizeTitleSection: 3em;
     font-family: "Kazimir";
     transform: skewY(-1.5deg);
     background-color: $primary_color;
+    // box-shadow: black 1px 10px 20px 0px;;
     p
     {
         text-align: center;
@@ -53,15 +54,34 @@ $fontSizeTitleSection: 3em;
 
 .home
 {
+    display: grid;
+    grid-auto-rows: min-content;
+    grid-row: 10px;
+
+    .title
+    {
+        @extend %title;
+        margin: 10px 0;
+    }
+
+    .slider
+    {
+        height: 500px;
+        margin: 25px 0;
+        // padding: 25px;   
+    }
+
+    .text
+    {
+        @extend %font;
+        font-size: 1.25em;
+        text-align: justify;
+        margin: 25px;
+    }
 
     .comments
     {
         // padding: 25px;
-
-        .title
-        {
-            @extend %title;
-        }
 
         .content
         {

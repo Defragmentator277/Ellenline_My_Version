@@ -6,7 +6,6 @@ import classesInput from './GeneralScss/Input.module.scss'
 import classes from './InputBoolean.module.scss';
 
 const InputBoolean = (props) => {
-    const placeholder = props.placeholder;
     const [value, setValue] = useState(props.value);
     const title = props.title;
     const name = props.name;

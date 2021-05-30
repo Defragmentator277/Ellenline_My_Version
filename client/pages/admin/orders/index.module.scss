@@ -1,4 +1,7 @@
 @import '../../../styles/index.scss';
+$show_time: .5s;
+$easing: cubic-bezier(0.33, 1, 0.68, 1);
+//Start width nav panel from left
 
 .users
 {
@@ -37,6 +40,8 @@
         //
         display: grid;
         row-gap: 10px;
+        //
+        height: fit-content;
         padding: 5px;
 
         .greetings
@@ -104,8 +109,10 @@
                 {
                     display: grid;
                     grid-template-columns: max-content min-content;
+                    column-gap: 7.5px;
                     //
                     margin-bottom: 10px;
+                    cursor: pointer;
 
                     h1
                     {
@@ -115,7 +122,28 @@
 
                     i
                     {
+                        @extend %grid_center;
+                        transition: transform $show_time $easing;
+                    }
+                }
+                
+                &.active
+                {
+                    height: auto;
 
+                    .greetings
+                    {
+                        i
+                        {
+                            transform: rotate(180deg);
+                        }
+                    }
+                    
+                    .tour,
+                    .relax,
+                    .cruise
+                    {
+                        height: auto;
                     }
                 }
                 
@@ -126,6 +154,8 @@
                     display: grid;
                     grid-template-columns: 1fr 1fr;
                     gap: 10px;
+                    overflow: hidden;
+                    height: 0;
 
                     .tour_info,
                     .relax_info,
@@ -138,6 +168,8 @@
                     {
                         grid-column: 2;
                     }
+
+                    
                 }
             }
 
@@ -147,7 +179,7 @@
                 grid-column-end: 3;
                 //
                 display: grid;
-                grid-template-columns: repeat(2, 1fr);
+                grid-template-columns: repeat(3, 1fr);
                 column-gap: 10px;
 
                 .button

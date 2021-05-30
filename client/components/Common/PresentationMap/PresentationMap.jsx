@@ -1,5 +1,5 @@
 import { YMaps, Map, Placemark, Clusterer, GeoObject } from 'react-yandex-maps';
-import classes from './YandexMap.module.scss';
+import classes from './PresentationMap.module.scss';
 
 const PresentationMap = (props) => {
     let mapState = {};
@@ -12,8 +12,6 @@ const PresentationMap = (props) => {
     {
         mapState = {center: props.cityCoordinates, zoom: 10};
     }
-  
-    console.log(mapState);
 
     const markState = {points: props.points,  modules: ['geoObject.addon.balloon', 'geoObject.addon.hint']}
 
@@ -49,4 +47,4 @@ const PresentationMap = (props) => {
         </div>)
 }
 
-export default PresentationMap
+export default PresentationMap;

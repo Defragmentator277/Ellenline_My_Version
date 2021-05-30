@@ -2,7 +2,6 @@ import React, {Component, useEffect, useState} from 'react';
 import Router from 'next/router';
 //
 import ClientLayout from '../../../layouts/ClientLayout.jsx';
-// import SearchRelax from '../../../components/Common/Search/SearchRelax.jsx';
 import InputText from '../../../components/CustomElements/InputText.jsx';
 import InputNumber from '../../../components/CustomElements/InputNumber.jsx';
 import SelectOption from '../../../components/CustomElements/SelectOption.jsx';
@@ -11,16 +10,13 @@ import PriceCompare from '../../../components/CustomElements/PriceCompare.jsx';
 import Global from '../../global.js';
 import classes from './index.module.scss';
 
-// const ChooseResort = dynamic(() => import('../../../components/Common/ChooseResort/ChooseResort.jsx'), 
-// {
-//     // loader: место для прелоадера
-// });
-
+//Страница с формой поиска
 const Relax = (props) => {
+    //Названии коллекции
     const type = props.type;
     const searchInfo = props.searchInfo;
     //{ name:... , stars:... , country:... , locality:... , price: { min: ..., max:... } }
-    //
+    //Конвертирующий объект
     const convert = Global.GetConvert(type);
 
     //#region Variables and get functions
@@ -83,6 +79,7 @@ const Relax = (props) => {
     }
     //#endregion
 
+    //Генерация ссылки в зависимости от критериев поиска
     function ToLink(path)
     {
         function OnClick(e) {
@@ -95,18 +92,19 @@ const Relax = (props) => {
                 locality: locality,
                 price: { min: minPrice, max: maxPrice }
             };
-            //
+            //Переадрисация
             Router.push(`/resorts/${type}/${path}?condition=${JSON.stringify(condition)}`);
         }
-        //
+        //Конвертирование в название 
         let content = <h1 onClick={OnClick}>{convert[path]}</h1>;
-        // return <Link href={`/resorts/${type}/${path}?condition=${condition}`}>{content}</Link>;
         return content;
     }
 
+    //Генериция поля для кол-ва звезд
     function GenerateStars() {
         switch(type)
         {
+            //Если это санаторий, пансионат поле генерируется
             case 'relax':
                 return <InputNumber 
                 className={classes.stars} 
@@ -118,6 +116,7 @@ const Relax = (props) => {
         }
     }
 
+    //Дополнительный css класс, в случаи если это санатории или пансионаты
     const not_relax_class = type != 'relax' ? classes.not_relax : '';
 
     return (
@@ -166,8 +165,9 @@ const Relax = (props) => {
     )
 }
 
-//Здесь я заранее задам пути т.к. их всего три: (вот они слева направо)
-//cruises, relax, tours
+//Здесь заранее задаются пути т.к. их всего три: (вот они слева направо) в файле Global
+//Функция NextJS запускающаяся при сборке сайта, 
+//возвращает все пути для данного динамического маршрута
 export async function getStaticPaths() {
     const paths = Object.keys(Global.resorts).map((element) => {
         return { params: { type: element } };
@@ -178,11 +178,14 @@ export async function getStaticPaths() {
     }
 }
 
+//Функция NextJS запускающаяся при сборке сайта, 
+//на основе путей из getStatisPaths делает запросы к серверу, 
+//и передает ответы главному компоненту через props
 export async function getStaticProps(router) {
+    //Получение коллекции
     const type = router.params.type;
-    //
+    //Получение городов, сгруппированных по странам
     const res = await fetch(`${Global.url}/api/resorts/getCitiesDependsOnCountries`);
-    console.log(res);
     const searchInfo = await res.json();
     // 
     return {

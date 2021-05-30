@@ -1,7 +1,7 @@
 import React from 'react'
 import classes from './Footer.module.scss';
 import Link from 'next/link'
-import PresentationMap from '../Map/PresentationMap'
+import PresentationMap from '../PresentationMap/PresentationMap.jsx';
 import Image from 'next/image';
 
 const homeOnMap= [{coordinates: [59.87026708231266, 30.26207174039379], hintContent: 'Эллинлайн', balloonContentBody: 'ул. Зайцева, 3, корп. 2, Санкт-Петербург'}];

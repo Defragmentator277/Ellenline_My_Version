@@ -1,6 +1,6 @@
 import React from 'react';
 //
-import PresentationMap from '../Map/PresentationMap';
+import PresentationMap from '../PresentationMap/PresentationMap.jsx';
 //
 import classes from './Providers.module.scss';
 

@@ -11,7 +11,7 @@ const AdminHeader = (props) => {
         if(!account_worker)
             return;
         //Кнопки находящиеся на каждой форме
-        const buttons = [];//[ <div className={classes.item}><Link href='/admin/staff'>Сотрудники</Link></div> ]
+        const buttons = [];
         switch(account_worker.role)
         {
             case 'managers':

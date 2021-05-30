@@ -6,8 +6,9 @@ import Global from '../../global.js';
 import classes from './index.module.scss';
 
 const Db = (props) => {
+    //Массив для создания списка слева меню, получение перевода названия коллекции
     const items = props.items ?
-        props.items.map((element) => { return { title: element, href: element } }) 
+        props.items.map((element) => { return { title: Global.GetTranslate(element), href: element } }) 
         : [];
 
     return(
@@ -20,8 +21,11 @@ const Db = (props) => {
     )
 }
 
+//Функция NextJS запускающаяся при сборке сайта, 
+//на основе путей из getStatisPaths делает запросы к серверу, 
+//и передает ответы главному компоненту через props
 export async function getStaticProps(router) {
-    //Запрос к бд для получения коллекции из mongoDB
+    //Запрос к бд для получения названия коллекции
     const collections = await (await fetch(Global.url + '/api/db/')).json();
 
     return {
