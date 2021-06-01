@@ -26,19 +26,19 @@
     background-color: $primary_color;
 }
 
-.top::after, .bottom::before
-{
-    z-index: 0;
-    display: block;
-    position: absolute;
-    width: 110%;
-    height: 100%;
-    left: -5%;
-    right: -5%;
-    content: ' ';
-    background-color: $primary_color;
-    transform: rotate(-5deg);
-}
+// .top::after, .bottom::before
+// {
+//     z-index: 0;
+//     display: block;
+//     position: absolute;
+//     width: 110%;
+//     height: 100%;
+//     left: -5%;
+//     right: -5%;
+//     content: ' ';
+//     background-color: $primary_color;
+//     transform: rotate(-5deg);
+// }
 
 .top{
     grid-area: top;
@@ -79,6 +79,7 @@
 
 .bottom p{
     margin: 0;
+    margin-top: 15px;
     font-size: 1em;
 }
 
@@ -111,6 +112,7 @@
 }
 
 .price{
+    @extend %grid_center;
     grid-area: price;
     display: grid;
     width: 100%;

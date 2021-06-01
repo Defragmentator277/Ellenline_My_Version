@@ -1,0 +1,59 @@
+/*colorBase-RGBA!!!*/
+test{color:#007cb9;/*$colorBase*/color:#EBDAAD;/*$colorAdditional*/color:#FEAE00;/*$colorButton*/color:#fff;/*$colorBaseInverse*/color:#313140;/*$colorAdditionalInverse*/color:#333;/*$colorText*/}
+a{color:#007cb9;}
+#logoUp{color:#007cb9;}
+.social__link{background-color:#007cb9;}
+.b-contacts--header{color:#007cb9;}
+.b-topnav{background-color:#007cb9;}
+.topmenu__sublistli.all{background:#007cb9;}
+.offers__price{color:#007cb9;}
+.b-footer{background-color:#007cb9;}
+.order-form__submit{background-color:#007cb9;}
+.owl-carousel.mainSlider .item .caption .desc{background:#007cb9;background:rgba(0,124,185,.7);}
+.bgBlue{background:#007cb9;}
+.b-back-to-top{background-color:rgba(0,124,185,.5);}
+body .jot-name{color:#007cb9;}
+.topmenu__item.active .topmenu__link, .topmenu__link:hover, .topmenu__subitem.active .topmenu__sublink, .topmenu__sublink:hover{color:#fff;}
+.topmenu__sublist li.all {background:#007cb9;}
+@media (max-width:768px) {
+	.b-topnav .b-topmenu__list {background-color: #007cb9;}
+}
+
+/*colorBasedark*/
+.topmenu__item.active,.topmenu__item:hover{background-color:#006ba0;}
+#quickTourOrder input[type="submit"]{background:#006ba0;}
+@media (max-width:768px) {
+	.b-topnav .topmenu__item.active {background-color: #006ba0;}
+}
+
+/*colorButton-RGBA!!!*/
+#logoDown{color:#2db29f;border-top:2px solid #2db29f;}
+.social__link:hover{background-color:#2db29f;}
+a.b-button,.b-button{background:#2db29f;}
+.country-menu__nav ul ul a:hover{color:#2db29f;}
+.hotel__price,.program__price{color:#2db29f;}
+.owl-carousel.mainSlider .item .caption .title{background:#2db29f;background:rgba(45,178,159,.7);}
+.profiles .item .position{color:#2db29f;}
+.profile.position{color:#2db29f;}
+.award .description{border-top:1px solid #2db29f;}
+.form [type='submit']{background:#2db29f;}
+body .jot-comment .jot-subject{color:#2db29f;}
+body .jot-answer{border-left:4px solid #2db29f;}
+
+/*color3*/
+a:hover{color:#20b5ff;}
+.order-form__submit:hover{background-color:#20b5ff;}
+.dotsCont>div.active{background:#20b5ff;}
+
+/*color4*/
+.topmenu__sublist{background-color:#86d7ff;}
+#quickTourOrder{background:#86d7ff;}
+.orderPage #quickTourOrder{background:#86d7ff !important;}
+.b-why{background-color:#86d7ff;}
+@media (max-width:768px) {
+	.b-topnav .topmenu__item:hover .topmenu__sublist {background-color: #86d7ff;}
+}
+
+@media (max-width:768px) {
+	.b-topnav .topmenu__item a {color: #fff;}
+}

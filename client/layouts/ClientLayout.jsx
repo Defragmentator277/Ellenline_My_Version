@@ -70,12 +70,14 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
             <Head>
                 <title>{title}</title>
             </Head>
-            <Header/>
             <AsideHeader className={classes.header}/>
             <main className={classes.main}>
+                <Header/>
+                {/* <iframe src="https://demo.paykeeper.ru/form/" style={{ width: '100%', height: '800px'}}></iframe> */}
                 {children}
                 {/*  */}
-                <Footer/>
+                {/* <Footer/> */}
+                <Footer_v2/>
             </main>
         </>;
     }

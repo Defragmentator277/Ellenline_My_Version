@@ -11,15 +11,17 @@ $fontSizeTitleSection: 3em;
 {
     font-size: 2em;
     font-family: "Kazimir";
-    transform: skewY(-1.5deg);
+    // transform: skewY(-1.5deg);
     background-color: $primary_color;
+    background: linear-gradient(0deg, $primary_color, $sub_color);
+    // box-shadow: black 0px 20px 50px 0px;
     p
     {
         text-align: center;
         margin: 0 auto;
         padding: 15px 0;
-        transform: skewY(1.5deg);
-        color: $sub_color;
+        text-shadow: black 1px 1px, black 1px 1px, black 1px 1px, black 1px 1px, black 1px 1px;
+        color: white;
     }
 }
 
@@ -53,6 +55,17 @@ $fontSizeTitleSection: 3em;
 
 .home
 {
+    .title
+    {
+        @extend %title;
+    }
+
+    .slider
+    {
+        height: 300px;
+        width: 1150px;
+        margin: 0 auto;
+    }
 
     .comments
     {
@@ -67,5 +80,15 @@ $fontSizeTitleSection: 3em;
         {
             padding: 25px;
         }
+    }
+
+    .list
+    {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
+        justify-content: center;
+        grid-auto-rows: 550px;
+        gap: 10px;
+        padding: 15px 10px;
     }
 }

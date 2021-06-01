@@ -9,4 +9,13 @@
         @extend %title;
         margin: 25px auto;
     }
+
+    #fillNemoTravel
+    {
+        background-color: transparent;
+        & > section
+        {
+        }
+    }
+
 }
