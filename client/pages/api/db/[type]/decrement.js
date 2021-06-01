@@ -15,7 +15,6 @@ handler.get(async (req, res) => {
     const inc = parseInt(req.query.inc);
     //
     const collection = req.db.collection(type);
-    console.log('enter');
 
     if(type == 'relax' 
     || type == 'cruises')

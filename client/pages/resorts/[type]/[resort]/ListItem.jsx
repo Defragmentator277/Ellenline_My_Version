@@ -3,16 +3,25 @@ import Link from 'next/link';
 import classes from './ListItem.module.scss';
 
 const ListItem = (props) => {
-    const [id, setId] = useState(props.id);
-    const [image, setImage] = useState(props.image);
-    const [title, setTitle] = useState(props.title);
-    const [adress, setAddress] = useState(props.adress);
-    const [min_price, setPrice] = useState(props.min_price);
-    const [services, setServices] = useState(props.services);
-    const [category, setCategory] = useState(props.category);
-    //
+    //Название коллекции
     const path = props.path;
+    //Тип элемента
+    const [category, setCategory] = useState(props.category);
+    //Айди элемента
+    const [id, setId] = useState(props.id);
+    ////
+    //Ссылка на изображение
+    const [image, setImage] = useState(props.image);
+    //Название
+    const [title, setTitle] = useState(props.title);
+    //Адрес
+    const [adress, setAddress] = useState(props.adress);
+    //Минимальная цена
+    const [min_price, setPrice] = useState(props.min_price);
+    //Услуги
+    const [services, setServices] = useState(props.services);
     
+    //Конвертирование услуг в иконки FontAwesome и текст
     function ConvertServices(){
         let elements = [];
         if(services && services.length != 0)
@@ -20,6 +29,7 @@ const ListItem = (props) => {
             for(let i = 0; i < services.length; i++)
             {
                 let service = services[i];
+                //Смещение колонок
                 let column_offset = {gridColumn: `${i + 1}`};
                 elements.push(<i class={"fa fa-" + service.icon} aria-hidden="true" style={column_offset}></i>);
             }
@@ -27,6 +37,7 @@ const ListItem = (props) => {
         return elements;
     }
 
+    //Создание ссылок на страницу с подробной информацией
     return (
         <Link href={`/resorts/${path}/${category}/${id}`}>
             <div className={classes.list_item + ' ' + classes.className}

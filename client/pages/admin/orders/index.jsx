@@ -8,29 +8,33 @@ import SelectOption from '../../../components/CustomElements/SelectOption.jsx';
 import Global from '../../global.js';
 import classes from './index.module.scss';
 
+//Страница с заказами для менеджеров
 const Orders = (props) => {
-    const payments = [ 'Не оплаченно', 'Оплаченно половины суммы', 'Заказ оплачен' ];
+    //Нужен для маршрутизации по страницам
     const router = useRouter();
-    //
+    //Состояния оплаты
+    const payments = [ 'Не оплаченно', 'Оплаченно половины суммы', 'Заказ оплачен' ];
+    //Массив пользователей с заказами
     const orders = props.orders;
-    console.log(orders);
-    //
+
+    //Генерация основного контента
     function GenerateContent() {
+        //Получение аккаунта сотрудника
         const account_worker = Global.getCookie('account_worker');
         //
         function GenerateUser(user) {
 
-            function GenerateOrders(type_orders)
+            function GenerateOrders(type_order)
             {
                 const elements = [];
-                const orders = user[type_orders];
+                const orders = user[type_order];
                 //
                 function ConvertOrder(order)
                 {
                     function OnClickEndOrder(e, type) {
                         function AfterAddingHistory() {
                             const prop = {
-                                key: type_orders,
+                                key: type_order,
                                 new_value: order.id
                             }
                             //
@@ -77,7 +81,7 @@ const Orders = (props) => {
                         new_order.id_manager = Global.ConvertToDBRef('managers', account_worker._id);
                         //
                         const prop = {
-                            key: 'history_' + type_orders,
+                            key: 'history_' + type_order,
                             new_value: new_order
                         }
                         //
@@ -107,7 +111,7 @@ const Orders = (props) => {
                     function OnChaingePayment(e, value) {
                         const prop = {
                             key: 'status',
-                            path: type_orders,
+                            path: type_order,
                             id: order.id,
                             new_value: value
                         }
@@ -134,7 +138,65 @@ const Orders = (props) => {
                         })
                     }
                     //
-                    switch(type_orders)
+                    function OnClickDeny() {
+                        const prop = {
+                            key: type_order,
+                            new_value: order.id
+                        };
+                        //
+                        // console.log(prop);
+                        // console.log(user);
+                        // return;
+                        fetch(`${Global.url}/api/db/users/update?id=${user._id}&prop=${JSON.stringify(prop)}&operator=${'$pull'}`)
+                        .then((res) => {
+                            console.log('Успех!');
+                            console.log(res);
+                            return res.json();
+                        })
+                        .then((res) => {
+                            console.log(res);
+                            let query;
+                            if(type_order == 'tours_orders')
+                                query = `${Global.url}/api/db/tours/decrement?id=${order.tour._id}&arr_id=${order.id}&inc=${-order.tickets}`;
+                            else if(type_order == 'relax_orders')
+                                query = `${Global.url}/api/db/relax/decrement?id=${order.relax._id}&arr_id=${order.id}&inc=${-1}`;
+                            else if(type_order == 'cruises_orders')
+                                query = `${Global.url}/api/db/cruises/decrement?id=${order.cruise._id}&arr_id=${order.id}&inc=${-1}`;
+                            else
+                                console.log('Такого типа нету');
+                            fetch(query)
+                            .then((res) => {
+                                console.log('Успех!');
+                                console.log(res);
+                                return res.json();
+                            })
+                            .then((res) => {
+                                console.log(res);
+                                alert('Вы успешно отменили бронирование пользователю ' + user.name + ' ' + user.surname + ' ' + user.middle_name);
+                            })
+                            .catch((err) => {
+                                console.log('Ошибка!');
+                                console.log(err);
+                                return err.json();
+                            })
+                            .catch((err) => {
+                                console.log(err);
+                            })
+                            .finally(() => {
+                                location.reload();
+                            });
+                        })
+                        .catch((err) => {
+                            console.log('Ошибка!');
+                            console.log(err);
+                            return err.json();
+                        })
+                        .catch((err) => {
+                            console.log(err);
+                        })
+                    }
+                    //
+                    switch(type_order)
                     {
                         case 'tours_orders':
                             const tour = order.tour;
@@ -190,6 +252,9 @@ const Orders = (props) => {
                                 </div>
                                 {/*  */}
                                 <div className={classes.buttons}>
+                                    <button className={classes.button} onClick={OnClickDeny}>
+                                        Отказаться
+                                    </button>
                                     <button className={classes.button} onClick={OnClickTour}>
                                         Перейти на страницу
                                     </button>
@@ -265,6 +330,9 @@ const Orders = (props) => {
                                 </div>
                                 {/*  */}
                                 <div className={classes.buttons}>
+                                    <button className={classes.button} onClick={OnClickDeny}>
+                                        Отказаться
+                                    </button>
                                     <button className={classes.button} onClick={OnCLickRelax}>
                                         Перейти на страницу
                                     </button>
@@ -332,6 +400,9 @@ const Orders = (props) => {
                                 </div>
                                 {/*  */}
                                 <div className={classes.buttons}>
+                                    <button className={classes.button} onClick={OnClickDeny}>
+                                        Отказаться
+                                    </button>
                                     <button className={classes.button} onClick={OnClickCruise}>
                                         Перейти на страницу
                                     </button>
@@ -343,6 +414,12 @@ const Orders = (props) => {
                     }
                 }
                 //
+                function ExpandBookingSection(e) {
+                    let arrow = e.currentTarget;
+                    arrow.parentNode.classList
+                    .toggle(classes.active);
+                }
+                //
                 if(orders)
                 {
                     for(let i = 0; i < orders.length; i++)
@@ -352,29 +429,29 @@ const Orders = (props) => {
                 }
                 //
                 if(elements.length > 0)
-                    switch(type_orders)
+                    switch(type_order)
                     {
                         case 'tours_orders':
                             return <div className={classes.tours_orders}>
-                                <div className={classes.greetings}>
+                                <div className={classes.greetings} onClick={ExpandBookingSection}>
                                     <h1>Забронированные туры</h1>
-                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
                                 </div>
                                 {elements}
                             </div>;
                         case 'relax_orders':
                             return <div className={classes.relax_orders}>
-                                <div className={classes.greetings}>
+                                <div className={classes.greetings} onClick={ExpandBookingSection}>
                                     <h1>Забронированные санатории, пансионаты</h1>
-                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
                                 </div>
                                 {elements}
                             </div>;
                         case 'cruises_orders':
                             return <div className={classes.cruises_orders}>
-                                <div className={classes.greetings}>
+                                <div className={classes.greetings} onClick={ExpandBookingSection}>
                                     <h1>Забронированные круизы</h1>
-                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
                                 </div>
                                 {elements}
                             </div>;
@@ -423,15 +500,19 @@ const Orders = (props) => {
         const elements = [];
         for(let i = 0; i < orders.length; i++)
         {
+            //Конвертирования каждого пользователя, в карточку с заказом
             elements.push(GenerateUser(orders[i]));
         }
-        //
         if(account_worker && account_worker.role == 'managers')
+            //В случаи если сотрудник существует и его роль менеджер
+            //происходит генерация карточек пользователей
             return <div className={classes.users}>
                 <div className={classes.greetings}>{elements.length == 0 ? 'В данный момент здесь нету активных заказов' : 'Карточки заказов пользователей'}</div>
                 {elements}
             </div>;
         else
+            //В случаи если сотрудник не существует и его роль не администратор
+            //вывод информации о ошибки, и последующее перекидвание на главную страницу
             return <ModalWindow title='Ошибка!' onClose={() => { router.push('/admin') }}>
                 <div className={classes.text}>
                     У вас нет необходимости работать с заказами, 
@@ -447,7 +528,11 @@ const Orders = (props) => {
     )
 }
 
+//Функция NextJS запускающаяся при сборке сайта, 
+//на основе путей из getStatisPaths делает запросы к серверу, 
+//и передает ответы главному компоненту через props
 export async function getStaticProps(router) {
+    //Запрос на получение всех заказов, и из конвертация из id в объекты
     const orders = await (await fetch(`${Global.url}/api/getAllOrders`)).json();
 
     return {

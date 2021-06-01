@@ -1,4 +1,6 @@
 @import '../../../styles/index.scss';
+$show_time: .5s;
+$easing: cubic-bezier(0.33, 1, 0.68, 1);
 
 .account
 {
@@ -14,11 +16,11 @@
     .greetings
     {
         grid-column-start: 1;
+        font-size: 1.25em;
 
         & > h1
         {
             margin: 5px 0;
-            font-size: 2em;
         }
     }
 
@@ -89,8 +91,28 @@
             .title
             {
                 @extend %font;
-                font-size: 2em;
+                //
+                display: grid;
+                grid-template-columns: min-content auto;
+                column-gap: 10px;
+                //
                 margin-bottom: 5px;
+                padding-left: 10px;
+
+                h1
+                {
+                    width: fit-content;
+                    font-size: 2em;
+                }
+
+                i
+                {
+                    @extend %grid_center;
+                    //
+                    z-index: 101;
+                    font-size: 2em;
+                    transition: transform $show_time $easing;
+                }
             }
 
             .buttons
@@ -109,7 +131,7 @@
                     @extend %button;
                     grid-row: 1;
                     padding: 10px 15px;
-                    font-size: .8em;
+                    font-size: 1em;
                 }
             }
 
@@ -132,6 +154,9 @@
                 row-gap: 15px;
                 //
                 margin-bottom: 25px;
+                // height: 0;
+                display: none;
+                // overflow: hidden;
 
                 h1, p
                 {
@@ -265,6 +290,25 @@
                     grid-row: 4;
                 }
 
+            }
+
+            &.active
+            {
+                .title
+                {
+                    i
+                    {
+                        transform: rotate(180deg);
+                    }
+                }
+
+                .tour,
+                .cruise,
+                .relax
+                {
+                    // height: auto;
+                    display: block;
+                }
             }
         }
     }

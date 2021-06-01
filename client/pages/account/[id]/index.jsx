@@ -11,23 +11,85 @@ import SelectOption from '../../../components/CustomElements/SelectOption.jsx';
 import Global from '../../global.js';
 import classes from './index.module.scss';
 
+//Страница личного кабинета пользователя
 const Account = (props) => {
+    //Роутер необходим для маршрутизации
     const router = useRouter();
+    //Установка модульного окна
     const [window, setWindow] = useState();
-    //
+    //Получение данных о пользователей из props
     const [user, setUser] = useState(props.user);
+    //Сохранения логина и пароля, для авторизации после изменения данных
     const login = props.login;
     const password = props.password;
 
+    //Событие, происходящее при изменении любого input`a
     function OnChainge(e, value, prop) {
         user[prop] = value;
         setUser({...user});
     }
 
+    //Событие, происходящее при нажатии кнопки "Принять изменения"
     function OnClick(e) {
+        //Создание глубокой копии пользователя, для избежания несоответсвия данныъ
         const copy_user = JSON.parse(JSON.stringify(user));
+        //Функция конвертации заказа
+        //Заменяет объекты санаториев, пансионатов, туров и круизов на ссылки документов других коллекций
+        function ConvertOrder(order)
+        {
+            switch(order)
+            {
+                case 'tours_orders':
+                case 'history_tours_orders':
+                    copy_user[order] = copy_user[order].map((element) => {
+                        element.id_tour = Global.ConvertToDBRef('tours', element.tour._id);
+                        if(order == 'history_tours_orders')
+                        {
+                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
+                            delete element.manager;
+                        }
+                        delete element.tour;
+                        return element;
+                    });
+                    break;
+                case 'relax_orders':
+                case 'history_relax_orders':
+                    copy_user[order] = copy_user[order].map((element) => {
+                        element.id_relax = Global.ConvertToDBRef('relax', element.relax._id);
+                        if(order == 'history_tours_orders')
+                        {
+                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
+                            delete element.manager;
+                        }
+                        delete element.manager;
+                        return element;
+                    });
+                    break;
+                case 'cruises_orders':
+                case 'history_cruises_orders':
+                    copy_user[order] = copy_user[order].map((element) => {
+                        element.id_cruise = Global.ConvertToDBRef('cruises', element.cruise._id);
+                        if(order == 'history_tours_orders')
+                        {
+                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
+                            delete element.manager;
+                        }
+                        delete element.manager;
+                        return element;
+                    });
+                    break;
+            }
+        }
+        //Удаление поля _id
         delete copy_user._id;
-        //
+        //Конвертировани всех заказов
+        ConvertOrder('tours_orders');
+        ConvertOrder('history_tours_orders');
+        ConvertOrder('relax_orders');
+        ConvertOrder('history_relax_orders');
+        ConvertOrder('cruise_orders');
+        ConvertOrder('history_cruises_orders');
+        //Запрос на обновлении информации о пользователе
         fetch(`${Global.url}/api/db/users/update?prop=${JSON.stringify(copy_user)}&id=${user._id}&operator=${'$replace'}`)
         .then((res) => {
             console.log('Успех!');
@@ -37,7 +99,7 @@ const Account = (props) => {
         .then((res) => {
             console.log(res);
             alert('Вы успешно изменили информацию о себе');
-            Global.setCookie('account_user', { _id: user._id, login: user.login, password: user.password });
+            //Устанавливать Cookie излишне, он сам установиться при перезагрузке страницы
         })
         .catch((err) => {
             console.log('Ошибка!');
@@ -46,26 +108,31 @@ const Account = (props) => {
         })
         .catch((err) => {
             console.log(err);
+            //Реакция на ошибку
             alert('Произошла непредвиденная ошибка');
         })
         .finally(() => {
+            //Обновление страницы в любом случаи
             location.reload();
         });
     }   
 
     function GenerateContent() {
+        //Получение данных о пользователе из Cookie
         const account_user = Global.getCookie('account_user');
-        //
+        //Проверка на существование Cookie и соотвествие учетных данных пользователя
         if(account_user && 
            account_user.login == login && 
            account_user.password == password)
         {
+            //Функция генерация всех заказов
             function GenerateOrders() {
-                // function Generate
 
+                //Общая функция для генерации одного заказа
                 function GenerateOrders(type_order, isHistory = false) {
 
                     function ConvertOrder(order) {
+                        //Генерация кнопки "Оставить комментарий", генерируется если isHistory = true
                         function GenerateLeaveCommentButton(some_relax, out_collection) {
                             const comments = some_relax.comments;
                             //
@@ -124,11 +191,12 @@ const Account = (props) => {
                                 Оставить комментарий
                             </button>;
                         }     
-                        //
+                        //Генерация кнопки "Доплатить", генерируется если isHistory = false
                         function GeneratePayInAdditioon() {
+                            //Если заказ оплачен, функция ничего не возвращает
                             if(order.status == 'Заказ оплачен')
                                 return;
-                            //
+                            //Событие, происходящие при клике
                             function OnClickPayInAddition() {
                                 //
                                 function UpdatePayment(prop) {
@@ -183,6 +251,70 @@ const Account = (props) => {
                             //
                             return <button className={classes.button} onClick={OnClickPayInAddition}>
                                 Доплатить
+                            </button>;
+                        }
+                        //Генерация кнопки "Отказаться", генерируется если isHistory = false
+                        function GenerateDenyButton() {
+                            //Событие, происходящие при клике
+                            function OnClickDeny() {
+                                const prop = {
+                                    key: type_order,
+                                    new_value: order.id
+                                };
+                                //Удаление брони из аккаунта пользователя
+                                fetch(`${Global.url}/api/db/users/update?id=${user._id}&prop=${JSON.stringify(prop)}&operator=${'$pull'}`)
+                                .then((res) => {
+                                    console.log('Успех!');
+                                    console.log(res);
+                                    return res.json();
+                                })
+                                .then((res) => {
+                                    console.log(res);
+                                    //После успешного запроса, изменения кол-во доступных мест в зависимости от типа брони
+                                    let query;
+                                    if(type_order == 'tours_orders')
+                                        query = `${Global.url}/api/db/tours/decrement?id=${order.tour._id}&arr_id=${order.id}&inc=${-order.tickets}`;
+                                    else if(type_order == 'relax_orders')
+                                        query = `${Global.url}/api/db/relax/decrement?id=${order.relax._id}&arr_id=${order.id}&inc=${-1}`;
+                                    else if(type_order == 'cruises_orders')
+                                        query = `${Global.url}/api/db/cruises/decrement?id=${order.cruise._id}&arr_id=${order.id}&inc=${-1}`;
+                                    else
+                                        console.log('Такого типа нету');
+                                    fetch(query)
+                                    .then((res) => {
+                                        console.log('Успех!');
+                                        console.log(res);
+                                        return res.json();
+                                    })
+                                    .then((res) => {
+                                        console.log(res);
+                                        //В случаи успеха, выводиться окно предупреждения
+                                        alert('Вы успешно отказатались от брони!');
+                                    })
+                                    .catch((err) => {
+                                        console.log('Ошибка!');
+                                        console.log(err);
+                                        return err.json();
+                                    })
+                                    .catch((err) => {
+                                        console.log(err);
+                                    })
+                                    .finally(() => {
+                                        location.reload();
+                                    });
+                                })
+                                .catch((err) => {
+                                    console.log('Ошибка!');
+                                    console.log(err);
+                                    return err.json();
+                                })
+                                .catch((err) => {
+                                    console.log(err);
+                                });
+                            }
+                            //
+                            return <button className={classes.button} onClick={OnClickDeny}>
+                                Отказаться
                             </button>
                         }
                         //
@@ -191,12 +323,12 @@ const Account = (props) => {
                             case 'tours_orders':
                             case 'history_tours_orders':
                                 const tour = order.tour;
-                                //
+                                //В случаи если тура больше нету в БД
                                 if(!tour)
                                     return <div className={classes.dont_exists}>
                                         <h1>Данный тур больше не существует!</h1>
                                     </div>;
-                                //
+                                //Событие, происходящие по клику на "Перейти страницу"
                                 function OnClickTour(e) {
                                     router.push(`/resorts/tours/${tour.timetable.length > 1 ? 'multiday' : 'oneday' }/${tour._id}`);
                                 }
@@ -260,19 +392,23 @@ const Account = (props) => {
                                         <button className={classes.button} onClick={OnClickTour}>
                                             Перейти на страницу
                                         </button>
-                                        {isHistory ? GenerateLeaveCommentButton(tour, 'tours') : GeneratePayInAdditioon()}
+                                        {isHistory ? GenerateLeaveCommentButton(tour, 'tours') : 
+                                        <>
+                                            {GenerateDenyButton()}
+                                            {GeneratePayInAdditioon()} 
+                                        </>}
                                     </div>
                                 </div>;
                             case 'relax_orders':
                             case 'history_relax_orders':
                                 const relax = order.relax;
                                 const room = order.room;
-                                //
+                                //В случаи если санатория, пансионата или комнаты больше нету в БД
                                 if(!relax || !room)
                                     return <div className={classes.dont_exists}>
                                         <h1>Данное место отдыха больше не существует!</h1>
                                     </div>;
-                                //
+                                //Событие, происходящие по клику на "Перейти страницу"
                                 function OnClickRelax(e) {
                                     router.push(`/resorts/relax/${relax.type == 'Санаторий' ? 'sanatoriums' : 'pensionats' }/${relax._id}`);
                                 }
@@ -357,18 +493,23 @@ const Account = (props) => {
                                         <button className={classes.button} onClick={OnClickRelax}>
                                             Перейти на страницу
                                         </button>
-                                        {isHistory ? GenerateLeaveCommentButton(relax, 'relax') : GeneratePayInAdditioon()}
+                                        {isHistory ? GenerateLeaveCommentButton(relax, 'relax') : 
+                                        <>
+                                            {GenerateDenyButton()}
+                                            {GeneratePayInAdditioon()} 
+                                        </>}
                                     </div>
                                 </div>;
                             case 'cruises_orders':
                             case 'history_cruises_orders':
                                 const cruise = order.cruise;
                                 const cabin = order.room;
+                                //В случаи если круиза или комнаты больше нету в БД
                                 if(!cruise || !cabin)
                                     return <div className={classes.dont_exists}>
                                         <h1>Данный круиз больше не существует!</h1>
                                     </div>;
-                                //
+                                //Событие, происходящие по клику на "Перейти страницу"
                                 function OnClickCruise(e) {
                                     router.push(`/resorts/cruise/${cruise.type == 'Речной' ? 'river' : 'marine' }/${cruise._id}`);
                                 }
@@ -445,59 +586,90 @@ const Account = (props) => {
                                         <button className={classes.button} onClick={OnClickCruise}>
                                             Перейти на страницу
                                         </button>
-                                        {isHistory ? GenerateLeaveCommentButton(cruise, 'cruises') : GeneratePayInAdditioon()}
+                                        {isHistory ? GenerateLeaveCommentButton(cruise, 'cruises') : 
+                                        <>
+                                            {GenerateDenyButton()}
+                                            {GeneratePayInAdditioon()} 
+                                        </>}
                                     </div>
                                 </div>;
                         }
                     }
 
                     const elements = [];
+                    //Получение нужного массива с заказами
                     const orders = user[type_order];
-                    //tours
+                    //Если массив сущетсвует
                     if(orders)
                     {
                         for(let i = 0; i < orders.length; i++)
                         {
+                            //Итерация каждого заказа
                             const order = orders[i];
-                            //
                             elements.push(ConvertOrder(order));
                         }
                     }
-                    //
-                    switch(type_order)
-                    {
-                        case 'tours_orders':
-                            return <div className={classes.tours}>
-                                {elements.length > 0 ? <h1 className={classes.title}>Забронированные туры</h1> : ''}
-                                {elements}
-                            </div>;
-                        case 'relax_orders':
-                            return <div className={classes.relaxes}>
-                                {elements.length > 0 ? <h1 className={classes.title}>Забронированные санатории, пансионаты</h1> : ''}
-                                {elements}
-                            </div>;
-                        case 'cruises_orders':
-                            return <div className={classes.cruises}>
-                                {elements.length > 0 ? <h1 className={classes.title}>Забронированные круизы</h1> : ''}
-                                {elements}
-                            </div>;
-                        //
-                        case 'history_tours_orders':
-                            return <div className={classes.tours}>
-                                {elements.length > 0 ? <h1 className={classes.title}>История покупок туров</h1> : ''}
-                                {elements}
-                            </div>;
-                        case 'history_relax_orders':
-                            return <div className={classes.relaxes}>
-                                {elements.length > 0 ? <h1 className={classes.title}>История покупок санаториев и пансионатов</h1> : ''}
-                                {elements}
-                            </div>;
-                        case 'history_cruises_orders':
-                            return <div className={classes.cruises}>
-                                {elements.length > 0 ? <h1 className={classes.title}>История покупок круизов</h1> : ''}
-                                {elements}
-                            </div>;
+                    //Событие, происходяще по клику на заголовок заказов
+                    function ExpandBookingSection(e) {
+                        let arrow = e.currentTarget;
+                        arrow.parentNode.classList
+                        .toggle(classes.active);
                     }
+                    //В зависимости от типа заказа генерация разного текста заголовка
+                    if(elements.length > 0)
+                        switch(type_order)
+                        {
+                            //Обычные заказы
+                            case 'tours_orders':
+                                return <div className={classes.tours}>
+                                    <div className={classes.title} onClick={ExpandBookingSection}>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        <h1>Забронированные туры</h1>
+                                    </div>
+                                    {elements}
+                                </div>;
+                            case 'relax_orders':
+                                return <div className={classes.relaxes}>
+                                    <div className={classes.title} onClick={ExpandBookingSection}>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        <h1>Забронированные санатории, пансионаты</h1>
+                                    </div>
+                                    {elements}
+                                </div>;
+                            case 'cruises_orders':
+                                return <div className={classes.cruises}>
+                                    <div className={classes.title} onClick={ExpandBookingSection}>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        <h1>Забронированные круизы</h1>
+                                    </div>
+                                    {elements}
+                                </div>;
+                            //Заказы ушедшие в историю
+                            case 'history_tours_orders':
+                                return <div className={classes.tours}>
+                                    <div className={classes.title} onClick={ExpandBookingSection}>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        <h1>История покупок туров</h1>
+                                    </div>
+                                    {elements}
+                                </div>;
+                            case 'history_relax_orders':
+                                return <div className={classes.relaxes}>
+                                    <div className={classes.title} onClick={ExpandBookingSection}>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        <h1>История покупок санаториев и пансионатов</h1>
+                                    </div>
+                                    {elements}
+                                </div>;
+                            case 'history_cruises_orders':
+                                return <div className={classes.cruises}>
+                                    <div className={classes.title} onClick={ExpandBookingSection}>
+                                        <i class="fa fa-arrow-down" aria-hidden="true"></i>
+                                        <h1>История покупок круизов</h1>
+                                    </div>
+                                    {elements}
+                                </div>;
+                        }
                 }
 
                 return <>
@@ -524,11 +696,6 @@ const Account = (props) => {
                         <img src={user.image}/>
                     </div>
                     <div  className={classes.inputs}>
-                        {/*  */}
-                        <InputText title='Логин'
-                        value={user.login}
-                        className={classes.input + ' ' + classes.login}
-                        onChainge={(e, value) => OnChainge(e, value, 'login')}/>
                         {/*  */}
                         <InputText title='Пароль'
                         value={user.password}
@@ -574,10 +741,9 @@ const Account = (props) => {
                 {GenerateOrders()}
             </div>;
         }
-        else
-            return;
     }
 
+    //Генерация модульного окна
     function GenerateModalWindow() {
         return window ? <ModalWindow {...window} onClose={() => setWindow()}/> : '';
     }
@@ -594,8 +760,10 @@ const Account = (props) => {
     )
 }
 
+//Функция NextJS запускающаяся при сборке сайта, 
+//возвращает все пути для данного динамического маршрута
 export async function getStaticPaths() {
-    const paths = []
+    const paths = [];
     //
     const res = await fetch(`${Global.url}/api/db/users`);
     const users = await res.json();
@@ -607,6 +775,9 @@ export async function getStaticPaths() {
     };
 }
 
+//Функция NextJS запускающаяся при сборке сайта, 
+//на основе путей из getStatisPaths делает запросы к серверу, 
+//и передает ответы главному компоненту через props
 export async function getStaticProps(router) {
     const id_user = router.params.id;
     //
@@ -623,6 +794,3 @@ export async function getStaticProps(router) {
 }
 
 export default Account;
-// export default <AccountContextComponent.Consumer>
-//     {AccountContext => <Account AccountContext={AccountContext}/>}
-// </AccountContextComponent.Consumer>;

@@ -1,12 +1,37 @@
 import { DBRef, ObjectID } from 'bson';
 
 export default class Global {
-    static url = 'http://localhost:3000';
+    // static url = 'http://185.251.91.231:3000';
+    static url = 'http://192.168.1.34:3000';
 
     static resorts = {
         'relax': [ 'pensionats', 'sanatoriums' ],
         'cruises': [ 'river', 'marine' ],
         'tours': [ 'oneday', 'multiday' ]
+    }
+
+    static GetTranslate(word) {
+        switch(word)
+        {
+            case 'admins':
+                return 'Администраторы';
+            case 'countries':
+                return 'Страны';
+            case 'cruises':
+                return 'Круизы';
+            case 'localities':
+                return 'Города';
+            case 'managers':
+                return 'Менеджеры';
+            case 'motorships':
+                return 'Суда';
+            case 'relax':
+                return 'Санатории, Пансионаты';
+            case 'tours':
+                return 'Туры';
+            case 'users':
+                return 'Пользователя';
+        }
     }
 
     //Возможно стоит поместить этот массив в БД, а может нет :/
@@ -200,28 +225,6 @@ export default class Global {
             'max-age': -1
         })
     }
-
-    // static getCookie(cookies, name) {
-    //     console.log('getCookie');
-    //     let res = getCookie(name);
-    //     console.log(res);
-    //     return !res || Object.keys(res) == 0 ? undefined : res;
-    // }
-
-    // static setCookie(setCookieThis, name, value, options = { path: '/' })
-    // {
-    //     console.log('setCookie');
-    //     if(name == 'account_user')
-    //         setCookie(name, { _id: value._id, login: value.login, password: value.password }, options);
-    //         // setCookieThis(null, name, JSON.stringify({ _id: value._id, login: value.login, password: value.password }), options);
-    //     else if(name = 'account_worker')
-    //         setCookie(name, { _id: value._id, login: value.login, password: value.password, role: value.role }, options);
-    //         // setCookieThis(null, name, JSON.stringify({ _id: value._id, login: value.login, password: value.password, role: value.role}, options));
-    //     else
-    //         setCookie(name, value, options);
-    //         // setCookieThis(null, name, value, options);
-    //     console.log(getCookie(name, true));
-    // }
 
     static CorrectArray(element, order) {
         if(Object.keys(element[order][0]).length == 0)

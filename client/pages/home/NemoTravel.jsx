@@ -13,7 +13,7 @@ const NemoTravel = () => {
 
     return <div className={classes.nemo_travel}>
         <div className={classes.title}>
-            <p>Поиск</p>
+            <p>Поиск NemoTravel</p>
         </div>
         <div id="fillNemoTravel"></div>
     </div>;

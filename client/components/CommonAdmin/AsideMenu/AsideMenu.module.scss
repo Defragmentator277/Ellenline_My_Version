@@ -18,6 +18,7 @@
     .item
     {
         position: relative;
+        border-bottom: 1px $primary_color solid;
 
         &:hover
         {

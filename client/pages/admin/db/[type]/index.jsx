@@ -6,26 +6,31 @@ import ContextMenu from '../../../../components/Common/ContextMenu/ContextMenu.j
 import SelectOption from '../../../../components/CustomElements/SelectOption.jsx';
 //
 import Global from '../../../global.js';
-import Local from '../local.js';
 import classes from './index.module.scss';
 
 const Type = (props) => {
+    //Массив для создания списка слева меню, получение перевода названия коллекции
     const items = props.items ?
-        props.items.map((element) => { return { title: element, href: element } }) 
+        props.items.map((element) => { return { title: Global.GetTranslate(element), href: element } }) 
         : [];
+    //Генерируемая коллекция
     const type = props.type;
+    //Содержимое коллекции
     const collection = props.collection;
+    //Структура коллекции
     const struct = props.struct;
-    //
+    //Модальное окно
     const [contentModal, setContentModal] = useState();
+    //Контекстное меню
     const [contentContext, setContentContext] = useState();
-    //
 
+    //Генерация названия
     function GenerateTitle() {
-        const title = Global.FirstLetter(type);//Local.items.find((element) => element.href == type).title;
+        const title = Global.GetTranslate(type);//Local.items.find((element) => element.href == type).title;
         return <h1 className={classes.title}>{title}</h1>;
     }
 
+    //Генерация таблицы
     function GenerateTable() {
         const elements = [];
 
@@ -39,19 +44,17 @@ const Type = (props) => {
                 return element.prop;
         });
 
-        //Функция итерации 
+        //Функция генерирующая строки таблицы 
         function GenerateRows() {
             //По клику на клетку запоминает последний айди
             let last_id;
-            //GLOBAl
-            //Конвертирование элемента для модального окна
+
+            //Конвертирование элемента для модального окна "добавления" элемента массива
             function ConvertToFieldsAddButton(element) {
                 switch(element.type)
                 {
                     case 'massive':
-                        //В случаи если это массив значит нужно добавить кнопку
-                        //element.prop = [ ... ]
-                        // console.log(element.prop);
+                    //В случаи если это массив
                         return {
                             type: 'button',
                             prop: 
@@ -63,7 +66,7 @@ const Type = (props) => {
                             translate: element.translate,
                             min: element.min
                         };
-                    //В случаи массива или объекта
+                    //В случаи объекта
                     case 'object':
                         let prop = element.prop;
                         if(Array.isArray(prop))
@@ -77,14 +80,16 @@ const Type = (props) => {
                         else
                             //В случаи если это объект рекурсивно добираемся до свойств
                             return ConvertToFieldsAddButton(prop);
+                    //В случаи поля OtherId
                     case 'OtherId':
                         element.getValues = (setValues) => Global.GetIds(setValues, element.ref); 
                         return element;
+                    //В случаи поля InnerId
                     case 'InnerId':
                         element.getValues = (setValues) => Global.GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${element.ref}`, 'id');
-                        // element.getValues = (setValues) => setValues([]);
-                        // return element;
+                        return element;
                     default:
+                    //По умолчанию возвращает элемент
                         return element;
                 }
             }
@@ -104,14 +109,14 @@ const Type = (props) => {
                             fields.push(ConvertToFieldsAddButton(element));
                         }
                     });
-                    //
+                    //Изменения состояния модульного окна
                     setContentModal(
                     {
                         title: 'Добавить',
                         fields: fields,
                         onChainge: (e, value) => 
                         {
-                            //All properties
+                            //Запрос на добавление
                             fetch(`${Global.url}/api/db/${type}/insert?object=${JSON.stringify(value)}`)
                             .then((res) => 
                             {
@@ -142,18 +147,19 @@ const Type = (props) => {
                 //В этой функции происходит основное взаимодествие с БД
                 function OnClickCell(e) {
                     e.preventDefault();
+                    //Получение ячейки
                     const cell = e.currentTarget;
-                    //header тоже считается поэтому на одни элемент меньше
+                    //Получение колонны
                     const column = cell.getAttribute('column');
                     //В случаи если колонна id
                     if(column == '_id' || column == 'id')
                         return;
                     const id = object._id;
+                    //Сохраняем последнее айди
                     last_id = id;
+                    //Получаем структуру данного поля
                     const field_struct = struct.find((elem_struct) => elem_struct.prop === column || elem_struct.title === column);
                     const type_of = field_struct.type;
-                    console.log(column);
-                    console.log(field_struct);
                     //В случаи если объект являеться сложным запоминает айди, но не открывает контекстное меню
                     if(field_struct.secret ||
                        type_of == 'object' ||
@@ -162,7 +168,6 @@ const Type = (props) => {
                        type_of == 'OtherId' || 
                        type_of == 'InnerId')
                         return;
-                    //Buttons
                     //Кнопка изменить
                     const ChangeButton =
                     {
@@ -212,14 +217,12 @@ const Type = (props) => {
                             .then((res) => 
                             {
                                 console.log('Успех');
-                                //Приводит к несоотвествиям данных
-                                // //Удаление объекта из таблицы
-                                // document.getElementById('dataTable').removeChild(cell.parentNode);
                                 return res.json();
                             })
                             .then((res) => 
                             {
                                 console.log(res);
+                                //Удаление объекта из таблицы, и перезагрузка страницы
                                 location.reload();
                             })
                             //
@@ -234,8 +237,7 @@ const Type = (props) => {
                             });                
                         }
                     }
-                    //Создание content для контекстного меню
-                    //
+                    //Изменение состояния контекстного меню
                     setContentContext(
                     { 
                         content: [ ChangeButton, AddButton, DeleteButton ],
@@ -246,13 +248,16 @@ const Type = (props) => {
                         }
                     });
                 }
-                //#region For Difficult generation
+
+                //#region Рекурсивная функция, которая в зависимости от типа данных генерирует ячейку таблицы
+                //в случаи вложенности, генерирует кнопку, по клику на которую октрывается модульное окно с содержимым
                 function ConvertVariable(object, elem_struct, path = []) {
-                    // last_id = 
                     const this_path = [];
                     let prop_path, id, last_prop;
-                    //
+                    //Установка переменных this_path, id, prop_path, last_prop
+                    //нужных для изменения значений в бд 
                     function getPathsIdsProp() {
+                        //Итерация пути вложенности в объект
                         for(let i = 0; i < path.length; i++)
                         {
                             if(typeof path[i] == 'number')
@@ -271,7 +276,7 @@ const Type = (props) => {
 
                         this_path.push(elem_struct.prop);
                     }
-                    //
+                    //Конвертация значения в объект нужный для изменения значения в бд
                     function convertToUpdateObject(value) {
                         switch(id)
                         {
@@ -286,17 +291,14 @@ const Type = (props) => {
                                     key: last_prop, 
                                     new_value: value
                                 };
-                            //В случаи нескольких вложенных массивов
-                            //Пока не поддерживается
-                            // default:
-                            //     console.log("ERROR HAS ARRAY IN ARRAY, THIS FEATURE DON`T SUPPORT");
-                            //     break;
                         };
                     }
-                    //
+                    //События, происходящее при изменении полей выпадающего списка 
+                    //с типом данных combobox, OtherId, InnerId
                     function onChangeSelection(e, value) {
+                        //Конвертирования значение в удобоваримый вид
                         const new_object = convertToUpdateObject(value);
-                        //
+                        //Запрос на обновление данных в бд
                         fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(new_object)}`)
                         .then((res) => 
                         {
@@ -309,11 +311,14 @@ const Type = (props) => {
                             console.log(err);
                         });
                     }
-                    //
+                    //Css класс обертки переменной
                     let className;
+                    //Содержимое
                     let content = [];
+                    //Генерация поля в зависимости от структуры
                     switch(elem_struct.type)
                     {
+                        //По умолчанию ошибка
                         default:
                             console.log(elem_struct.type + ' TYPE DON`T SUPPORT');
                             return <div>DONT SUPPORT</div>;
@@ -322,25 +327,30 @@ const Type = (props) => {
                         case 'boolean':
                         case 'time':
                         case 'date':
-                        //MongoDB object represent id of element in documents (TABLE IN SQL NOTATION)
                         case 'ObjectId':
+                            //В случаи простых типов данных
                             getPathsIdsProp();
-                            // this_path - all path to propertie, elem_struct.prop - last propertie
     
+                            //Событие, происходящие по клике на переменную
                             function OnClickVariable(e) {
                                 e.preventDefault();
     
+                                //Если значение переменной секретно 
+                                //или если его колонка id, _id, 
+                                //контекстное меню не вызывается
                                 if(elem_struct.secret ||
                                    elem_struct.prop == 'id' ||
                                    elem_struct.prop == '_id')
                                     return;
-                                    
+
+                                //Кнопка изменить
                                 const ChangeButton = 
                                 {
                                     title: 'Изменить',
                                     OnClick: 
                                     (e) => 
                                     {
+                                        //Изменение состояния модульного окна
                                         setContentModal(    
                                         {
                                             title: 'Изменить',
@@ -361,7 +371,6 @@ const Type = (props) => {
                                                     console.log(res);
                                                     location.reload();
                                                 })
-                                                //Ошибка
                                                 .catch((err) => 
                                                 {
                                                     console.log('Ошибка');
@@ -375,7 +384,7 @@ const Type = (props) => {
                                         });
                                     }
                                 };
-            
+                                //Изменения состояния контекстного меню
                                 setContentContext(
                                 {
                                     content: [ ChangeButton ],
@@ -426,23 +435,24 @@ const Type = (props) => {
                             isOnce={true}
                             getValues={(setValues) => Global.GetIds(setValues, `${type}/sub_func/getInnerIds?id=${last_id}&key=${elem_struct.ref}`, 'id')}/>;
                         case 'massive':
-                            // getPathsIdsProp();
-                            //
                             className = classes.massive;
-                            //
+                            //Массив
                             const array = object[elem_struct.title];
+                            //Путь до массива в объекте
                             const array_path = path.concat(elem_struct.title).join('.');
-                            //
+                            //Итерация массива
                             array.forEach((element, index) => {
-                                
+                                //Событие, происходящие по клику на кнопку удалить
                                 function OnClickRemoveButton(e) {
                                     e.preventDefault();
+                                    //
                                     if(array.length == 1)
                                     {
                                         alert('Запрещено удалять первый элемент массива!');
                                         return;
                                     }
                                     const object = { key: array_path, new_value: element.id };
+                                    //Запрос на удаление элемента из массива
                                     fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$pull'}`)
                                     .then((res) => 
                                     {
@@ -452,6 +462,7 @@ const Type = (props) => {
                                     .then((res) => 
                                     {
                                         console.log(res);
+                                        //В случаи успеха страница перезагружается
                                         location.reload();
                                     })
                                     .catch((err) => 
@@ -464,14 +475,14 @@ const Type = (props) => {
                                         console.log(err);
                                     });
                                 }
-                                //Конвертация элемента массива
+                                //Конвертация элемента массива в вид объекта и последующая конвертация
                                 function ConvertElementOfArray() {
                                     return ConvertVariable(
                                         { [elem_struct.title]: element }, 
                                         { ...elem_struct, type: 'object', }, 
                                         path.concat(element.id));
                                 }
-                                //
+                                //Добавление конвертированных элементов, в содержимое
                                 content.push(<div className={classes.item}>
                                     {ConvertElementOfArray()}
                                     <button onClick={(e) => OnClickRemoveButton(e)}>
@@ -479,12 +490,11 @@ const Type = (props) => {
                                     </button>
                                 </div>);
                             });
-                            //Add button
-                            //Назвать элемент чтобы затем в ModalWindow найти это кнопку и создать элемент по подобию
-                            //Объекта который также будет находиться в кнопке
+                            //Событие, происходящие по клику на кнопку добавить
                             function OnClickAddButton(e, value)
                             {
                                 e.preventDefault();
+                                //Привидение к удобоваримому значению, для обновления
                                 const object = { key: array_path, new_value: value };
                                 fetch(`${Global.url}/api/db/${type}/update?id=${last_id}&prop=${JSON.stringify(object)}&operator=${'$push'}`)
                                 .then((res) => 
@@ -495,6 +505,7 @@ const Type = (props) => {
                                 .then((res) => 
                                 {
                                     console.log(res);
+                                    //Обновление странцы
                                     location.reload();
                                 })
                                 .catch((err) => 
@@ -513,7 +524,6 @@ const Type = (props) => {
                                 window={
                                 {
                                     title: 'Добавить',
-                                    //elem_struct.prop содержит все поля для создания нового элемента 
                                     fields: elem_struct.prop,
                                     onChainge: OnClickAddButton,
                                     toGetInnerIds: `${type}/sub_func/getInnerIds?id=${new_id}`
@@ -524,16 +534,8 @@ const Type = (props) => {
                         case 'object':
                             className = classes.object; 
                             const new_object = object[elem_struct.title];
-                            //
+                            //Итерация каждого свойства объекта, и его последующая конвертация
                             elem_struct.prop.forEach((element) => {
-                                // let title = ;
-                                // if(element.translate)
-                                //     title = elem
-                                // if(element.title)
-                                //     title = element.title;
-                                // else
-                                //     title = element.prop;
-                                //
                                 content.push(<>
                                     <div className={classes.text}>
                                         {Global.FirstLetter(element.translate || element.title || element.prop)}:
@@ -545,13 +547,13 @@ const Type = (props) => {
                             });
                             break;
                     }
-                    //
+                    //Если это первый сложный объект, создание кнопки
                     if(path.length == 0)
                     {
                         content = <div className={className}>
                             {content}
                         </div>;
-                        //
+                        //Событие, происходящие по клику на кнопку "Открыть"
                         function OpenModalButton(e, content, title) {
                             setContentModal(
                             { 
@@ -570,9 +572,6 @@ const Type = (props) => {
                     </div>;
                 }
                 //#endregion
-
-                const iddddd = object._id;
-
                 return <tr _id={object._id}>
                     {struct.map((elem_struct) => {
                         //new 
@@ -615,12 +614,13 @@ const Type = (props) => {
                 elements.push(<tr onClick={(e) => OnClick(e)}>{header}</tr>);
             }
             GenerateHeader();
+            //Итерация документов в коллекции
             for(let i = 0; i < collection.length; i++)
             {
                 const object = collection[i];
                 elements.push(GetRow(object));
             }
-            
+            //
             return elements;
         }
         //Создание таблицы
@@ -633,7 +633,7 @@ const Type = (props) => {
             {GenerateRows()}
         </table>;
     }
-
+    //Генерация модульного окна
     function GenerateModalWindow() {
         return contentModal ? 
         <ModalWindow className={classes.modal} 
@@ -645,7 +645,7 @@ const Type = (props) => {
             {contentModal.content}
         </ModalWindow> : '';
     }
-
+    //Генерация контекстного меню
     function GenerateContextMenu() {
         return contentContext ? 
         <ContextMenu items={contentContext.content} 
@@ -665,9 +665,12 @@ const Type = (props) => {
     )
 }
 
+//Функция NextJS запускающаяся при сборке сайта, 
+//возвращает все пути для данного динамического маршрута
 export async function getStaticPaths() {
-    //ТУТ ИСПРАВИТь
+    //Получение всех названия коллекций из БД
     const collections = await (await fetch(Global.url + '/api/db/')).json();
+    //Конвертирование в пути
     const paths = collections.map((element) => { return { params: { type: element } } });
 
     return {
@@ -676,12 +679,17 @@ export async function getStaticPaths() {
     }
 }
 
+//Функция NextJS запускающаяся при сборке сайта, 
+//на основе путей из getStatisPaths делает запросы к серверу, 
+//и передает ответы главному компоненту через props
 export async function getStaticProps(router) {
-    //Запрос к бд для получения коллекции из mongoDB
+    //Переменная содержащая название коллекции
     const type = router.params.type;
+    //Получение всех названия коллекций из БД
     const items = await (await fetch(Global.url + '/api/db/')).json();
-    //
+    //Получение содержимого коллекции из БД
     const collection = await (await fetch(Global.url + '/api/db/' + type)).json();
+    //Получение структуры коллекции из бд
     const struct = await (await (fetch(Global.url + '/api/db/' + type + '/struct'))).json();
     //
     return {
