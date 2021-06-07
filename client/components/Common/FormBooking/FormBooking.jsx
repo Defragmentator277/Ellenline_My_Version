@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from 'react';
 //
 import SelectOption from '../../CustomElements/SelectOption.jsx';
-import InputText from '../../CustomElements/InputText.jsx';
 import InputDate from '../../CustomElements/InputDate.jsx';
-import Button from '../../CustomElements/Button.jsx';
 import InputNumber from '../../CustomElements/InputNumber.jsx';
-import InputTelephone from '../../CustomElements/InputTelephone.jsx';
-import InputEmail from '../../CustomElements/InputEmail.jsx';
 import ChooseRoom from '../ChooseRoom/ChooseRoom.jsx';
 import ModalWindow from '../ModalWindow/ModalWindow.jsx';
 //

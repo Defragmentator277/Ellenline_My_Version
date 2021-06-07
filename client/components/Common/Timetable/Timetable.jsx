@@ -5,14 +5,6 @@ const Timetable = (props) => {
     const timetable = props.timetable;
 
     function ConvertDay(day) {
-        // const elements = [];
-        // for(let i = 0; i < massive.length; i++)
-        // {
-        //     elements.push(<div className={classes.event}>
-        //         <span>{}</span><p>{}</p>
-        //     </div>)
-        // }
-        // return elements;
         return <div className={classes.event}>
             <span>{day.time.start + ' - ' + day.time.end}</span>
             <p>{day.description}</p>

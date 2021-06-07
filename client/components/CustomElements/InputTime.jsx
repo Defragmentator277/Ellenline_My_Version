@@ -14,8 +14,6 @@ const InputTime = (props) => {
 
     function OnChange(e) {
         const value = e.currentTarget.value;
-        console.log('Time');
-        console.log(value);
         if(onChainge)
             onChainge(e, value);
     }

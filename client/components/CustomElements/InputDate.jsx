@@ -34,10 +34,6 @@ const InputDate = (props) => {
         return ConvertObjectDateToDate(date);
     });
 
-    // useEffect(() => {
-    //     document.getElementById('date').value = date;
-    // });
-
     function GenerateTitle() {
         return title ? <Title title={title}/> : '';
     }

@@ -6,7 +6,6 @@ import classesInput from './GeneralScss/Input.module.scss'
 
 const InputText = (props) => {
     const placeholder = props.placeholder || '+70000000000';
-    // props = props.settings;
     const [value, setValue] = useState(props.value);
     const title = props.title;
     const onChainge = props.onChainge;

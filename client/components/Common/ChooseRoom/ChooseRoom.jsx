@@ -9,13 +9,11 @@ import classes from './ChooseRoom.module.scss';
 const ChooseRoom = (props) => {
     const [rooms, setRooms] = useState(props.rooms);
     const [index, setIndex] = useState(0);
-    // const [room, setRoom] = useState(rooms[index]);
     const getValues = props.getValues;
     const room = rooms[index];
     const type = props.type;
     //
     const start_state = {
-        // id_room: room.id,
         room: room,
         number_of: {
             adult: 1,
@@ -29,11 +27,6 @@ const ChooseRoom = (props) => {
             type: '',
             price: ''
         }
-        // food: '',
-        // prices: {
-        //     usual: 0,
-        //     on_weekends: 0
-        // }
     };
     const [reservation, setReservation] = useState(start_state);
     const onChainge = props.onChainge;
@@ -41,8 +34,6 @@ const ChooseRoom = (props) => {
     function GenerateReservationDependOnIndex(index) {
         const new_obj = Object.assign({}, start_state);
         const room = rooms[index];
-        // new_obj.id_room = room.id;
-        // new_obj.prices = room.prices;
         new_obj.room = room;
         setReservation(new_obj);
         setIndex(index);
@@ -50,8 +41,6 @@ const ChooseRoom = (props) => {
 
     useEffect(() => {
         GenerateReservationDependOnIndex(0);
-        // if(getValues)
-        //     getValues(setRooms);
     }, [])
 
     useEffect(() => {

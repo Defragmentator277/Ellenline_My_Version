@@ -107,6 +107,9 @@ const AdminLayout = (props) => {
                 //В случаи ошибка удалить Cookie
                 Global.setCookie('account_worker', 'undefined');
             })
+            // .finally(() => {
+            //     location.reload();
+            // })
         }
     }
 

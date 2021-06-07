@@ -178,7 +178,7 @@ const Type = (props) => {
                             setContentModal(
                             { 
                                 title: 'Изменить', 
-                                fields: [ { type: type_of, prop: column } ],
+                                fields: [ { type: type_of, prop: column, translate: field_struct.translate } ],
                                 //По клику на кнопку изменить вызов api маршрута изменяющий данные в бд
                                 onChainge: (e, value) =>
                                 {

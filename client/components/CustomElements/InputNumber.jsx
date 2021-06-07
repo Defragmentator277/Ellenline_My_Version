@@ -34,8 +34,6 @@ const InputNumber = (props) => {
         setValue(new_value);
         if(onChainge)
             onChainge(e, new_value, setValue);
-        // else
-        //
     }
 
     function GenerateTitle() {
