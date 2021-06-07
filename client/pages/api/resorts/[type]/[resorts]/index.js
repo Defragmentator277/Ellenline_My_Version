@@ -87,6 +87,7 @@ handler.get(async (req, res) => {
                 services: { $first: '$services.available' },
                 rooms: { $first: '$rooms'},
                 timetable_schedule: { $first: '$timetable_departure' },
+                stars: { $first: '$stars' },
                 //
                 locality: { $first: { $objectToArray: '$id_locality' } }
             }},
@@ -114,7 +115,7 @@ handler.get(async (req, res) => {
                 min_price: { $min: '$rooms.prices.usual' },
                 services: { $first: '$services' },
                 rooms: { $push: '$rooms'},
-                // timetable_schedule: { $push: '$timetable_schedule' }
+                stars: { $first: '$stars' },
                 //
                 locality: { $first: '$locality' }
             }},
