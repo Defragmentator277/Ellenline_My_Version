@@ -122,7 +122,7 @@ export default class Global {
     }
 
     //Конвертирование элемента для модального окна
-    static ConvertToFieldsAddButtonMassive(element) {
+    static ConvertToFieldsAddButtonMassive(element, str) {
         switch(element.type)
         {
             case 'massive':
