@@ -41,7 +41,7 @@ const Resorts = (props) => {
                     if(condition.name && !new RegExp(condition.name, 'i').test(element.title))
                         continue;
                     console.log(condition);
-                    condition.length(element);
+                    console.log(element);
                     //Кол-ва звезд
                     if(condition.stars && condition.stars != element.stars)
                         continue;
