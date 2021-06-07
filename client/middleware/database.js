@@ -1,6 +1,6 @@
 import { MongoClient } from 'mongodb';
 import nextConnect from 'next-connect';
-import { getSession } from 'next-auth/client';
+// import { getSession } from 'next-auth/client';
 
 const client = new MongoClient('mongodb://localhost:27017/', 
 { 
