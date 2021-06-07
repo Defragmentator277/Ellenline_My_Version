@@ -56,6 +56,7 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
             display: grid;
             grid-template-columns: 1fr 1fr;
             grid-row: 2;
+            gap: 7.5px;
             //
             margin-left: 25px;
             padding-left: 5px;
@@ -76,7 +77,6 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
                 p
                 {
                     grid-column: 2;
-                    // align-self: flex-end;
                     align-self: center;
                 }
             }

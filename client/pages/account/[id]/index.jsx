@@ -414,17 +414,17 @@ const Account = (props) => {
                                 }
                                 //
                                 return <div className={classes.relax}>
+                                    {/*  */}
                                     <div className={classes.title_relax}>
                                         Фото c места отдыха
                                     </div>
-                                    <div className={classes.title_room}>
-                                        Фото комнаты
-                                    </div>
-                                    {/*  */}
                                     <div className={classes.image_relax}>
                                         <img src={relax.images[0].src}/>
                                     </div>
                                     {/*  */}
+                                    <div className={classes.title_room}>
+                                        Фото комнаты
+                                    </div>
                                     <div className={classes.image_room}>
                                         <img src={room.image}/>
                                     </div>
@@ -515,17 +515,17 @@ const Account = (props) => {
                                 }
                                 //
                                 return <div className={classes.cruise}>
-                                    <div className={classes.title_cruise}>
-                                        Фото c места отдыха
-                                    </div>
-                                    <div className={classes.title_cabin}>
-                                        Фото каюты
-                                    </div>
                                     {/*  */}
                                     <div className={classes.image_cruise}>
                                         <img src={cruise.images[0].src}/>
                                     </div>
+                                    <div className={classes.title_cruise}>
+                                        Фото c места отдыха
+                                    </div>
                                     {/*  */}
+                                    <div className={classes.title_cabin}>
+                                        Фото каюты
+                                    </div>
                                     <div className={classes.image_cabin}>
                                         <img src={cabin.image}/>
                                     </div>

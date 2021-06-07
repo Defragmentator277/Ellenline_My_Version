@@ -275,7 +275,7 @@ const Orders = (props) => {
                                 {/*  */}
                                 <div className={classes.relax_info}>
                                     <div className={classes.name}>
-                                        <h1>Название::</h1>
+                                        <h1>Название:</h1>
                                         <p>{relax.name}</p>
                                     </div>
                                     <div className={classes.name}>
@@ -289,6 +289,10 @@ const Orders = (props) => {
                                     <div className={classes.date_leave}>
                                         <h1>Дата отбытия:</h1>
                                         <p>{new Date(order.date_leave).toLocaleDateString()}</p>
+                                    </div>
+                                    <div className={classes.pets}>
+                                        <h1>Разрешены ли домашние питомцы:</h1>
+                                        <p>{room.pets ? 'Да' : 'Нет'}</p>
                                     </div>
                                     <div className={classes.price}>
                                         <h1>Общая сумма:</h1>
@@ -314,10 +318,6 @@ const Orders = (props) => {
                                     <div className={classes.type_food}>
                                         <h1>Тип питания:</h1>
                                         <p>{order.type_of_food.toUpperCase()}</p>
-                                    </div>
-                                    <div className={classes.pets}>
-                                        <h1>Разрешены ли домашние питомцы:</h1>
-                                        <p>{room.pets ? 'Да' : 'Нет'}</p>
                                     </div>
                                     <div className={classes.status}>
                                         <h1>Статус заказа:</h1>
