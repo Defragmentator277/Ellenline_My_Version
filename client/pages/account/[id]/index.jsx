@@ -23,6 +23,8 @@ const Account = (props) => {
     const login = props.login;
     const password = props.password;
 
+    console.log(user);
+
     //Событие, происходящее при изменении любого input`a
     function OnChainge(e, value, prop) {
         user[prop] = value;
