@@ -158,8 +158,6 @@ export default class Global {
                 element.getValues = (setValues) => Global.GetIds(setValues, element.ref); 
                 return element;
             case 'InnerId':
-                // const str
-                console.log(str);
                 element.getValues = (setValues) => Global.GetIds(setValues, str + `&key=${element.ref}`, 'id');
                 return element;
             default:
