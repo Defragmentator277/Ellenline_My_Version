@@ -134,7 +134,7 @@ export default class Global {
                     prop: 
                     {
                         title: 'Добавить',
-                        fields: element.prop.map((element) => Global.ConvertToFieldsAddButtonMassive(element))
+                        fields: element.prop.map((element) => Global.ConvertToFieldsAddButtonMassive(element, str))
                     },
                     title: element.title,
                     translate: element.translate,
@@ -146,7 +146,7 @@ export default class Global {
                 if(Array.isArray(prop))
                     return {
                         type: 'object',
-                        prop: prop.map((element) => Global.ConvertToFieldsAddButtonMassive(element)),
+                        prop: prop.map((element) => Global.ConvertToFieldsAddButtonMassive(element, str)),
                         title: element.title,
                         translate: element.translate,
                         min: element.min
