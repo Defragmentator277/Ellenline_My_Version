@@ -50,7 +50,6 @@ const Account = (props) => {
                             element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
                             delete element.manager;
                         }
-                        delete element.tour;
                         return element;
                     });
                     break;
@@ -58,12 +57,11 @@ const Account = (props) => {
                 case 'history_relax_orders':
                     copy_user[order] = copy_user[order].map((element) => {
                         element.id_relax = Global.ConvertToDBRef('relax', element.relax._id);
-                        if(order == 'history_tours_orders')
+                        if(order == 'history_relax_orders')
                         {
                             element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
                             delete element.manager;
                         }
-                        delete element.manager;
                         return element;
                     });
                     break;
@@ -71,12 +69,11 @@ const Account = (props) => {
                 case 'history_cruises_orders':
                     copy_user[order] = copy_user[order].map((element) => {
                         element.id_cruise = Global.ConvertToDBRef('cruises', element.cruise._id);
-                        if(order == 'history_tours_orders')
+                        if(order == 'history_cruises_orders')
                         {
                             element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
                             delete element.manager;
                         }
-                        delete element.manager;
                         return element;
                     });
                     break;
