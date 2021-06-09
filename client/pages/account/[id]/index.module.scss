@@ -307,7 +307,7 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
                 .relax
                 {
                     // height: auto;
-                    display: block;
+                    display: grid;
                 }
             }
         }

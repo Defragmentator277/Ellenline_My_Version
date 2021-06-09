@@ -423,6 +423,7 @@ db.structure.insertOne(
                         }
                     ],
                     title: 'available',
+                    translate: 'Входящие в стоимость',
                     min:1
                 },
                 //
@@ -444,6 +445,7 @@ db.structure.insertOne(
                         }
                     ],
                     title: 'cabin',
+                    translate: 'В каюте',
                     min:1
                 }
             ],
@@ -771,7 +773,7 @@ db.structure.insertOne(
             type: 'string',
             prop: 'description',
             translate: 'Описание',
-            hint: 'Описание'
+            hint: 'Описание'    
         },
         {
             type: 'number',
@@ -783,7 +785,7 @@ db.structure.insertOne(
             prop: 'adress',
             translate: 'Адресс'
         },
-        //
+        //  
         {
             type: 'massive',
             prop: 
@@ -923,7 +925,11 @@ db.structure.insertOne(
                     type: 'massive',
                     prop: 
                     [
-                        GetField('string', 'route')
+                        {
+                            type: 'string',
+                            prop: 'route',
+                            translate: 'Страна'
+                        }
                     ],
                     title: 'routes',
                     translate: 'Машрутах',
