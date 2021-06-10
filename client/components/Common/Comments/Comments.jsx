@@ -7,6 +7,7 @@ import classes from './Comments.module.scss';
 const Comments = (props) => {
     const comments = props.comments;
     const max = props.max;
+    const title = props.title || 'Комментарии';
     //
     const className = props.className;
     const classTitle = props.classTitle;
@@ -34,7 +35,7 @@ const Comments = (props) => {
         <div className={classes.comments + ' ' + className}>
             {comments && comments.length > 0 ? 
             <div className={classes.title + ' ' + classTitle}>
-                <p>Комментарии</p>
+                <p>{title}</p>
             </div> : ''}
             <div className={classes.content +' ' + classContent}>
                 {GenerateComments()}

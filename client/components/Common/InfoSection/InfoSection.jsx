@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 //
 import Slider from '../../CustomElements/Slider.jsx';
-import Button from '../../CustomElements/Button.jsx';
 //
 import classes from './InfoSection.module.scss';
 

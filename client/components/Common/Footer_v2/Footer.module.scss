@@ -1,0 +1,49 @@
+@import '../../../styles/index.scss';
+
+$linkcolor: white;
+
+.footer
+{
+    padding: 20px 80px;
+    background-color: $primary_color;
+    color: $linkcolor;
+    a
+    {
+        text-decoration: underline;
+        color: $linkcolor;
+    }
+    &__dis
+    {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-statr;
+    }
+    &__left
+    {
+        &__info__tur
+        {
+            font-weight: bold;
+            font-size: 1.2em
+        }
+        &__icon
+        {
+            img
+            {
+                width: 50px;
+            }
+        }
+
+    }
+    &__center
+    {
+        display: flex;
+        &__left
+        {
+            margin-right: 25px;
+        }
+        a
+        {
+            margin-right: 5px;
+        }
+    }
+}

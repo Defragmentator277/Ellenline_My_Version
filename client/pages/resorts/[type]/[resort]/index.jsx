@@ -37,6 +37,9 @@ const Resorts = (props) => {
                 //Проверка на соотвествия условию
                 if(condition)
                 {
+                    console.log(condition.name);
+                    console.log(element.title);
+                    console.log(!new RegExp(condition.name, 'i').test(element.title));
                     //Имени
                     if(condition.name && !new RegExp(condition.name, 'i').test(element.title))
                         continue;

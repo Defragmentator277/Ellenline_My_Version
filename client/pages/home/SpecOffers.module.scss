@@ -7,20 +7,25 @@ $fontSizeTitle: 1.2em;
 
 .news
 {
-
+    background-color: #5187b944;
     padding: 10px 80px;
     &__title
     {
         @extend %fontTitleSection;
+        margin-top: 0;
     }
     &__wrapper
     {
         &__item
         {
+            width: 50vw;
+            border-radius: 5px;
+            background-color:white;
             margin: 20px 0;
-            width: 550px;
+            padding: 10px;
             &__title
             {
+            width: 450px;
                 @extend %fontTitleNews
             }
             &__text, &__date
@@ -68,10 +73,12 @@ $fontSizeTitle: 1.2em;
         &__img
         {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             img
             {
-                width: 200px;
+                @extend %grid_center;
+                height: 170px;
+                object-fit: cover;
             }            
         }
     }

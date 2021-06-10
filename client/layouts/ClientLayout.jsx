@@ -3,6 +3,7 @@ import Head from 'next/head';
 //
 import Header from '../components/Common/Header/Header';
 import Footer from '../components/Common/Footer/Footer';
+import Footer_v2 from '../components/Common/Footer_v2/Footer';
 import AsideHeader from '../components/Common/Header/AsideHeader';
 import Notification from '../components/Common/Notification/Notification.jsx';
 //
@@ -80,7 +81,6 @@ const ClientLayout = ({ children, title = 'Эллинлайн' }) => {
                 {/* <iframe src="https://demo.paykeeper.ru/form/" style={{ width: '100%', height: '800px'}}></iframe> */}
                 {children}
                 {/*  */}
-                {/* <Footer/> */}
                 <Footer_v2/>
             </main>
         </>;

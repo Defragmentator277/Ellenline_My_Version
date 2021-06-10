@@ -74,15 +74,13 @@ const News = () => {
             {/* Секция с партнёрами ELLENLINE */}
             <div className={classes.news__partners}>
                 <h3 className={classes.news__partners__title}>
-                    Работаем с надёжными туроператорами
+                    Наши партнеры
                 </h3>
                 <div className={classes.news__partners__wrapper}>
                     <div className={classes.news__partners__img}>
-                        <img src='https://kaskad-trk.ru/wp-content/uploads/2019/06/pegas.png'/>
-                        <img src='http://surl.li/tsbh'/>
-                        <img src='https://kaskad-trk.ru/wp-content/uploads/2019/06/pegas.png'/>
-                        <img src='http://surl.li/tsbh'/>
-                        
+                        <img src='https://static.tildacdn.com/tild6164-3761-4535-b562-386566303739/Logo_Vodohod_Rus1.png'/>
+                        <img src='https://eclectica.ru/include/logoblack.png' style={{height: '150px'}}/>
+                        <img src='https://www.infoflot.com/i/logo.png'/>                        
                     </div>
                 </div>
             </div>

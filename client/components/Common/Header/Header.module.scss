@@ -5,17 +5,22 @@
     @extend %font;
     display: grid;
     grid-template-rows: fit-content fit-content;
-    row-gap: 25px;
-    padding: 25px 0;
+    
+    padding: 0px 0;
     .head
     {
-        display: flex;
-        justify-content: flex-start;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-auto-rows: auto;
         background-color: rgba(221, 221, 221, 0.623);
-        padding: 10px;
+        padding: 20px 100px;
         border-radius: 5px;
-        text-shadow: black 1px 1px, black 1px 1px, black 1px 1px, black 1px 1px, black 1px 1px;
+        padding-bottom: 0;
+        text-shadow: black 0 0 2px;
         color: white;
+        object-fit: fill;
+        height: 450px;
+        background: url('./headbg.jpg') center;
         .logo
         {
             margin-right: 60px;
@@ -23,42 +28,104 @@
             grid-template-columns: min-content max-content;
             column-gap: 10px;
             margin-left: 7.5px;
-    
+            grid-column: 1;
             img
             {
                 @extend %grid_center;
                 grid-column: 1;
             }
-    
             .text
             {
-                font-size: 1em;
+                font-size: 1.4em;
                 grid-column: 2;
                 text-align: center;
+                align-self: center;
+                justify-self: center;
                 h1, p
                 {
                     margin: 0px;
                 }
+                h1
+                {
+                    font-weight: bold;
+                }
             }
         }
-        
+        .phone
+        {
+            grid-column: 2;
+            align-self: center;
+            font-size: 1.2em;
+            .icon
+            {
+                a{
+                    img{
+
+                        width: 50px;
+                    }
+                }
+            }
+        }
+        .NemoTravel
+        {
+            z-index: 11;
+            grid-column-start: 1;
+            grid-column-end: 3;
+        }
     }
     .container
     {
-        width: 80vw;
+        width: 100%;
         margin: 0 auto;
+        margin-bottom: 75px;
+    }
+    .slogon{
+        grid-column-start: 1;
+        grid-column-end: 3;
+        font-size: 3em;
+        margin: 50px 0;
+        font-weight: bold;
+    }
+    .cloud
+    {
+        grid-column-start: 1;
+        grid-column-end: 3;
+        img
+        {
+            position: absolute;
+            left: -250px;
+            z-index: 0;
+            top: 738px;
+            width: 100%;
+        }
+    }
+    .cloud2
+    {
+        grid-column-start: 1;
+        grid-column-end: 3;
+        img
+        {
+            position: absolute;
+            left: 550px;
+            top: 738px;
+            width: 100%;
+            z-index: 0;
+        }
     }
     .menu
     {
-        margin-top: 20px;
         display: grid;
         // grid-template-columns: repeat(6, 1fr);
         grid-auto-columns: auto;
         grid-template-rows: 1fr;
         column-gap: 15px;
         background: linear-gradient(0deg, rgb(204, 204, 204), $primary_color);
-        width: 80vw;
+        padding: 10px 0px;
         border-radius: 5px;
+        position: absolute;
+        z-index: 100;
+        width: 100%;
+        margin-bottom: 50px;
         .item
         {
             // @extend %button;

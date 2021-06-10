@@ -1,8 +1,8 @@
 @import '../../styles/index.scss';
 
-$titlecolor: #866711;
-$textcolor: #be9421;
-$linkcolor: #a04419;
+$titlecolor: white;
+$textcolor: #0062FF;
+$linkcolor: rgb(103, 105, 224);
 $fontSizeText: 1.0em;
 $fontSizeTitle: 1.2em;
 $fontSizeTitleSection: 3em;
@@ -84,9 +84,13 @@ $fontSizeTitleSection: 3em;
             padding: 25px;
         }
     }
-
+    .title
+    {
+        margin-top: 0px;
+    }
     .list
     {
+        
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(300px, 400px));
         justify-content: center;
