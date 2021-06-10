@@ -46,39 +46,13 @@ handler.get(async (req, res) => {
     ]).toArray((err, collection) => {
         if(err)
         {
-            // console.log(err);
             res.json(err);
         }
         else
         {
-            // console.log(res);
             res.json(collection);
         }
     });
-
-    // req.db.collection('localities').find({
-    //     // { $match: { name: 'Россия' } }
-    //     // { $set: { 'new_id': {
-    //     //     '$id': '$_id',
-    //     //     '$ref': 'localities'
-    //     // } } },
-    //     // { $lookup: 
-    //     // {
-    //     //     from: 'localities',
-    //     //     localField: 'new_id',
-    //     //     foreignField: 'id_country',
-    //     //     as: 'testField'
-    //     // }}
-    // }).toArray((err, collection) => {
-    //     if(err)
-    //     {
-    //         console.log(err);
-    //         res.json(err);
-    //     }
-    //     else
-    //     {
-    //     }
-    // });
 
 });
 

@@ -27,67 +27,31 @@ const Account = (props) => {
 
     //Событие, происходящее при изменении любого input`a
     function OnChainge(e, value, prop) {
+        if(value.length == 0)
+        {
+            alert('Поле не может быть не заполненным');
+            location.reload();
+        }
         user[prop] = value;
         setUser({...user});
     }
 
     //Событие, происходящее при нажатии кнопки "Принять изменения"
     function OnClick(e) {
-        //Создание глубокой копии пользователя, для избежания несоответсвия данныъ
+        //Создание глубокой копии пользователя, для избежания несоответсвия данных
         const copy_user = JSON.parse(JSON.stringify(user));
         //Функция конвертации заказа
-        //Заменяет объекты санаториев, пансионатов, туров и круизов на ссылки документов других коллекций
-        function ConvertOrder(order)
-        {
-            switch(order)
-            {
-                case 'tours_orders':
-                case 'history_tours_orders':
-                    copy_user[order] = copy_user[order].map((element) => {
-                        element.id_tour = Global.ConvertToDBRef('tours', element.tour._id);
-                        if(order == 'history_tours_orders')
-                        {
-                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
-                            delete element.manager;
-                        }
-                        return element;
-                    });
-                    break;
-                case 'relax_orders':
-                case 'history_relax_orders':
-                    copy_user[order] = copy_user[order].map((element) => {
-                        element.id_relax = Global.ConvertToDBRef('relax', element.relax._id);
-                        if(order == 'history_relax_orders')
-                        {
-                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
-                            delete element.manager;
-                        }
-                        return element;
-                    });
-                    break;
-                case 'cruises_orders':
-                case 'history_cruises_orders':
-                    copy_user[order] = copy_user[order].map((element) => {
-                        element.id_cruise = Global.ConvertToDBRef('cruises', element.cruise._id);
-                        if(order == 'history_cruises_orders')
-                        {
-                            element.id_manager = Global.ConvertToDBRef('managers', element.manager._id);
-                            delete element.manager;
-                        }
-                        return element;
-                    });
-                    break;
-            }
-        }
         //Удаление поля _id
         delete copy_user._id;
         //Конвертировани всех заказов
-        ConvertOrder('tours_orders');
-        ConvertOrder('history_tours_orders');
-        ConvertOrder('relax_orders');
-        ConvertOrder('history_relax_orders');
-        ConvertOrder('cruise_orders');
-        ConvertOrder('history_cruises_orders');
+        delete copy_user.tours_orders;
+        delete copy_user.history_tours_orders;
+        //
+        delete copy_user.relax_orders;
+        delete copy_user.history_relax_orders;
+        //
+        delete copy_user.cruises_orders;
+        delete copy_user.history_cruises_orders;
         //Запрос на обновлении информации о пользователе
         fetch(`${Global.url}/api/db/users/update?prop=${JSON.stringify(copy_user)}&id=${user._id}&operator=${'$replace'}`)
         .then((res) => {
@@ -110,10 +74,10 @@ const Account = (props) => {
             //Реакция на ошибку
             alert('Произошла непредвиденная ошибка');
         })
-        .finally(() => {
-            //Обновление страницы в любом случаи
-            location.reload();
-        });
+        // .finally(() => {
+        //     //Обновление страницы в любом случаи
+        //     // location.reload();
+        // });
     }   
 
     function GenerateContent() {

@@ -7,7 +7,7 @@ const handler = nextConnect();
 
 handler.use(middleware);
 
-handler.get(async (req, res) => {
+const updateFunc = async (req, res) => {
     //all incoming
     const type = req.query.type;
     const id = req.query.id;
@@ -75,9 +75,10 @@ handler.get(async (req, res) => {
                 Update(id, prop, '$pull');
                 break;
             case '$replace':
+                // prop - is replace objects
                 collection.update(
                     { _id: ObjectId(id) }, 
-                    prop, 
+                    { $set: prop }, 
                     (err, result) => 
                     {
                         console.log(err);
@@ -110,6 +111,10 @@ handler.get(async (req, res) => {
             }
         );
     }
-});
+};
+
+handler.get(updateFunc);
+//
+handler.post(updateFunc);
 
 export default handler;

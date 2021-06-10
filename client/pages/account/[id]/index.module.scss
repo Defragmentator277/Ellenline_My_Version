@@ -16,10 +16,10 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
     .greetings
     {
         grid-column-start: 1;
-        font-size: 1.25em;
 
         & > h1
         {
+            font-size: 2em;
             margin: 5px 0;
         }
     }
@@ -109,7 +109,7 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
                 {
                     @extend %grid_center;
                     //
-                    z-index: 101;
+                    z-index: 50;
                     font-size: 2em;
                     transition: transform $show_time $easing;
                 }
@@ -292,8 +292,18 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
 
             }
 
+            .dont_exists
+            {
+                display: none;
+            }
+
             &.active
             {
+                .dont_exists
+                {
+                    display: block;
+                }
+
                 .title
                 {
                     i
@@ -458,28 +468,11 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
         }
     }
 }
-@media screen and (max-width: 600px)
+@media screen and (max-width: 768px)
 {
     .account
     {
-        .info
-        {
-            .greetings
-            {
-                // & > h1
-                // {
-                //     font-size: 1.5em;
-                // }
-            }
-            .inputs
-            {
-                .input
-                {
-                    font-size: 1em;
-                }
-            }
-        }
-        //
+        
         .orders,
         .history_orders
         {
@@ -488,22 +481,61 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
             .relaxes,
             .cruises
             {
-                .tour,
-                .relax,
-                .cruise
+                .title
                 {
-
-                    // h1
-                    // {
-                    //     font-size: 1em;
-                    // }
-
-                    // p
-                    // {
-                    //     font-size: .8em;
-                    // }
-
+                    font-size: .75em;
                 }
+            }
+        }
+    }
+}
+@media screen and (max-width: 600px)
+{
+    .account
+    {
+        .greetings
+        {
+            & > h1
+            {
+                font-size: 2em;
+            }
+        }
+        
+        .info
+        {
+            .inputs
+            {
+                .input
+                {
+                    font-size: 1em;
+                }
+            }
+        }
+        
+        .orders,
+        .history_orders
+        {
+
+            .tours,
+            .relaxes,
+            .cruises
+            {
+                // .tour,
+                // .relax,
+                // .cruise
+                // {
+
+                //     // h1
+                //     // {
+                //     //     font-size: 1em;
+                //     // }
+
+                //     // p
+                //     // {
+                //     //     font-size: .8em;
+                //     // }
+
+                // }
 
                 .tour
                 {
@@ -541,10 +573,13 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
     .account
     {
 
-        // .info, .greetings
-        // {
-        //     font-size: 1em;
-        // }
+        .greetings
+        {
+            & > h1
+            {
+                font-size: 1.8em;
+            }
+        }
 
         .orders,
         .history_orders
@@ -575,10 +610,6 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
                 }
 
                 // padding: 5px 10px;
-                .title
-                {
-                    font-size: 1.5em;
-                }
 
                 h1
                 {
