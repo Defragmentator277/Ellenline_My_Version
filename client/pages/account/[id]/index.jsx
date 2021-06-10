@@ -692,7 +692,7 @@ const Account = (props) => {
                         onChainge={(e, value) => OnChainge(e, value, 'image')}/>
                         {/*  */}
                         <SelectOption title='Пол'
-                        values={[ 'Мужской', 'Женский' ]}
+                        values={user.gender == 'Мужской' ? [ 'Мужской', 'Женский' ] : [ 'Женский', 'Мужской' ]}
                         className={classes.input + ' ' + classes.gender}
                         onChainge={(e, value) => OnChainge(e, value, 'gender')}/>
                         {/*  */}
