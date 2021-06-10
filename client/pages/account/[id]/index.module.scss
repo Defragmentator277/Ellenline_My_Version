@@ -537,6 +537,23 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
 
                 // }
 
+                .tour, 
+                .relax,
+                .cruise
+                {
+                        
+                    .buttons
+                    {   
+                        row-gap: 10px;
+                        .button
+                        {
+                            grid-column: 1;
+                            grid-row: unset;
+                        }
+                    }
+
+                }
+
                 .tour
                 {
                     row-gap: 15px;
@@ -619,20 +636,6 @@ $easing: cubic-bezier(0.33, 1, 0.68, 1);
                 p
                 {
                     font-size: .7em;
-                }
-
-                .tour
-                {
-                    
-                    .buttons
-                    {   
-                        row-gap: 10px;
-                        .button
-                        {
-                            grid-column: 1;
-                            grid-row: unset;
-                        }
-                    }
                 }
             }
         }

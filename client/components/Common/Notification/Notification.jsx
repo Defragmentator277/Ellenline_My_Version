@@ -14,7 +14,7 @@ const Notification = (props) => {
     const children = props.children;
     const preset = props.preset;
     //
-    const [active, setActive] = useState(true);
+    const [active, setActive] = useState(false);
     const [window, setWindow] = useState();
 
     function GenerateContent() {

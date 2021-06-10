@@ -83,15 +83,6 @@
         width: 100%;
         padding: 0 25px;
         grid-template-rows: repeat(2, min-content(1fr));
-        
-        // .fio, .e_mail, .telephone
-        // {
-        //     justify-self: center;
-        //     height: min-content;
-        //     padding: 5px;
-        //     max-width: 100%;
-        //     min-width: 50%;
-        // }
 
         .button
         {
@@ -149,9 +140,10 @@
         .info_going
         {
             grid-template-columns: 1fr;
+            column-gap: 0;
             // grid-template-rows: repeat(4, auto);
 
-            .time
+            .time, .date
             {
                 grid-column: 1;
             }

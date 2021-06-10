@@ -1,8 +1,8 @@
 import { DBRef, ObjectID } from 'bson';
 
 export default class Global {
-    static url = 'http://185.251.91.231:4000';
-    // static url = 'http://192.168.1.34:4000';
+    // static url = 'http://185.251.91.231:4000';
+    static url = 'http://192.168.1.34:4000';
 
     static resorts = {
         'relax': [ 'pensionats', 'sanatoriums' ],
