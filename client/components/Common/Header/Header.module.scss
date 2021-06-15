@@ -31,6 +31,7 @@
             grid-column: 1;
             img
             {
+                cursor: pointer;
                 @extend %grid_center;
                 grid-column: 1;
             }

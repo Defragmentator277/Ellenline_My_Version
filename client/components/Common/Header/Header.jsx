@@ -20,7 +20,7 @@ const Header = (props) => {
                 <div className={classes.container}>
                     <div className={classes.head}>
                         <div className={classes.logo}>
-                            <img src='https://ellinline.ru/assets/images/логотип(1).png'></img>
+                            <Link href={'/home'}><img src='https://ellinline.ru/assets/images/логотип(1).png'></img></Link>
                             <div className={classes.text}>
                                 <h1>Эллинлайн</h1>
                                 <p>Санкт-Петербург, ул. Зайцева д. 3<br/>Туроператор с 1993</p>
