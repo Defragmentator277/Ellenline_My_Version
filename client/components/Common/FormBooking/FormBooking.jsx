@@ -31,7 +31,7 @@ const FormBooking = (props) => {
     //#region Functions 
     function PrepareTimetable() {
         timetable.forEach((element) => {
-            element.date = new Date(element.date).toLocaleDateString();
+            element.date = new Date(element.date).toDateString();
         });
     }
     if(timetable)

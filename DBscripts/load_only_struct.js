@@ -563,6 +563,11 @@ db.structure.insertOne(
                 prop: 
                 [
                     {
+                        type: 'number',
+                        prop: 'id',
+                        translate: 'Айди элемента'
+                    },
+                    {
                         type: 'date',
                         prop: 'date',
                         translate: 'Дата'
