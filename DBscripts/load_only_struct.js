@@ -1,3 +1,19 @@
+//Функция для создания поля
+function GetField(type_of, prop, title, ref, items) {
+    //field: { type: ..., prop: ..., title: ..., ref: ..., items: ..., min: ... }
+    const field = 
+    { 
+        type: type_of, 
+        prop: prop
+    };
+    if(title)
+        field.title = title;
+    if(ref)
+        field.ref = ref;
+    if(items)
+        field.items = items;
+    return field;
+}
 
 //Создание струткутры БД
 db.structure.insertOne(
