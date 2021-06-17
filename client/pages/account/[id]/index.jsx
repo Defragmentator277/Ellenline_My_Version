@@ -474,7 +474,7 @@ const Account = (props) => {
                                     </div>;
                                 //Событие, происходящие по клику на "Перейти страницу"
                                 function OnClickCruise(e) {
-                                    router.push(`/resorts/cruise/${cruise.type == 'Речной' ? 'river' : 'marine' }/${cruise._id}`);
+                                    router.push(`/resorts/cruises/${cruise.type == 'Речной' ? 'river' : 'marine' }/${cruise._id}`);
                                 }
                                 //
                                 return <div className={classes.cruise}>
