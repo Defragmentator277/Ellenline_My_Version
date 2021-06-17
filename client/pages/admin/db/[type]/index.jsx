@@ -60,7 +60,7 @@ const Type = (props) => {
                             prop: 
                             {
                                 title: 'Добавить',
-                                fields: element.prop.map((element) => ConvertToFieldsAddButton(element))
+                                fields: element.prop.map((element) => { if(element.prop != 'id') ConvertToFieldsAddButton(element) })
                             },
                             title: element.title,
                             translate: element.translate,
