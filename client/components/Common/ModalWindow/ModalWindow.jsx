@@ -61,6 +61,8 @@ const ModalWindow = (props) => {
                             //item.props.window = { title: ..., fields: ..., onChainge: (e, value) => { ... } }
                             const str = item.props.window.toGetInnerIds;
                             //
+                            // item.props.window.fields = item.props
+                            //
                             item.props.window.fields = item.props.window.fields.map((element) => Global.ConvertToFieldsAddButtonMassive(element, str));
                             //
                             setWindow(item.props.window);

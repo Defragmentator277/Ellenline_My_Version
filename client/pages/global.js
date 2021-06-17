@@ -185,7 +185,6 @@ export default class Global {
     }
       
     static setCookie(name, value, options = {}) {
-        console.log('setCookie');
         //
         if(typeof value === 'object')
             value = JSON.stringify(value);
