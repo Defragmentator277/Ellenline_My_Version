@@ -180,7 +180,7 @@ const ModalWindow = (props) => {
                         const ids = GetValueOfPropertie(field.ref.split('.'))?.map((element) => element.id) || [];
                         //
                         return <SelectOption
-                        title={field.prop}
+                        title={field.translate || field.prop}
                         placeholder='Выберите айди'
                         classSelect={classes.input + ' ' + classes.select}
                         onChainge={(e, value) => SetValueOfPropertie(value)}
