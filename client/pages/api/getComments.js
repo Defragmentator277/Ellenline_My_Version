@@ -41,13 +41,15 @@ handler.get(async (req, res) => {
             ])).toArray((err, result) => 
             {
                 console.log(result);
-                comments = comments.concat(result).filter((element) => Object.keys(element).length != 0);
+                comments = comments.concat(result)
+                                   .sort((element_one, element_two) => { return new Date(element_one.date) - new Date(element_two.date) })
+                                   .filter((element) => Object.keys(element).length != 0);
                 // if(result)
                 //     Global.CorrectArray(result);
                 if(err)
                     res.json(err);
                 else
-                    res.json(comments.slice(0, 2));
+                    res.json(comments.slice(0, 3));
             })
         });
     });
