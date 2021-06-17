@@ -524,7 +524,7 @@ const Type = (props) => {
                                 window={
                                 {
                                     title: 'Добавить',
-                                    fields: elem_struct.prop.filter((elem) => elem.prop != 'id'),
+                                    fields: elem_struct.prop,
                                     onChainge: OnClickAddButton,
                                     toGetInnerIds: `${type}/sub_func/getInnerIds?id=${new_id}`
                                 }}>
