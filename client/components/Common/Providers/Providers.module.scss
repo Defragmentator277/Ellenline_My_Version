@@ -29,7 +29,6 @@
         grid-auto-rows: auto;
         grid-template-columns: repeat(3, 1fr);
         row-gap: 25px;
-
         i, p, span
         {
             font-size: 1.5em;
@@ -103,7 +102,10 @@
                     grid-column-start: 1;
                     grid-column-end: 3;
                 }
-
+                p
+                {
+                    font-size: 2em;
+                }
                 .service
                 {
                     grid-template-columns: 1fr 2.5fr;
