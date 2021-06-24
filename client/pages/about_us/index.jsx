@@ -14,6 +14,7 @@ const AboutUs = (props) => {
     return (
         <ClientLayout title='О нас'>
             <div className={classes.about_us}>
+                <iframe src="https://sozvezdie-tour.ru/cat/tury/rossiya?export=True&layout=detailed&sortby=nearest" scrollbars="yes" frameborder="0" scrolling="auto" allowtransparency="true" width="100%" height="1200"></iframe>
                 <div className={classes.greetings}>
                     <div className={classes.title}>
                         Добро пожаловать на сайт Эллинлайн!

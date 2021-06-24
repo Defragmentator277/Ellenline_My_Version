@@ -27,6 +27,7 @@ class MyDocument extends Document {
           {/*  */}
           <link rel="stylesheet" href="https://cdn.nemo.travel/search-form/v2.5.22/flights.search.widget.min.css" />
           <script src="https://cdn.nemo.travel/search-form/v2.5.22/flights.search.widget.min.js"></script>
+          <script src="https://riverlines.ru/src/riverlines.js"></script>
         </Head>
         <body>
           <Main />
